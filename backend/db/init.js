@@ -50,8 +50,8 @@ function initDatabase() {
             }
 
             if (row.count === 0) {
-              const defaultUser = "admin";
-              const defaultPassword = "admin123";
+              const defaultUser = "Admin";
+              const defaultPassword = "Admin123!";
               const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
               db.run(
