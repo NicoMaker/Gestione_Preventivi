@@ -92,92 +92,57 @@ router.post("/", (req, res) => {
 
   const dataMovimento = data_movimento || new Date().toISOString();
 
-  const insertOrdine = (finalMarcaId) => {
-    db.run(
-      `INSERT INTO ordini (cliente_id, data_movimento, modello_id, marca_id, note) 
-       VALUES (?, ?, ?, ?, ?)`,
-      [cliente_id, dataMovimento, modello_id || null, finalMarcaId, note || null],
-      function (err) {
-        if (err) {
-          console.error("Errore creazione ordine:", err);
-          return res.status(500).json({ error: err.message });
-        }
-
-        const ordineId = this.lastID;
-
-        // Recupera i dati completi dell'ordine appena creato
-        db.get(
-          `SELECT 
-            o.id,
-            o.cliente_id,
-            c.nome as cliente_nome,
-            c.num_tel as cliente_tel,
-            c.email as cliente_email,
-            o.data_movimento,
-            o.modello_id,
-            m.nome as modello_nome,
-            o.marca_id,
-            ma.nome as marca_nome,
-            o.note,
-            o.created_at
-          FROM ordini o
-          JOIN clienti c ON o.cliente_id = c.id
-          LEFT JOIN modelli m ON o.modello_id = m.id
-          LEFT JOIN marche ma ON o.marca_id = ma.id
-          WHERE o.id = ?`,
-          [ordineId],
-          (err2, ordine) => {
-            if (err2) {
-              return res.status(500).json({ error: err2.message });
-            }
-
-            const io = req.app.get("io");
-            if (io) {
-              io.emit("ordine_aggiunto");
-              io.emit("ordini_aggiornati");
-            }
-
-            console.log(`Ordine creato: ID ${ordineId} per cliente ${cliente_id}`);
-
-            res.json(ordine);
-          }
-        );
+  db.run(
+    `INSERT INTO ordini (cliente_id, data_movimento, modello_id, marca_id, note) 
+     VALUES (?, ?, ?, ?, ?)`,
+    [cliente_id, dataMovimento, modello_id || null, marca_id || null, note || null],
+    function (err) {
+      if (err) {
+        console.error("Errore creazione ordine:", err);
+        return res.status(500).json({ error: err.message });
       }
-    );
-  };
 
-  // Se è stato selezionato un modello, verifichiamo che appartenga alla marca indicata.
-  if (modello_id) {
-    db.get(
-      "SELECT id, marche_id, nome FROM modelli WHERE id = ?",
-      [modello_id],
-      (err, modello) => {
-        if (err) {
-          console.error("Errore verifica modello:", err);
-          return res.status(500).json({ error: err.message });
-        }
-        if (!modello) {
-          return res.status(400).json({ error: "Modello selezionato non valido" });
-        }
+      const ordineId = this.lastID;
 
-        // Se l'utente ha scelto anche una marca, devono coincidere
-        if (marca_id && modello.marche_id) {
-          if (String(modello.marche_id) !== String(marca_id)) {
-            return res.status(400).json({
-              error: "Il modello selezionato non appartiene alla marca indicata",
-            });
+      // Recupera i dati completi dell'ordine appena creato
+      db.get(
+        `SELECT 
+          o.id,
+          o.cliente_id,
+          c.nome as cliente_nome,
+          c.num_tel as cliente_tel,
+          c.email as cliente_email,
+          o.data_movimento,
+          o.modello_id,
+          m.nome as modello_nome,
+          o.marca_id,
+          ma.nome as marca_nome,
+          o.note,
+          o.created_at
+        FROM ordini o
+        JOIN clienti c ON o.cliente_id = c.id
+        LEFT JOIN modelli m ON o.modello_id = m.id
+        LEFT JOIN marche ma ON o.marca_id = ma.id
+        WHERE o.id = ?`,
+        [ordineId],
+        (err2, ordine) => {
+          if (err2) {
+            return res.status(500).json({ error: err2.message });
           }
-        }
 
-        // Se marca non specificata, usiamo quella del modello
-        const finalMarcaId = marca_id || modello.marche_id || null;
-        insertOrdine(finalMarcaId);
-      }
-    );
-  } else {
-    // Nessun modello, possiamo inserire direttamente (marca opzionale)
-    insertOrdine(marca_id || null);
-  }
+          const io = req.app.get("io");
+          if (io) {
+            io.emit("ordine_aggiunto");
+            io.emit("ordini_aggiornati");
+          }
+
+          console.log(`Ordine creato: ID ${ordineId} per cliente ${cliente_id}`);
+
+          res.json(ordine);
+        }
+      );
+    }
+  );
 });
 
 // PUT - Aggiorna ordine
@@ -191,63 +156,31 @@ router.put("/:id", (req, res) => {
     });
   }
 
-  const updateOrdine = (finalMarcaId) => {
-    db.run(
-      `UPDATE ordini 
-       SET cliente_id = ?, data_movimento = ?, modello_id = ?, marca_id = ?, note = ? 
-       WHERE id = ?`,
-      [cliente_id, data_movimento, modello_id || null, finalMarcaId, note || null, id],
-      function (err) {
-        if (err) {
-          console.error("Errore aggiornamento ordine:", err);
-          return res.status(500).json({ error: err.message });
-        }
-
-        if (this.changes === 0) {
-          return res.status(404).json({ error: "Ordine non trovato" });
-        }
-
-        const io = req.app.get("io");
-        if (io) {
-          io.emit("ordine_modificato", { id });
-          io.emit("ordini_aggiornati");
-        }
-
-        console.log(`Ordine aggiornato: ID ${id}`);
-        res.json({ success: true });
+  db.run(
+    `UPDATE ordini 
+     SET cliente_id = ?, data_movimento = ?, modello_id = ?, marca_id = ?, note = ? 
+     WHERE id = ?`,
+    [cliente_id, data_movimento, modello_id || null, marca_id || null, note || null, id],
+    function (err) {
+      if (err) {
+        console.error("Errore aggiornamento ordine:", err);
+        return res.status(500).json({ error: err.message });
       }
-    );
-  };
 
-  // Se è stato selezionato un modello, verifichiamo che appartenga alla marca indicata.
-  if (modello_id) {
-    db.get(
-      "SELECT id, marche_id, nome FROM modelli WHERE id = ?",
-      [modello_id],
-      (err, modello) => {
-        if (err) {
-          console.error("Errore verifica modello:", err);
-          return res.status(500).json({ error: err.message });
-        }
-        if (!modello) {
-          return res.status(400).json({ error: "Modello selezionato non valido" });
-        }
-
-        if (marca_id && modello.marche_id) {
-          if (String(modello.marche_id) !== String(marca_id)) {
-            return res.status(400).json({
-              error: "Il modello selezionato non appartiene alla marca indicata",
-            });
-          }
-        }
-
-        const finalMarcaId = marca_id || modello.marche_id || null;
-        updateOrdine(finalMarcaId);
+      if (this.changes === 0) {
+        return res.status(404).json({ error: "Ordine non trovato" });
       }
-    );
-  } else {
-    updateOrdine(marca_id || null);
-  }
+
+      const io = req.app.get("io");
+      if (io) {
+        io.emit("ordine_modificato", { id });
+        io.emit("ordini_aggiornati");
+      }
+
+      console.log(`Ordine aggiornato: ID ${id}`);
+      res.json({ success: true });
+    }
+  );
 });
 
 // DELETE - Elimina ordine
