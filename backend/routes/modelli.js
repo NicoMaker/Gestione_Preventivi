@@ -2,12 +2,17 @@ const express = require('express');
 const { db } = require('../db/init');
 const router = express.Router();
 
-// Get all modelli with marca info
+// Get all modelli with marca info and conteggio ordini
 router.get('/', (req, res) => {
   const query = `
-    SELECT m.*, ma.nome as marca_nome
+    SELECT 
+      m.*,
+      ma.nome as marca_nome,
+      COUNT(DISTINCT o.id) AS ordini_count
     FROM modelli m
     LEFT JOIN marche ma ON m.marche_id = ma.id
+    LEFT JOIN ordini o ON o.modello_id = m.id
+    GROUP BY m.id, m.nome, m.marche_id, m.created_at, ma.nome
     ORDER BY m.nome
   `;
   
@@ -22,10 +27,15 @@ router.get('/', (req, res) => {
 // Get single modello
 router.get('/:id', (req, res) => {
   const query = `
-    SELECT m.*, ma.nome as marca_nome
+    SELECT 
+      m.*,
+      ma.nome as marca_nome,
+      COUNT(DISTINCT o.id) AS ordini_count
     FROM modelli m
     LEFT JOIN marche ma ON m.marche_id = ma.id
+    LEFT JOIN ordini o ON o.modello_id = m.id
     WHERE m.id = ?
+    GROUP BY m.id, m.nome, m.marche_id, m.created_at, ma.nome
   `;
   
   db.get(query, [req.params.id], (err, row) => {

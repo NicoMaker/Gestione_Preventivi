@@ -220,7 +220,7 @@ document.getElementById("filterClienti")?.addEventListener("input", (e) => {
 
 async function viewClienteOrdini(clienteId, clienteNome) {
   try {
-    const res = await fetch(`${API_URL}/clienti/${clienteId}/ordini`);
+    const res = await fetch(`${API_URL}/ordini/cliente/${clienteId}`);
     const ordini = await res.json();
 
     const ordiniHtml =
@@ -749,7 +749,7 @@ function renderModelli() {
 
   if (modelli.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="3" class="text-center">Nessun modello presente</td></tr>';
+      '<tr><td colspan="4" class="text-center">Nessun modello presente</td></tr>';
     return;
   }
 
@@ -759,6 +759,13 @@ function renderModelli() {
     <tr>
       <td><strong>${m.nome}</strong></td>
       <td>${m.marca_nome || "-"}</td>
+      <td class="text-center-badge">
+        <span class="prodotti-badge ${
+          m.ordini_count > 0 ? "has-products" : "empty"
+        }">
+          ${m.ordini_count || 0}
+        </span>
+      </td>
       <td class="text-right">
         <button class="btn-icon" onclick="editModello(${m.id})">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
