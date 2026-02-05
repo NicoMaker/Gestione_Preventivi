@@ -4,4 +4,4 @@ cambiare testi
 - e note preventivo
 - ricerca in nuvo preventivo per cliente e modello 
 
-nella parte clineti aggiungere data passaggio e flag ricontatto cliente (social) con ckeckbox cliccato se si altrimenti no (bool in db -> true or false -> 0 0 1)
+nella parte clienti aggiungere data passaggio e flag ricontatto cliente (social) con ckeckbox cliccato se si altrimenti no (bool in db -> true or false -> 0 0 1)
