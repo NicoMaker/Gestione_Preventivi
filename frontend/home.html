@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestione Clienti e Ordini</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="app-container">
+      <button
+        class="mobile-menu-toggle"
+        id="mobileMenuToggle"
+        aria-label="Toggle menu"
+      >
+        <div class="hamburger">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+      </button>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <h2>Gestione Sistema</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" data-section="clienti">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+            </svg>
+            <span>Clienti</span>
+          </a>
+          <a href="#" class="nav-item" data-section="ordini">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <path d="M9 12h6m-6 4h6" />
+            </svg>
+            <span>Ordini</span>
+          </a>
+          <a href="#" class="nav-item" data-section="marche">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 7h-9M14 17H5M3 7h2M21 17h-4M15 12h6M9 12H3M15 6v12M9 6v12" />
+            </svg>
+            <span>Marche</span>
+          </a>
+          <a href="#" class="nav-item" data-section="modelli">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+            <span>Modelli</span>
+          </a>
+          <a href="#" class="nav-item" data-section="utenti">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+            </svg>
+            <span>Utenti</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <div class="user-details">
+              <span class="user-name" id="currentUser">Admin</span>
+              <span class="user-role">Amministratore</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+            </svg>
+            <span>Esci</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Sistema Notifiche -->
+      <div id="notificationContainer" class="notification-container"></div>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Sezione CLIENTI -->
+        <section id="section-clienti" class="content-section active">
+          <div class="section-header">
+            <div>
+              <h1>Gestione Clienti</h1>
+              <p>Visualizza e gestisci i clienti</p>
+            </div>
+            <div class="filter-controls">
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="filterClienti"
+                  class="filter-input"
+                  placeholder="Cerca cliente..."
+                />
+              </div>
+              <button class="btn btn-primary" onclick="openClienteModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Nuovo Cliente</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Telefono</th>
+                    <th>Email</th>
+                    <th style="text-align: center">Ordini</th>
+                    <th class="text-right">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="clientiTableBody">
+                  <tr>
+                    <td colspan="5" class="text-center">
+                      <span>Caricamento...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sezione ORDINI -->
+        <section id="section-ordini" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Gestione Ordini</h1>
+              <p>Visualizza e gestisci gli ordini</p>
+            </div>
+            <div class="filter-controls">
+              <input
+                type="text"
+                id="filterOrdini"
+                class="filter-input"
+                placeholder="Cerca per cliente, marca, modello..."
+              />
+              <button class="btn btn-primary" onclick="openOrdineModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Nuovo Ordine</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Marca</th>
+                    <th>Modello</th>
+                    <th>Note</th>
+                    <th class="text-right">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="ordiniTableBody">
+                  <tr>
+                    <td colspan="6" class="text-center">
+                      <span>Caricamento...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sezione MARCHE -->
+        <section id="section-marche" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Gestione Marche</h1>
+              <p>Crea e gestisci le marche</p>
+            </div>
+            <div class="filter-controls">
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="filterMarche"
+                  class="filter-input"
+                  placeholder="Cerca marca..."
+                />
+              </div>
+              <button class="btn btn-primary" onclick="openMarcaModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Nuova Marca</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome Marca</th>
+                    <th class="text-right">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="marcheTableBody">
+                  <tr>
+                    <td colspan="2" class="text-center">
+                      <span>Caricamento...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sezione MODELLI -->
+        <section id="section-modelli" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Gestione Modelli</h1>
+              <p>Crea e gestisci i modelli</p>
+            </div>
+            <div class="filter-controls">
+              <input
+                type="text"
+                id="filterModelli"
+                class="filter-input"
+                placeholder="Cerca modello..."
+              />
+              <button class="btn btn-primary" onclick="openModelloModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Nuovo Modello</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome Modello</th>
+                    <th>Marca</th>
+                    <th class="text-right">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="modelliTableBody">
+                  <tr>
+                    <td colspan="3" class="text-center">
+                      <span>Caricamento...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sezione UTENTI -->
+        <section id="section-utenti" class="content-section">
+          <div class="section-header">
+            <div>
+              <h1>Gestione Utenti</h1>
+              <p>Amministra gli utenti del sistema</p>
+            </div>
+            <button class="btn btn-primary" onclick="openUtenteModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>Nuovo Utente</span>
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th class="text-right">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="utentiTableBody">
+                  <tr>
+                    <td colspan="2" class="text-center">
+                      <span>Caricamento...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Modal Cliente -->
+    <div class="modal" id="modalCliente">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalClienteTitle">Nuovo Cliente</h3>
+          <button class="btn-close" onclick="closeClienteModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <form id="formCliente">
+          <input type="hidden" id="clienteId" />
+          <div class="form-group">
+            <label for="clienteNome">Nome Cliente *</label>
+            <input type="text" id="clienteNome" required />
+          </div>
+          <div class="form-group">
+            <label for="clienteTel">Telefono</label>
+            <input type="tel" id="clienteTel" />
+          </div>
+          <div class="form-group">
+            <label for="clienteEmail">Email</label>
+            <input type="email" id="clienteEmail" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeClienteModal()">
+              Annulla
+            </button>
+            <button type="submit" class="btn btn-primary">Salva</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Ordine -->
+    <div class="modal" id="modalOrdine">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalOrdineTitle">Nuovo Ordine</h3>
+          <button class="btn-close" onclick="closeOrdineModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <form id="formOrdine">
+          <input type="hidden" id="ordineId" />
+          <div class="form-group">
+            <label for="ordineCliente">Cliente *</label>
+            <select id="ordineCliente" required>
+              <option value="">Seleziona cliente</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ordineData">Data Movimento</label>
+            <input type="datetime-local" id="ordineData" />
+          </div>
+          <div class="form-group">
+            <label for="ordineMarca">Marca</label>
+            <select id="ordineMarca">
+              <option value="">Seleziona marca</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ordineModello">Modello</label>
+            <select id="ordineModello">
+              <option value="">Seleziona modello</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ordineNote">Note</label>
+            <textarea id="ordineNote" rows="3"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeOrdineModal()">
+              Annulla
+            </button>
+            <button type="submit" class="btn btn-primary">Salva</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Marca -->
+    <div class="modal" id="modalMarca">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalMarcaTitle">Nuova Marca</h3>
+          <button class="btn-close" onclick="closeMarcaModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <form id="formMarca">
+          <input type="hidden" id="marcaId" />
+          <div class="form-group">
+            <label for="marcaNome">Nome Marca *</label>
+            <input type="text" id="marcaNome" required />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeMarcaModal()">
+              Annulla
+            </button>
+            <button type="submit" class="btn btn-primary">Salva</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Modello -->
+    <div class="modal" id="modalModello">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalModelloTitle">Nuovo Modello</h3>
+          <button class="btn-close" onclick="closeModelloModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <form id="formModello">
+          <input type="hidden" id="modelloId" />
+          <div class="form-group">
+            <label for="modelloNome">Nome Modello *</label>
+            <input type="text" id="modelloNome" required />
+          </div>
+          <div class="form-group">
+            <label for="modelloMarca">Marca</label>
+            <select id="modelloMarca">
+              <option value="">Seleziona marca</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModelloModal()">
+              Annulla
+            </button>
+            <button type="submit" class="btn btn-primary">Salva</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Utente -->
+    <div class="modal" id="modalUtente">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalUtenteTitle">Nuovo Utente</h3>
+          <button class="btn-close" onclick="closeUtenteModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <form id="formUtente">
+          <input type="hidden" id="utenteId" />
+          <div class="form-group">
+            <label for="utenteNome">Nome *</label>
+            <input type="text" id="utenteNome" required />
+          </div>
+          <div class="form-group">
+            <label for="utentePassword">Password *</label>
+            <input type="password" id="utentePassword" />
+            <small>Lascia vuoto per mantenere la password esistente</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeUtenteModal()">
+              Annulla
+            </button>
+            <button type="submit" class="btn btn-primary">Salva</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="realtime.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
