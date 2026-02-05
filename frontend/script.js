@@ -181,14 +181,6 @@ function renderClienti() {
         <span class="badge-count">${c.ordini_count || 0}</span>
       </td>
       <td class="text-right">
-        <button class="btn-icon" onclick="viewClienteOrdini(${
-          c.id
-        }, '${c.nome.replace(/'/g, "\\'")}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-        </button>
         <button class="btn-icon" onclick="editCliente(${c.id})">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
