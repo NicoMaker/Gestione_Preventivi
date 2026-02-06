@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestione Preventivi</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" href="img/Logo.png" />
   </head>
 
   <body>
@@ -505,15 +506,30 @@
             <input type="hidden" id="clienteId" />
             <div class="form-group">
               <label for="clienteNome">Nome Cliente *</label>
-              <input type="text" id="clienteNome" required  placeholder="Nome Cliente"/>
+              <input
+                type="text"
+                id="clienteNome"
+                required
+                placeholder="Nome Cliente"
+              />
             </div>
             <div class="form-group">
               <label for="clienteTel">Telefono *</label>
-              <input type="tel" id="clienteTel" required  placeholder="Telefono Cliente"/>
+              <input
+                type="tel"
+                id="clienteTel"
+                required
+                placeholder="Telefono Cliente"
+              />
             </div>
             <div class="form-group">
               <label for="clienteEmail">Email *</label>
-              <input type="email" id="clienteEmail" required  placeholder="Email Cliente"/>
+              <input
+                type="email"
+                id="clienteEmail"
+                required
+                placeholder="Email Cliente"
+              />
             </div>
             <div class="form-group">
               <label for="clienteDataPassaggio">Data Passaggio</label>
@@ -660,7 +676,12 @@
             <input type="hidden" id="marcaId" />
             <div class="form-group">
               <label for="marcaNome">Nome Marca *</label>
-              <input type="text" id="marcaNome" required  placeholder="Nome Marca"/>
+              <input
+                type="text"
+                id="marcaNome"
+                required
+                placeholder="Nome Marca"
+              />
             </div>
           </div>
           <div class="modal-footer">
@@ -697,16 +718,24 @@
         <form id="formModello">
           <div class="modal-body">
             <input type="hidden" id="modelloId" />
-            
+
             <div class="form-group">
               <label for="modelloNome">Nome Modello *</label>
-              <input type="text" id="modelloNome" required placeholder="Nome Modello" />
+              <input
+                type="text"
+                id="modelloNome"
+                required
+                placeholder="Nome Modello"
+              />
             </div>
 
             <!-- SELECT SEARCHABLE PER MARCA NEL MODELLO -->
             <div class="form-group">
               <label for="modelloMarcaSearch">Marca *</label>
-              <div class="select-search-container" id="modelloMarcaSearch_container">
+              <div
+                class="select-search-container"
+                id="modelloMarcaSearch_container"
+              >
                 <!-- Popolato da JavaScript -->
               </div>
             </div>
