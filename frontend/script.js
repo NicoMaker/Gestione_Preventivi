@@ -432,59 +432,35 @@ document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
 });
 
 async function openOrdineModal(ordine = null) {
+  await loadClientiForSelect();
+  await loadMarcheForSelect();
+  await loadModelliForSelect();
+
   const modal = document.getElementById("modalOrdine");
   const title = document.getElementById("modalOrdineTitle");
   const form = document.getElementById("formOrdine");
-
-  await Promise.all([
-    loadClientiForSelect(),
-    loadMarcheForSelect(),
-    loadModelliForSelect(),
-  ]);
 
   form.reset();
 
   if (ordine) {
     title.textContent = "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
-
-    // Imposta cliente
     document.getElementById("ordineCliente").value = ordine.cliente_id;
-    const cliente = allClienti.find((c) => c.id === ordine.cliente_id);
-    if (cliente) {
-      document.getElementById("ordineClienteSearch").value = cliente.nome;
-    }
-
     document.getElementById("ordineData").value = formatDateForInput(
       ordine.data_movimento,
     );
     document.getElementById("ordineMarca").value = ordine.marca_id || "";
-
-    // Imposta modello
     document.getElementById("ordineModello").value = ordine.modello_id || "";
-    const modello = allModelli.find((m) => m.id === ordine.modello_id);
-    if (modello) {
-      document.getElementById("ordineModelloSearch").value = modello.nome;
-    }
-
     document.getElementById("ordineNote").value = ordine.note || "";
   } else {
     title.textContent = "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
-    document.getElementById("ordineData").value = formatDateForInput(
-      new Date().toISOString(),
-    );
-    document.getElementById("ordineClienteSearch").value = "";
-    document.getElementById("ordineModelloSearch").value = "";
+    
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("ordineData").value = today;
   }
 
   modal.classList.add("active");
-
-  // Setup autocomplete Cliente
-  setupClienteAutocomplete();
-
-  // Setup autocomplete Modello
-  setupModelloAutocomplete();
 }
 
 function closeOrdineModal() {
@@ -498,255 +474,6 @@ async function loadClientiForSelect() {
   } catch (error) {
     console.error("Errore caricamento clienti:", error);
   }
-}
-
-// 🔥 AUTOCOMPLETE CLIENTE
-function setupClienteAutocomplete() {
-  const searchInput = document.getElementById("ordineClienteSearch");
-  const hiddenInput = document.getElementById("ordineCliente");
-  const resultsDiv = document.getElementById("clienteSearchResults");
-
-  if (!searchInput || !resultsDiv) return;
-
-  // Rimuovi listener precedenti
-  const newSearchInput = searchInput.cloneNode(true);
-  searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-
-  newSearchInput.addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-
-    if (searchTerm === "") {
-      // Mostra tutti i clienti
-      displayClienteResults(
-        allClienti,
-        resultsDiv,
-        hiddenInput,
-        newSearchInput,
-      );
-    } else {
-      // Filtra clienti
-      const filtered = allClienti.filter(
-        (c) =>
-          c.nome.toLowerCase().includes(searchTerm) ||
-          (c.email && c.email.toLowerCase().includes(searchTerm)) ||
-          (c.num_tel && c.num_tel.includes(searchTerm)),
-      );
-      displayClienteResults(filtered, resultsDiv, hiddenInput, newSearchInput);
-    }
-  });
-
-  newSearchInput.addEventListener("focus", () => {
-    displayClienteResults(allClienti, resultsDiv, hiddenInput, newSearchInput);
-  });
-
-  // Chiudi risultati se clicco fuori
-  document.addEventListener("click", (e) => {
-    if (!newSearchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-      resultsDiv.classList.remove("show");
-    }
-  });
-}
-
-function displayClienteResults(clienti, resultsDiv, hiddenInput, searchInput) {
-  if (clienti.length === 0) {
-    resultsDiv.innerHTML = `
-      <div class="search-no-results">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-        </svg>
-        <strong>Nessun cliente trovato</strong>
-      </div>
-    `;
-    resultsDiv.classList.add("show");
-    return;
-  }
-
-  resultsDiv.innerHTML = clienti
-    .map(
-      (c) => `
-    <div class="search-result-item" data-id="${c.id}" data-nome="${c.nome}">
-      <div class="search-result-name">${highlightMatch(c.nome, searchInput.value)}</div>
-      <div class="search-result-meta">
-        ${c.num_tel ? `📞 ${c.num_tel}` : ""}
-        ${c.email ? `📧 ${c.email}` : ""}
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-
-  resultsDiv.classList.add("show");
-
-  // Click su risultato
-  resultsDiv.querySelectorAll(".search-result-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const id = item.dataset.id;
-      const nome = item.dataset.nome;
-      hiddenInput.value = id;
-      searchInput.value = nome;
-      searchInput.classList.add("has-selection");
-      resultsDiv.classList.remove("show");
-    });
-  });
-}
-
-// 🔥 AUTOCOMPLETE MODELLO
-function setupModelloAutocomplete() {
-  const searchInput = document.getElementById("ordineModelloSearch");
-  const hiddenInput = document.getElementById("ordineModello");
-  const resultsDiv = document.getElementById("modelloSearchResults");
-  const marcaSelect = document.getElementById("ordineMarca");
-
-  if (!searchInput || !resultsDiv) return;
-
-  // Rimuovi listener precedenti
-  const newSearchInput = searchInput.cloneNode(true);
-  searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-
-  newSearchInput.addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    const marcaId = marcaSelect.value;
-
-    let modelliToShow = allModelli;
-
-    // Filtra per marca se selezionata
-    if (marcaId) {
-      modelliToShow = modelliToShow.filter(
-        (m) => m.marche_id && String(m.marche_id) === String(marcaId),
-      );
-    }
-
-    // Filtra per testo
-    if (searchTerm !== "") {
-      modelliToShow = modelliToShow.filter(
-        (m) =>
-          m.nome.toLowerCase().includes(searchTerm) ||
-          (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm)),
-      );
-    }
-
-    displayModelloResults(
-      modelliToShow,
-      resultsDiv,
-      hiddenInput,
-      newSearchInput,
-      marcaSelect,
-    );
-  });
-
-  newSearchInput.addEventListener("focus", () => {
-    const marcaId = marcaSelect.value;
-    let modelliToShow = marcaId
-      ? allModelli.filter(
-          (m) => m.marche_id && String(m.marche_id) === String(marcaId),
-        )
-      : allModelli;
-    displayModelloResults(
-      modelliToShow,
-      resultsDiv,
-      hiddenInput,
-      newSearchInput,
-      marcaSelect,
-    );
-  });
-
-  // Quando cambia marca, aggiorna lista modelli
-  if (marcaSelect) {
-    marcaSelect.addEventListener("change", () => {
-      newSearchInput.value = "";
-      hiddenInput.value = "";
-      newSearchInput.classList.remove("has-selection");
-      const marcaId = marcaSelect.value;
-      const modelliToShow = marcaId
-        ? allModelli.filter(
-            (m) => m.marche_id && String(m.marche_id) === String(marcaId),
-          )
-        : allModelli;
-      displayModelloResults(
-        modelliToShow,
-        resultsDiv,
-        hiddenInput,
-        newSearchInput,
-        marcaSelect,
-      );
-    });
-  }
-
-  // Chiudi risultati se clicco fuori
-  document.addEventListener("click", (e) => {
-    if (!newSearchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-      resultsDiv.classList.remove("show");
-    }
-  });
-}
-
-function displayModelloResults(
-  modelli,
-  resultsDiv,
-  hiddenInput,
-  searchInput,
-  marcaSelect,
-) {
-  if (modelli.length === 0) {
-    resultsDiv.innerHTML = `
-      <div class="search-no-results">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-        </svg>
-        <strong>Nessun modello trovato</strong>
-      </div>
-    `;
-    resultsDiv.classList.add("show");
-    return;
-  }
-
-  resultsDiv.innerHTML = modelli
-    .map(
-      (m) => `
-    <div class="search-result-item" data-id="${m.id}" data-nome="${m.nome}" data-marca-id="${m.marche_id || ""}">
-      <div class="search-result-name">${highlightMatch(m.nome, searchInput.value)}</div>
-      <div class="search-result-meta">
-        ${m.marca_nome ? `<span class="search-result-marca">${m.marca_nome}</span>` : ""}
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-
-  resultsDiv.classList.add("show");
-
-  // Click su risultato
-  resultsDiv.querySelectorAll(".search-result-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const id = item.dataset.id;
-      const nome = item.dataset.nome;
-      const marcaId = item.dataset.marcaId;
-
-      hiddenInput.value = id;
-      searchInput.value = nome;
-      searchInput.classList.add("has-selection");
-
-      // Imposta anche la marca se presente
-      if (marcaId && marcaSelect) {
-        marcaSelect.value = marcaId;
-      }
-
-      resultsDiv.classList.remove("show");
-    });
-  });
-}
-
-// Funzione per evidenziare il testo cercato
-function highlightMatch(text, search) {
-  if (!search || search.trim() === "") return text;
-  const regex = new RegExp(`(${escapeRegex(search)})`, "gi");
-  return text.replace(regex, "<mark>$1</mark>");
-}
-
-function escapeRegex(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 async function loadMarcheForSelect() {
@@ -1631,326 +1358,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==================== RICERCA AUTOCOMPLETE NEI SELECT ====================
 // Aggiungi questo codice DOPO le funzioni esistenti in script.js
 
-/**
- * Trasforma un <select> in un campo di ricerca con autocomplete
- * @param {string} selectId - ID del select
- * @param {Array} data - Array di oggetti con id e nome
- * @param {string} placeholder - Testo placeholder
- */
-function makeSelectSearchable(selectId, data, placeholder = "Cerca...") {
-  const selectElement = document.getElementById(selectId);
-  if (!selectElement) return;
-
-  // Crea wrapper
-  const wrapper = document.createElement("div");
-  wrapper.className = "select-search-wrapper";
-  wrapper.style.position = "relative";
-
-  // Crea input di ricerca
-  const searchInput = document.createElement("input");
-  searchInput.type = "text";
-  searchInput.className = "select-search-input";
-  searchInput.placeholder = placeholder;
-  searchInput.style.cssText = `
-    width: 100%;
-    padding: 12px 40px 12px 18px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    font-size: 15px;
-    transition: all 0.25s ease;
-    background: white;
-  `;
-
-  // Icona lente di ricerca
-  const searchIcon = document.createElement("span");
-  searchIcon.innerHTML = "🔍";
-  searchIcon.style.cssText = `
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    font-size: 16px;
-  `;
-
-  // Dropdown risultati
-  const resultsDropdown = document.createElement("div");
-  resultsDropdown.className = "select-search-results";
-  resultsDropdown.style.cssText = `
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 300px;
-    overflow-y: auto;
-    background: white;
-    border: 2px solid #6366f1;
-    border-top: none;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    display: none;
-    z-index: 1000;
-    margin-top: -2px;
-  `;
-
-  // Hidden input per valore
-  const hiddenInput = document.createElement("input");
-  hiddenInput.type = "hidden";
-  hiddenInput.id = `${selectId}_value`;
-
-  // Nascondi select originale
-  selectElement.style.display = "none";
-
-  // Inserisci wrapper
-  selectElement.parentNode.insertBefore(wrapper, selectElement);
-  wrapper.appendChild(searchInput);
-  wrapper.appendChild(searchIcon);
-  wrapper.appendChild(resultsDropdown);
-  wrapper.appendChild(hiddenInput);
-  wrapper.appendChild(selectElement);
-
-  // Dati completi
-  let allData = data;
-  let selectedValue = null;
-
-  // Funzione per popolare dropdown
-  function populateResults(filteredData) {
-    resultsDropdown.innerHTML = "";
-
-    if (filteredData.length === 0) {
-      resultsDropdown.innerHTML = `
-        <div style="padding:20px;text-align:center;color:#64748b;">
-          Nessun risultato trovato
-        </div>
-      `;
-      resultsDropdown.style.display = "block";
-      return;
-    }
-
-    filteredData.forEach((item) => {
-      const resultItem = document.createElement("div");
-      resultItem.className = "select-search-result-item";
-      resultItem.textContent = item.nome;
-      resultItem.dataset.value = item.id;
-      resultItem.style.cssText = `
-        padding: 12px 18px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f1f5f9;
-      `;
-
-      resultItem.addEventListener("mouseenter", () => {
-        resultItem.style.background = "#f8fafc";
-        resultItem.style.paddingLeft = "22px";
-      });
-
-      resultItem.addEventListener("mouseleave", () => {
-        resultItem.style.background = "white";
-        resultItem.style.paddingLeft = "18px";
-      });
-
-      resultItem.addEventListener("click", () => {
-        selectValue(item.id, item.nome);
-      });
-
-      resultsDropdown.appendChild(resultItem);
-    });
-
-    resultsDropdown.style.display = "block";
-  }
-
-  // Funzione per selezionare valore
-  function selectValue(id, nome) {
-    selectedValue = id;
-    searchInput.value = nome;
-    hiddenInput.value = id;
-    selectElement.value = id;
-
-    console.log("[v0] selectValue called - ID:", id, "Nome:", nome);
-    console.log("[v0] selectElement.value after set:", selectElement.value);
-    console.log("[v0] selectElement.id:", selectElement.id);
-
-    // Trigger change event sul select originale
-    const event = new Event("change", { bubbles: true });
-    selectElement.dispatchEvent(event);
-
-    resultsDropdown.style.display = "none";
-
-    // Stile selezionato
-    searchInput.style.background =
-      "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)";
-    searchInput.style.borderColor = "#10b981";
-    searchInput.style.fontWeight = "600";
-    searchInput.style.color = "#065f46";
-  }
-
-  // Funzione per resettare
-  function resetSearch() {
-    searchInput.value = "";
-    hiddenInput.value = "";
-    selectedValue = null;
-    selectElement.value = "";
-    searchInput.style.background = "white";
-    searchInput.style.borderColor = "var(--border)";
-    searchInput.style.fontWeight = "500";
-    searchInput.style.color = "var(--text-primary)";
-    resultsDropdown.style.display = "none";
-  }
-
-  // Event listener input
-  searchInput.addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-
-    if (searchTerm === "") {
-      // Se vuoto, mostra tutti
-      populateResults(allData);
-      resetSearch();
-    } else {
-      // Filtra risultati
-      const filtered = allData.filter((item) =>
-        item.nome.toLowerCase().includes(searchTerm),
-      );
-      populateResults(filtered);
-    }
-  });
-
-  // Focus mostra tutti
-  searchInput.addEventListener("focus", () => {
-    if (searchInput.value === "") {
-      populateResults(allData);
-    }
-    searchInput.style.borderColor = "#6366f1";
-    searchInput.style.boxShadow = "0 0 0 4px rgba(99, 102, 241, 0.1)";
-  });
-
-  // Blur nasconde dropdown
-  searchInput.addEventListener("blur", () => {
-    setTimeout(() => {
-      resultsDropdown.style.display = "none";
-      searchInput.style.borderColor = "var(--border)";
-      searchInput.style.boxShadow = "none";
-    }, 200);
-  });
-
-  // Click fuori chiude dropdown
-  document.addEventListener("click", (e) => {
-    if (!wrapper.contains(e.target)) {
-      resultsDropdown.style.display = "none";
-    }
-  });
-
-  // Metodo pubblico per aggiornare dati
-  wrapper.updateData = (newData) => {
-    allData = newData;
-    if (resultsDropdown.style.display === "block") {
-      populateResults(newData);
-    }
-  };
-
-  // Metodo pubblico per resettare
-  wrapper.reset = resetSearch;
-
-  // Metodo pubblico per impostare valore
-  wrapper.setValue = (id) => {
-    const item = allData.find((d) => d.id == id);
-    if (item) {
-      selectValue(item.id, item.nome);
-    }
-  };
-
-  return wrapper;
-}
-
-// ==================== APPLICA RICERCA AI SELECT ====================
-
-// Variabili globali per i wrapper
-let clienteSearchWrapper = null;
-let modelloSearchWrapper = null;
-
-// Funzione per inizializzare ricerca select
-async function initSelectSearch() {
-  // Aspetta che i dati siano caricati
-  if (!allClienti.length) await loadClienti();
-  if (!allModelli.length) await loadModelli();
-
-  // Applica ricerca al select Cliente
-  if (document.getElementById("ordineCliente")) {
-    clienteSearchWrapper = makeSelectSearchable(
-      "ordineCliente",
-      allClienti.map((c) => ({ id: c.id, nome: c.nome })),
-      "Cerca cliente...",
-    );
-  }
-
-  // Applica ricerca al select Modello
-  if (document.getElementById("ordineModello")) {
-    modelloSearchWrapper = makeSelectSearchable(
-      "ordineModello",
-      allModelli.map((m) => ({
-        id: m.id,
-        nome: m.marca_nome ? `${m.nome} (${m.marca_nome})` : m.nome,
-      })),
-      "Cerca modello...",
-    );
-  }
-}
-
-// Override della funzione openOrdineModal per supportare ricerca
-const originalOpenOrdineModal = openOrdineModal;
-openOrdineModal = async function (ordine = null) {
-  await originalOpenOrdineModal(ordine);
-
-  // Inizializza ricerca se non già fatto
-  if (!clienteSearchWrapper || !modelloSearchWrapper) {
-    await initSelectSearch();
-  }
-
-  // Se in modifica, imposta valori
-  if (ordine) {
-    if (clienteSearchWrapper && ordine.cliente_id) {
-      clienteSearchWrapper.setValue(ordine.cliente_id);
-    }
-    if (modelloSearchWrapper && ordine.modello_id) {
-      modelloSearchWrapper.setValue(ordine.modello_id);
-    }
-  } else {
-    // Reset in creazione
-    if (clienteSearchWrapper) clienteSearchWrapper.reset();
-    if (modelloSearchWrapper) modelloSearchWrapper.reset();
-  }
-};
-
-// Override populateOrdineModelliByMarca per supportare ricerca
-const originalPopulateOrdineModelliByMarca = populateOrdineModelliByMarca;
-populateOrdineModelliByMarca = function (marcaId) {
-  // Prima esegui la funzione originale
-  originalPopulateOrdineModelliByMarca(marcaId);
-
-  // Poi aggiorna i dati del wrapper se esiste
-  if (modelloSearchWrapper) {
-    const filtered =
-      marcaId && marcaId !== ""
-        ? allModelli.filter(
-            (m) => m.marche_id && String(m.marche_id) === String(marcaId),
-          )
-        : allModelli;
-
-    modelloSearchWrapper.updateData(
-      filtered.map((m) => ({
-        id: m.id,
-        nome: m.marca_nome ? `${m.nome} (${m.marca_nome})` : m.nome,
-      })),
-    );
-  }
-};
-
-// Inizializza al caricamento
-document.addEventListener("DOMContentLoaded", () => {
-  // Aspetta un po' prima di inizializzare (per dare tempo ai dati di caricarsi)
-  setTimeout(initSelectSearch, 1000);
-  });
-
-// ==================== 🆕 SELECT SEARCHABLE PER MARCA E MODELLO ====================
+// ==================== SELECT SEARCHABLE PER MARCA E MODELLO ====================
 
 /**
  * Crea un campo di ricerca searchable per select
@@ -2236,6 +1644,7 @@ function createSearchableSelect(
 }
 
 // Variabili globali per i searchable selects
+let clienteSearchOrdine = null;
 let marcaSearchOrdine = null;
 let modelloSearchOrdine = null;
 let marcaSearchModello = null;
@@ -2266,6 +1675,26 @@ async function initModelloSearchableSelect() {
 
 // Inizializza SELECT searchable per il form Ordine
 async function initOrdineSearchableSelects() {
+  // SELECT CLIENTE nel form Ordine
+  clienteSearchOrdine = createSearchableSelect(
+    "ordineClienteSearch_container",
+    "ordineCliente",
+    "Cerca cliente...",
+    async () => {
+      const res = await fetch(`${API_URL}/clienti`);
+      const clienti = await res.json();
+      return clienti.map((c) => ({
+        id: c.id,
+        nome: c.nome,
+        extra: c.email || c.num_tel || "",
+      }));
+    },
+    (id, nome) => {
+      // Cliente selezionato
+    },
+    true, // required
+  );
+
   // SELECT MARCA nel form Ordine
   marcaSearchOrdine = createSearchableSelect(
     "ordineMarcaSearch_container",
@@ -2277,7 +1706,6 @@ async function initOrdineSearchableSelects() {
       return marche.map((m) => ({ id: m.id, nome: m.nome }));
     },
     async (id, nome) => {
-      console.log("Marca selezionata:", nome);
       // Quando seleziono una marca, filtro i modelli
       if (modelloSearchOrdine) {
         await updateModelloByMarca(id);
@@ -2302,7 +1730,6 @@ async function initOrdineSearchableSelects() {
       }));
     },
     (id, nome) => {
-      console.log("Modello selezionato:", nome);
       // Quando seleziono un modello, aggiorno la marca se non già selezionata
       const modelloCompleto = allModelli.find(
         (m) => String(m.id) === String(id),
@@ -2320,6 +1747,7 @@ async function initOrdineSearchableSelects() {
   );
 
   // Carica dati iniziali
+  if (clienteSearchOrdine) await clienteSearchOrdine.loadData();
   if (marcaSearchOrdine) await marcaSearchOrdine.loadData();
   if (modelloSearchOrdine) await modelloSearchOrdine.loadData();
 }
@@ -2334,8 +1762,6 @@ async function updateModelloByMarca(marcaId) {
   const filtered = marcaId
     ? modelli.filter((m) => String(m.marche_id) === String(marcaId))
     : modelli;
-
-  console.log(`Filtrati ${filtered.length} modelli per marca ${marcaId}`);
 
   modelloSearchOrdine.filterData(
     filtered.map((m) => ({
@@ -2362,7 +1788,7 @@ async function initModelloSearchableSelects() {
       return marche.map((m) => ({ id: m.id, nome: m.nome }));
     },
     (id, nome) => {
-      console.log("Marca selezionata nel modello:", nome);
+      // Marca selezionata
     },
     true, // required
   );
@@ -2382,12 +1808,14 @@ window.openOrdineModal = async function (ordine = null) {
   form.reset();
 
   // Inizializza searchable selects se non già fatto
-  if (!marcaSearchOrdine || !modelloSearchOrdine) {
+  if (!clienteSearchOrdine || !marcaSearchOrdine || !modelloSearchOrdine) {
     await initOrdineSearchableSelects();
   } else {
     // Reset se già esistono
+    clienteSearchOrdine.reset();
     marcaSearchOrdine.reset();
     modelloSearchOrdine.reset();
+    await clienteSearchOrdine.loadData();
     await marcaSearchOrdine.loadData();
     await modelloSearchOrdine.loadData();
   }
@@ -2395,13 +1823,16 @@ window.openOrdineModal = async function (ordine = null) {
   if (ordine) {
     title.textContent = "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
-    document.getElementById("ordineCliente").value = ordine.cliente_id;
     document.getElementById("ordineData").value = formatDateForInput(
       ordine.data_movimento,
     );
     document.getElementById("ordineNote").value = ordine.note || "";
 
     // Imposta valori nei searchable selects
+    if (ordine.cliente_id && clienteSearchOrdine) {
+      await clienteSearchOrdine.loadData();
+      clienteSearchOrdine.setValue(ordine.cliente_id);
+    }
     if (ordine.marca_id && marcaSearchOrdine) {
       await marcaSearchOrdine.loadData();
       marcaSearchOrdine.setValue(ordine.marca_id);
@@ -2482,107 +1913,4 @@ async function initOrdineSelects() {
             document.getElementById('ordineModello').value = id;
         };
     }
-}
-
-// GESTIONE INVIO (ANTI-DUPLICATO)
-document.getElementById('formOrdine').addEventListener('submit', async function(e) {
-    // Blocca l'invio standard del browser per evitare il doppio invio
-    e.preventDefault();
-    e.stopPropagation();
-
-    const btnSalva = this.querySelector('button[type="submit"]');
-    
-    // Recupero ID dai campi hidden
-    const payload = {
-        id: document.getElementById('ordineId').value || null,
-        cliente_id: document.getElementById('ordineCliente').value,
-        marche_id: document.getElementById('ordineMarca').value,
-        modelli_id: document.getElementById('ordineModello').value,
-        data_ordine: document.getElementById('ordineData').value,
-        note: document.getElementById('ordineNote').value
-    };
-
-    // VALIDAZIONE: Se mancano i dati fondamentali, non inviare NULLA
-    if (!payload.cliente_id || !payload.marche_id || !payload.modelli_id) {
-        alert("⚠️ Seleziona Cliente, Marca e Modello dai suggerimenti!");
-        return;
-    }
-
-    try {
-        btnSalva.disabled = true; // Disabilita bottone per sicurezza extra
-        
-        const response = await fetch(`${API_URL}/ordini`, {
-            method: payload.id ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (response.ok) {
-            alert("✅ Preventivo salvato!");
-            closeOrdineModal();
-            loadOrdini(); 
-        } else {
-            const err = await response.json();
-            alert("❌ Errore: " + err.error);
-        }
-    } catch (error) {
-        console.error("Errore invio:", error);
-    } finally {
-        btnSalva.disabled = false;
-    }
-});
-
-// Funzione per gestire l'invio unico e validato
-function setupOrdineForm() {
-    const form = document.getElementById('formOrdine');
-    const btnSalva = document.getElementById('btnSalvaOrdine');
-
-    // Rimuoviamo eventuali listener precedenti per evitare invii multipli
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-
-    newForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Recuperiamo i dati dagli input HIDDEN
-        const payload = {
-            id: document.getElementById('ordineId').value || null,
-            cliente_id: document.getElementById('ordineCliente').value,
-            marche_id: document.getElementById('ordineMarca').value,
-            modelli_id: document.getElementById('ordineModello').value,
-            data_ordine: document.getElementById('ordineData').value,
-            note: document.getElementById('ordineNote').value
-        };
-
-        // BLOCCANTE: Se mancano i dati, non fa la chiamata al server
-        if (!payload.cliente_id || !payload.marche_id || !payload.modelli_id) {
-            alert("⚠️ Errore: Devi selezionare Cliente, Marca e Modello dai suggerimenti!");
-            return;
-        }
-
-        try {
-            btnSalva.disabled = true; // Impedisce click multipli
-            
-            const method = payload.id ? 'PUT' : 'POST';
-            const response = await fetch(`${API_URL}/ordini`, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                alert("✅ Preventivo salvato con successo!");
-                closeOrdineModal();
-                loadOrdini(); 
-            } else {
-                const err = await response.json();
-                alert("❌ Errore: " + err.error);
-            }
-        } catch (error) {
-            console.error("Errore invio:", error);
-        } finally {
-            btnSalva.disabled = false;
-        }
-    });
 }
