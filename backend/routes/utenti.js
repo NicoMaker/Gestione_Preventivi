@@ -90,6 +90,7 @@ router.put("/:id", async (req, res) => {
     if (err1 || !user)
       return res.status(404).json({ error: "Utente non trovato" });
 
+    const oldNome = user.nome;
     let newNome = nome ? nome.trim() : user.nome;
     let newPasswordHash = user.password;
 
@@ -124,7 +125,12 @@ router.put("/:id", async (req, res) => {
 
         const io = req.app.get("io");
         if (io) {
-          io.emit("utente_modificato", { id, newNome });
+          // Emetti evento con vecchio e nuovo nome
+          io.emit("utente_modificato", { 
+            id, 
+            oldNome, 
+            newNome 
+          });
           io.emit("utenti_aggiornati");
         }
         res.json({ success: true, nome: newNome });
@@ -136,19 +142,37 @@ router.put("/:id", async (req, res) => {
 // DELETE /api/utenti/:id - elimina utente
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  db.get("SELECT COUNT(*) AS total FROM utenti", [], (err, row) => {
-    if (row.total <= 1)
-      return res
-        .status(400)
-        .json({ error: "Impossibile eliminare l'ultimo utente" });
+  
+  // Prima ottieni il nome dell'utente
+  db.get("SELECT nome FROM utenti WHERE id = ?", [id], (err, user) => {
+    if (err || !user) {
+      return res.status(404).json({ error: "Utente non trovato" });
+    }
+    
+    const nomeUtente = user.nome;
+    
+    db.get("SELECT COUNT(*) AS total FROM utenti", [], (err, row) => {
+      if (row.total <= 1)
+        return res
+          .status(400)
+          .json({ error: "Impossibile eliminare l'ultimo utente" });
 
-    db.run("DELETE FROM utenti WHERE id = ?", [id], function (err) {
-      const io = req.app.get("io");
-      if (io) {
-        io.emit("utente_eliminato", { id });
-        io.emit("utenti_aggiornati");
-      }
-      res.json({ success: true });
+      db.run("DELETE FROM utenti WHERE id = ?", [id], function (err) {
+        if (err) {
+          return res.status(500).json({ error: "Errore eliminazione utente" });
+        }
+        
+        const io = req.app.get("io");
+        if (io) {
+          // Emetti evento con nome utente eliminato
+          io.emit("utente_eliminato", { 
+            id, 
+            nomeUtente 
+          });
+          io.emit("utenti_aggiornati");
+        }
+        res.json({ success: true });
+      });
     });
   });
 });

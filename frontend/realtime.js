@@ -2,12 +2,10 @@
 
 // Connessione Socket.IO
 let socket = null;
-let ignoreNextUpdate = false; // Flag per ignorare aggiornamenti dopo operazioni locali
+let ignoreNextUpdate = false;
 
 // Inizializza Socket.IO
 function initSocket() {
-  // Ottieni l'URL del server (stesso host e porta del frontend)
-  // Il server Express serve il frontend e Socket.IO sulla stessa porta
   const socketUrl = window.location.origin;
 
   socket = io(socketUrl, {
@@ -19,7 +17,6 @@ function initSocket() {
 
   socket.on('connect', () => {
     console.log('✅ Connesso al server real-time');
-    // Notifica rimossa - connessione silenziosa
   });
 
   socket.on('disconnect', () => {
@@ -30,9 +27,7 @@ function initSocket() {
     console.error('Errore connessione Socket.IO:', error);
   });
 
-  // Eventi per aggiornamenti real-time
-  
-  // Marche - Aggiorna solo se l'operazione viene da altri dispositivi
+  // Eventi marche
   socket.on('marca_aggiunta', () => {
     if (!ignoreNextUpdate && typeof loadMarche === 'function') {
       loadMarche();
@@ -59,79 +54,94 @@ function initSocket() {
     }
   });
 
-  // Prodotti - Aggiorna solo se l'operazione viene da altri dispositivi
-  socket.on('prodotto_aggiunto', () => {
-    if (!ignoreNextUpdate && typeof loadProdotti === 'function') {
-      loadProdotti();
+  // Eventi modelli
+  socket.on('modello_aggiunto', () => {
+    if (!ignoreNextUpdate && typeof loadModelli === 'function') {
+      loadModelli();
     }
   });
 
-  socket.on('prodotto_modificato', () => {
-    if (!ignoreNextUpdate && typeof loadProdotti === 'function') {
-      loadProdotti();
+  socket.on('modello_modificato', () => {
+    if (!ignoreNextUpdate && typeof loadModelli === 'function') {
+      loadModelli();
     }
   });
 
-  socket.on('prodotto_eliminato', () => {
-    if (!ignoreNextUpdate && typeof loadProdotti === 'function') {
-      loadProdotti();
+  socket.on('modello_eliminato', () => {
+    if (!ignoreNextUpdate && typeof loadModelli === 'function') {
+      loadModelli();
     }
   });
 
-  socket.on('prodotti_aggiornati', () => {
-    if (!ignoreNextUpdate && typeof loadProdotti === 'function') {
-      loadProdotti();
+  socket.on('modelli_aggiornati', () => {
+    if (!ignoreNextUpdate && typeof loadModelli === 'function') {
+      loadModelli();
     }
   });
 
-  // Movimenti - Aggiorna solo se l'operazione viene da altri dispositivi
-  socket.on('movimento_aggiunto', () => {
-    if (!ignoreNextUpdate && typeof loadMovimenti === 'function') {
-      loadMovimenti();
+  // Eventi preventivi (ex ordini)
+  socket.on('ordine_aggiunto', () => {
+    if (!ignoreNextUpdate && typeof loadOrdini === 'function') {
+      loadOrdini();
     }
   });
 
-  socket.on('movimento_eliminato', () => {
-    if (!ignoreNextUpdate && typeof loadMovimenti === 'function') {
-      loadMovimenti();
+  socket.on('ordine_modificato', () => {
+    if (!ignoreNextUpdate && typeof loadOrdini === 'function') {
+      loadOrdini();
+    }
+  });
+
+  socket.on('ordine_eliminato', () => {
+    if (!ignoreNextUpdate && typeof loadOrdini === 'function') {
+      loadOrdini();
+    }
+  });
+
+  socket.on('ordini_aggiornati', () => {
+    if (!ignoreNextUpdate && typeof loadOrdini === 'function') {
+      loadOrdini();
     }
   });
 
   socket.on('dati_aggiornati', () => {
-    if (!ignoreNextUpdate && typeof loadMovimenti === 'function') {
-      loadMovimenti();
+    if (!ignoreNextUpdate && typeof loadOrdini === 'function') {
+      loadOrdini();
     }
   });
 
-  // Magazzino - Aggiorna solo se l'operazione viene da altri dispositivi
-  socket.on('magazzino_aggiornato', () => {
-    if (!ignoreNextUpdate) {
-      if (typeof loadRiepilogo === 'function') loadRiepilogo();
-      if (typeof loadMovimenti === 'function') loadMovimenti();
-      if (typeof loadProdotti === 'function') loadProdotti();
+  // Eventi clienti
+  socket.on('cliente_aggiunto', () => {
+    if (!ignoreNextUpdate && typeof loadClienti === 'function') {
+      loadClienti();
     }
   });
 
-  // Utenti - Aggiorna solo se l'operazione viene da altri dispositivi
-  socket.on('utente_aggiunto', () => {
-    if (!ignoreNextUpdate && typeof loadUtenti === 'function') {
-      loadUtenti();
+  socket.on('cliente_modificato', () => {
+    if (!ignoreNextUpdate && typeof loadClienti === 'function') {
+      loadClienti();
     }
   });
 
+  socket.on('cliente_eliminato', () => {
+    if (!ignoreNextUpdate && typeof loadClienti === 'function') {
+      loadClienti();
+    }
+  });
+
+  socket.on('clienti_aggiornati', () => {
+    if (!ignoreNextUpdate && typeof loadClienti === 'function') {
+      loadClienti();
+    }
+  });
+
+  // 🔥 GESTIONE UTENTI - LOGOUT MULTIPLO
   socket.on('utente_modificato', (data) => {
-    const currentUsername = localStorage.getItem('username');
+    const currentUsername = localStorage.getItem('nomeUtente');
     
     // Se l'utente modificato è quello loggato, fai logout
-    if (data.oldUsername && currentUsername === data.oldUsername) {
-      if (typeof forceLogout === 'function') {
-        forceLogout('Il tuo account è stato modificato da un altro dispositivo. Effettua di nuovo il login.');
-      } else {
-        // Fallback se forceLogout non è disponibile
-        localStorage.removeItem('username');
-        localStorage.removeItem('activeSection');
-        window.location.href = 'index.html';
-      }
+    if (data.oldNome && currentUsername === data.oldNome) {
+      forceLogout('Il tuo account è stato modificato. Effettua di nuovo il login.');
       return;
     }
     
@@ -141,21 +151,20 @@ function initSocket() {
   });
 
   socket.on('utente_eliminato', (data) => {
-    const currentUsername = localStorage.getItem('username');
+    const currentUsername = localStorage.getItem('nomeUtente');
     
     // Se l'utente eliminato è quello loggato, fai logout
-    if (data.username && currentUsername === data.username) {
-      if (typeof forceLogout === 'function') {
-        forceLogout('Il tuo account è stato eliminato. Verrai disconnesso.');
-      } else {
-        // Fallback se forceLogout non è disponibile
-        localStorage.removeItem('username');
-        localStorage.removeItem('activeSection');
-        window.location.href = 'index.html';
-      }
+    if (data.nomeUtente && currentUsername === data.nomeUtente) {
+      forceLogout('Il tuo account è stato eliminato.');
       return;
     }
     
+    if (!ignoreNextUpdate && typeof loadUtenti === 'function') {
+      loadUtenti();
+    }
+  });
+
+  socket.on('utente_aggiunto', () => {
     if (!ignoreNextUpdate && typeof loadUtenti === 'function') {
       loadUtenti();
     }
@@ -168,6 +177,24 @@ function initSocket() {
   });
 }
 
+// 🚪 LOGOUT FORZATO
+function forceLogout(message) {
+  // Mostra alert moderno
+  showAlertModal(
+    message || 'Sei stato disconnesso.',
+    'Sessione Terminata',
+    'warning'
+  );
+  
+  // Aspetta 2 secondi e redirect
+  setTimeout(() => {
+    localStorage.removeItem('nomeUtente');
+    localStorage.removeItem('utenteId');
+    localStorage.removeItem('activeSection');
+    window.location.href = 'index.html';
+  }, 2000);
+}
+
 // Sistema di notifiche moderne
 function showNotification(message, type = 'info', duration = 4000) {
   const container = document.getElementById('notificationContainer');
@@ -176,7 +203,6 @@ function showNotification(message, type = 'info', duration = 4000) {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   
-  // Icona in base al tipo
   let icon = '';
   switch(type) {
     case 'success':
@@ -207,12 +233,10 @@ function showNotification(message, type = 'info', duration = 4000) {
 
   container.appendChild(notification);
 
-  // Animazione di entrata
   setTimeout(() => {
     notification.classList.add('show');
   }, 10);
 
-  // Rimozione automatica
   if (duration > 0) {
     setTimeout(() => {
       notification.classList.remove('show');
@@ -232,7 +256,7 @@ if (document.readyState === 'loading') {
   initSocket();
 }
 
-// Funzione per ignorare il prossimo aggiornamento (dopo operazione locale)
+// Funzione per ignorare il prossimo aggiornamento
 function ignoreNextSocketUpdate(duration = 2000) {
   ignoreNextUpdate = true;
   setTimeout(() => {
@@ -243,18 +267,10 @@ function ignoreNextSocketUpdate(duration = 2000) {
 // Esporta per uso globale
 window.showNotification = showNotification;
 window.ignoreNextSocketUpdate = ignoreNextSocketUpdate;
+window.forceLogout = forceLogout;
 
-// ==================== MODALI MODERNI ====================
+// ==================== MODALI MODERNE ====================
 
-/**
- * Mostra un modale di conferma moderno (sostituisce confirm())
- * @param {string} message - Messaggio da mostrare
- * @param {string} title - Titolo del modale (opzionale)
- * @returns {Promise<boolean>} - true se confermato, false se annullato
- */
-/**
- * Mostra modale di conferma moderna (Promise)
- */
 function showConfirmModal(message, title = 'Conferma') {
   return new Promise((resolve) => {
     const modal = document.getElementById('confirmModal');
@@ -265,11 +281,9 @@ function showConfirmModal(message, title = 'Conferma') {
     const closeBtn = modal.querySelector('.modal-close');
     const iconContainer = document.getElementById('confirmIcon');
 
-    // Imposta testi
     msgElem.innerHTML = message;
     titleElem.textContent = title;
 
-    // Se il titolo contiene "Elimina", rendiamo il tasto e l'icona "Pericolo" (Rosso)
     if (title.toLowerCase().includes('elimina')) {
       confirmBtn.style.background = 'var(--danger)';
       iconContainer.innerHTML = '🗑️';
@@ -307,14 +321,10 @@ function showConfirmModal(message, title = 'Conferma') {
   });
 }
 
-/**
- * Chiude il modale di conferma
- */
 function closeConfirmModal(alreadyResolved = false) {
   const modal = document.getElementById('confirmModal');
   modal.classList.remove('active', 'show');
   
-  // Rimuovi listener
   if (window.confirmModalBackdropHandler) {
     modal.removeEventListener('click', window.confirmModalBackdropHandler);
     delete window.confirmModalBackdropHandler;
@@ -327,26 +337,16 @@ function closeConfirmModal(alreadyResolved = false) {
     }
     delete window.confirmModalCloseHandler;
   }
-  
-  // Resolve non chiamato qui - viene chiamato dagli handler specifici
 }
 
-/**
- * Mostra un modale di alert moderno (sostituisce alert())
- * @param {string} message - Messaggio da mostrare
- * @param {string} title - Titolo del modale (opzionale)
- * @param {string} type - Tipo: 'success', 'error', 'warning', 'info' (default: 'info')
- */
 function showAlertModal(message, title = 'Informazione', type = 'info') {
   const modal = document.getElementById('alertModal');
   const titleEl = document.getElementById('alertModalTitle');
   const messageEl = document.getElementById('alertMessage');
   const iconEl = document.getElementById('alertIcon');
 
-  // Imposta titolo
   titleEl.textContent = title;
 
-  // Icona in base al tipo
   let iconSvg = '';
   switch(type) {
     case 'success':
@@ -391,9 +391,7 @@ function showAlertModal(message, title = 'Informazione', type = 'info') {
 
   iconEl.innerHTML = iconSvg;
 
-  // Messaggio - supporta HTML e newline
   if (message.includes('\n') || message.length > 200) {
-    // Messaggio lungo o multilinea - formatta meglio
     const lines = message.split('\n');
     let formattedMessage = '';
     
@@ -416,10 +414,8 @@ function showAlertModal(message, title = 'Informazione', type = 'info') {
     messageEl.textContent = message;
   }
 
-  // Mostra modale
   modal.classList.add('active', 'show');
   
-  // Handler pulsante OK
   const okBtn = document.getElementById('alertModalOkBtn');
   if (okBtn) {
     okBtn.onclick = (e) => {
@@ -428,7 +424,6 @@ function showAlertModal(message, title = 'Informazione', type = 'info') {
     };
   }
   
-  // Handler pulsante chiudi (X)
   const closeBtn = modal.querySelector('.modal-close');
   if (closeBtn) {
     closeBtn.onclick = (e) => {
@@ -437,7 +432,6 @@ function showAlertModal(message, title = 'Informazione', type = 'info') {
     };
   }
   
-  // Handler backdrop click
   const handleBackdropClick = (e) => {
     if (e.target === modal) {
       closeAlertModal();
@@ -446,7 +440,6 @@ function showAlertModal(message, title = 'Informazione', type = 'info') {
   modal.addEventListener('click', handleBackdropClick);
   window.alertModalBackdropHandler = handleBackdropClick;
   
-  // Previeni chiusura quando si clicca sul contenuto
   const modalContent = modal.querySelector('.modal-content');
   if (modalContent) {
     modalContent.addEventListener('click', (e) => {
@@ -455,36 +448,26 @@ function showAlertModal(message, title = 'Informazione', type = 'info') {
   }
 }
 
-/**
- * Chiude il modale di alert
- */
 function closeAlertModal() {
   const modal = document.getElementById('alertModal');
   modal.classList.remove('active', 'show');
   
-  // Rimuovi listener backdrop
   if (window.alertModalBackdropHandler) {
     modal.removeEventListener('click', window.alertModalBackdropHandler);
     delete window.alertModalBackdropHandler;
   }
 }
 
-/**
- * Funzione helper per escape HTML
- */
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// Salva le funzioni originali (se necessario)
 const originalAlert = window.alert;
 const originalConfirm = window.confirm;
 
-// Sostituisce window.alert e window.confirm
 window.alert = function(message) {
-  // Determina tipo dal messaggio
   let type = 'info';
   let title = 'Informazione';
   
@@ -510,9 +493,7 @@ window.confirm = function(message) {
   return showConfirmModal(message, 'Conferma eliminazione');
 };
 
-// Esporta funzioni globali
 window.showConfirmModal = showConfirmModal;
 window.closeConfirmModal = closeConfirmModal;
 window.showAlertModal = showAlertModal;
 window.closeAlertModal = closeAlertModal;
-

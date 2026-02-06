@@ -11,11 +11,13 @@ router.get("/", (req, res) => {
       c.nome, 
       c.num_tel,
       c.email,
+      c.data_passaggio,
+      c.flag_ricontatto,
       c.created_at,
       COUNT(o.id) as ordini_count
     FROM clienti c
     LEFT JOIN ordini o ON c.id = o.cliente_id
-    GROUP BY c.id, c.nome, c.num_tel, c.email, c.created_at
+    GROUP BY c.id, c.nome, c.num_tel, c.email, c.data_passaggio, c.flag_ricontatto, c.created_at
     ORDER BY c.nome ASC
   `;
 
@@ -44,7 +46,7 @@ router.get("/:id", (req, res) => {
 
     // Recupera gli ordini del cliente
     db.all(
-      `SELECT * FROM ordini WHERE cliente_id = ? ORDER BY data_ordine DESC`,
+      `SELECT * FROM ordini WHERE cliente_id = ? ORDER BY data_movimento DESC`,
       [id],
       (err2, ordini) => {
         if (err2) {
@@ -62,15 +64,21 @@ router.get("/:id", (req, res) => {
 
 // POST - Crea nuovo cliente
 router.post("/", (req, res) => {
-  const { nome, num_tel, email } = req.body;
+  const { nome, num_tel, email, data_passaggio, flag_ricontatto } = req.body;
 
   if (!nome || !nome.trim()) {
     return res.status(400).json({ error: "Nome cliente obbligatorio" });
   }
 
   db.run(
-    "INSERT INTO clienti (nome, num_tel, email) VALUES (?, ?, ?)",
-    [nome.trim(), num_tel || null, email || null],
+    "INSERT INTO clienti (nome, num_tel, email, data_passaggio, flag_ricontatto) VALUES (?, ?, ?, ?, ?)",
+    [
+      nome.trim(), 
+      num_tel || null, 
+      email || null, 
+      data_passaggio || null,
+      flag_ricontatto ? 1 : 0
+    ],
     function (err) {
       if (err) {
         if (err.message.includes("UNIQUE")) {
@@ -93,6 +101,8 @@ router.post("/", (req, res) => {
         nome: nome.trim(),
         num_tel: num_tel || null,
         email: email || null,
+        data_passaggio: data_passaggio || null,
+        flag_ricontatto: flag_ricontatto ? 1 : 0,
         ordini_count: 0,
       });
     }
@@ -102,15 +112,22 @@ router.post("/", (req, res) => {
 // PUT - Aggiorna cliente
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { nome, num_tel, email } = req.body;
+  const { nome, num_tel, email, data_passaggio, flag_ricontatto } = req.body;
 
   if (!nome || !nome.trim()) {
     return res.status(400).json({ error: "Nome cliente obbligatorio" });
   }
 
   db.run(
-    "UPDATE clienti SET nome = ?, num_tel = ?, email = ? WHERE id = ?",
-    [nome.trim(), num_tel || null, email || null, id],
+    "UPDATE clienti SET nome = ?, num_tel = ?, email = ?, data_passaggio = ?, flag_ricontatto = ? WHERE id = ?",
+    [
+      nome.trim(), 
+      num_tel || null, 
+      email || null, 
+      data_passaggio || null,
+      flag_ricontatto ? 1 : 0,
+      id
+    ],
     function (err) {
       if (err) {
         if (err.message.includes("UNIQUE")) {
@@ -158,8 +175,8 @@ router.delete("/:id", (req, res) => {
         
         return res.status(400).json({
           error: ordiniCount === 1
-            ? "Impossibile eliminare: c'è 1 ordine collegato a questo cliente."
-            : `Impossibile eliminare: ci sono ${ordiniCount} ordini collegati a questo cliente.`,
+            ? "Impossibile eliminare: c'è 1 preventivo collegato a questo cliente."
+            : `Impossibile eliminare: ci sono ${ordiniCount} preventivi collegati a questo cliente.`,
           ordini_count: ordiniCount,
         });
       }

@@ -98,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ordineMarcaSelect.addEventListener("change", () => {
       const marcaId = ordineMarcaSelect.value;
       populateOrdineModelliByMarca(marcaId);
-      // quando cambio marca, azzero il modello
       ordineModelloSelect.value = "";
     });
 
@@ -110,6 +109,31 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       if (modello && modello.marche_id) {
         ordineMarcaSelect.value = String(modello.marche_id);
+      }
+    });
+  }
+
+  // 🔥 TOGGLE PASSWORD UTENTI
+  const togglePassword = document.getElementById('toggleUtentePassword');
+  const passwordInput = document.getElementById('utentePassword');
+  
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        togglePassword.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.08 2.58" />
+          <line x1="1" y1="1" x2="23" y2="23" />
+        `;
+        togglePassword.style.color = '#6366f1';
+      } else {
+        passwordInput.type = 'password';
+        togglePassword.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+          <circle cx="12" cy="12" r="3" />
+        `;
+        togglePassword.style.color = '#64748b';
       }
     });
   }
@@ -133,7 +157,7 @@ function renderClienti() {
 
   if (clienti.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="5" class="text-center">Nessun cliente presente</td></tr>';
+      '<tr><td colspan="7" class="text-center">Nessun cliente presente</td></tr>';
     return;
   }
 
@@ -177,6 +201,10 @@ function renderClienti() {
             : "-"
         }
       </td>
+      <td>${c.data_passaggio ? formatDate(c.data_passaggio) : '-'}</td>
+      <td style="text-align:center;">
+        ${c.flag_ricontatto ? '<span class="badge-ricontatto" style="font-size:22px;" title="Ricontatto Social">📱</span>' : '-'}
+      </td>
       <td style="text-align: center">
         <span class="badge-count">${c.ordini_count || 0}</span>
       </td>
@@ -205,42 +233,11 @@ document.getElementById("filterClienti")?.addEventListener("input", (e) => {
     (c) =>
       c.nome.toLowerCase().includes(searchTerm) ||
       (c.email && c.email.toLowerCase().includes(searchTerm)) ||
-      (c.num_tel && c.num_tel.includes(searchTerm))
+      (c.num_tel && c.num_tel.includes(searchTerm)) ||
+      (c.data_passaggio && c.data_passaggio.includes(searchTerm))
   );
   renderClienti();
 });
-
-async function viewClienteOrdini(clienteId, clienteNome) {
-  try {
-    const res = await fetch(`${API_URL}/ordini/cliente/${clienteId}`);
-    const ordini = await res.json();
-
-    const ordiniHtml =
-      ordini.length > 0
-        ? ordini
-            .map(
-              (o) => `
-      <div style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
-        <strong>Data:</strong> ${formatDate(o.data_movimento)}<br/>
-        <strong>Marca:</strong> ${o.marca_nome || "N/A"}<br/>
-        <strong>Modello:</strong> ${o.modello_nome || "N/A"}<br/>
-        <strong>Note:</strong> ${o.note || "-"}
-      </div>
-    `
-            )
-            .join("")
-        : "<p>Nessun ordine trovato per questo cliente.</p>";
-
-    showNotification(
-      `<h3>Ordini di ${clienteNome}</h3>${ordiniHtml}`,
-      "info",
-      10000
-    );
-  } catch (error) {
-    console.error("Errore caricamento ordini cliente:", error);
-    showNotification("Errore caricamento ordini", "error");
-  }
-}
 
 function openClienteModal(cliente = null) {
   const modal = document.getElementById("modalCliente");
@@ -255,9 +252,13 @@ function openClienteModal(cliente = null) {
     document.getElementById("clienteNome").value = cliente.nome;
     document.getElementById("clienteTel").value = cliente.num_tel || "";
     document.getElementById("clienteEmail").value = cliente.email || "";
+    document.getElementById("clienteDataPassaggio").value = cliente.data_passaggio || "";
+    document.getElementById("clienteFlagRicontatto").checked = cliente.flag_ricontatto == 1;
   } else {
     title.textContent = "Nuovo Cliente";
     document.getElementById("clienteId").value = "";
+    document.getElementById("clienteDataPassaggio").value = "";
+    document.getElementById("clienteFlagRicontatto").checked = false;
   }
 
   modal.classList.add("active");
@@ -273,7 +274,12 @@ function editCliente(id) {
 }
 
 async function deleteCliente(id) {
-  if (!confirm("Sei sicuro di voler eliminare questo cliente?")) return;
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo cliente?",
+    "Conferma Eliminazione"
+  );
+  
+  if (!conferma) return;
 
   try {
     const res = await fetch(`${API_URL}/clienti/${id}`, { method: "DELETE" });
@@ -299,6 +305,8 @@ document
     const nome = document.getElementById("clienteNome").value.trim();
     const num_tel = document.getElementById("clienteTel").value.trim();
     const email = document.getElementById("clienteEmail").value.trim();
+    const data_passaggio = document.getElementById("clienteDataPassaggio").value;
+    const flag_ricontatto = document.getElementById("clienteFlagRicontatto").checked;
 
     const method = id ? "PUT" : "POST";
     const url = id ? `${API_URL}/clienti/${id}` : `${API_URL}/clienti`;
@@ -307,7 +315,7 @@ document
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, num_tel, email }),
+        body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto }),
       });
 
       const data = await res.json();
@@ -330,7 +338,7 @@ document
     }
   });
 
-// ==================== ORDINI ====================
+// ==================== PREVENTIVI (EX ORDINI) ====================
 async function loadOrdini() {
   try {
     const res = await fetch(`${API_URL}/ordini`);
@@ -338,8 +346,8 @@ async function loadOrdini() {
     ordini = allOrdini;
     renderOrdini();
   } catch (error) {
-    console.error("Errore caricamento ordini:", error);
-    showNotification("Errore caricamento ordini", "error");
+    console.error("Errore caricamento preventivi:", error);
+    showNotification("Errore caricamento preventivi", "error");
   }
 }
 
@@ -348,7 +356,7 @@ function renderOrdini() {
 
   if (ordini.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="6" class="text-center">Nessun ordine presente</td></tr>';
+      '<tr><td colspan="6" class="text-center">Nessun preventivo presente</td></tr>';
     return;
   }
 
@@ -396,7 +404,6 @@ async function openOrdineModal(ordine = null) {
   const title = document.getElementById("modalOrdineTitle");
   const form = document.getElementById("formOrdine");
 
-  // Carica clienti, marche e modelli per i select
   await Promise.all([
     loadClientiForSelect(),
     loadMarcheForSelect(),
@@ -406,7 +413,7 @@ async function openOrdineModal(ordine = null) {
   form.reset();
 
   if (ordine) {
-    title.textContent = "Modifica Ordine";
+    title.textContent = "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
     document.getElementById("ordineCliente").value = ordine.cliente_id;
     document.getElementById("ordineData").value = formatDateForInput(
@@ -416,7 +423,7 @@ async function openOrdineModal(ordine = null) {
     document.getElementById("ordineModello").value = ordine.modello_id || "";
     document.getElementById("ordineNote").value = ordine.note || "";
   } else {
-    title.textContent = "Nuovo Ordine";
+    title.textContent = "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
     document.getElementById("ordineData").value = formatDateForInput(
       new Date().toISOString()
@@ -477,7 +484,6 @@ async function loadModelliForSelect() {
   }
 }
 
-// Popola la select dei modelli filtrando per marca (se presente)
 function populateOrdineModelliByMarca(marcaId) {
   const select = document.getElementById("ordineModello");
   if (!select) return;
@@ -508,14 +514,19 @@ function editOrdine(id) {
 }
 
 async function deleteOrdine(id) {
-  if (!confirm("Sei sicuro di voler eliminare questo ordine?")) return;
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo preventivo?",
+    "Conferma Eliminazione"
+  );
+  
+  if (!conferma) return;
 
   try {
     const res = await fetch(`${API_URL}/ordini/${id}`, { method: "DELETE" });
     const data = await res.json();
 
     if (res.ok) {
-      showNotification("Ordine eliminato con successo!", "success");
+      showNotification("Preventivo eliminato con successo!", "success");
       loadOrdini();
     } else {
       showNotification(data.error || "Errore durante l'eliminazione", "error");
@@ -535,7 +546,6 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   const modello_id = document.getElementById("ordineModello").value || null;
   const note = document.getElementById("ordineNote").value.trim();
 
-  // Validazione coerenza Marca/Modello lato frontend
   if (modello_id) {
     const modello = allModelli.find(
       (m) => String(m.id) === String(modello_id)
@@ -577,7 +587,7 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
 
     if (res.ok) {
       showNotification(
-        id ? "Ordine aggiornato!" : "Ordine creato!",
+        id ? "Preventivo aggiornato!" : "Preventivo creato!",
         "success"
       );
       closeOrdineModal();
@@ -677,7 +687,12 @@ function editMarca(id) {
 }
 
 async function deleteMarca(id) {
-  if (!confirm("Sei sicuro di voler eliminare questa marca?")) return;
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questa marca?",
+    "Conferma Eliminazione"
+  );
+  
+  if (!conferma) return;
 
   try {
     const res = await fetch(`${API_URL}/marche/${id}`, { method: "DELETE" });
@@ -819,7 +834,12 @@ function editModello(id) {
 }
 
 async function deleteModello(id) {
-  if (!confirm("Sei sicuro di voler eliminare questo modello?")) return;
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo modello?",
+    "Conferma Eliminazione"
+  );
+  
+  if (!conferma) return;
 
   try {
     const res = await fetch(`${API_URL}/modelli/${id}`, {
@@ -953,7 +973,12 @@ function editUtente(id) {
 }
 
 async function deleteUtente(id) {
-  if (!confirm("Sei sicuro di voler eliminare questo utente?")) return;
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo utente?",
+    "Conferma Eliminazione"
+  );
+  
+  if (!conferma) return;
 
   try {
     const res = await fetch(`${API_URL}/utenti/${id}`, { method: "DELETE" });
@@ -1052,35 +1077,22 @@ function showNotification(message, type = "info", duration = 5000) {
   }, duration);
 }
 
-
-// ==================== STAMPA ORDINI PER CLIENTE ====================
-
-// riuso lo stesso JSON di company-loader.js, se già lo carichi lì
+// ==================== STAMPA PREVENTIVI PER CLIENTE ====================
 let companyInfoPrintCache = null;
 
-/**
- * Carica le info aziendali per la stampa (riusa company-info.json)
- */
 async function loadCompanyInfoForPrint() {
   try {
     if (companyInfoPrintCache) return companyInfoPrintCache;
-
-    // se hai già companyInfo globale da company-loader.js puoi fare:
     if (typeof companyInfo !== 'undefined' && companyInfo) {
       companyInfoPrintCache = companyInfo;
       return companyInfoPrintCache;
     }
-
     const response = await fetch('company-info.json');
-    if (!response.ok) {
-      throw new Error(`Errore caricamento: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Errore caricamento: ${response.status}`);
     companyInfoPrintCache = await response.json();
-    console.log('✅ Company info caricato per stampa:', companyInfoPrintCache);
     return companyInfoPrintCache;
   } catch (error) {
-    console.error('❌ Errore caricamento company-info.json (stampa):', error);
-    // fallback
+    console.error('Errore caricamento company-info.json:', error);
     companyInfoPrintCache = {
       company: {
         name: 'Magazzino Moto',
@@ -1092,119 +1104,49 @@ async function loadCompanyInfoForPrint() {
         piva: '1234567890',
         phone: '+39 02 1234567',
         email: 'info@magazzinomoto.it',
-        website: 'www.magazzinomoto.it',
         logo: 'img/Logo.png',
       },
-      settings: {
-        currency: 'EUR',
-        currencySymbol: '€',
-        dateFormat: 'DD/MM/YYYY',
-        decimalSeparator: ',',
-        thousandsSeparator: '.',
-      },
+      settings: { currency: 'EUR', currencySymbol: '€' },
     };
     return companyInfoPrintCache;
   }
 }
 
-/**
- * Raggruppa gli ordini per cliente_id
- */
 function groupOrdiniByCliente(ordini) {
   return ordini.reduce((groups, ordine) => {
     const clienteId = ordine.cliente_id;
-    if (!groups[clienteId]) {
-      groups[clienteId] = [];
-    }
+    if (!groups[clienteId]) groups[clienteId] = [];
     groups[clienteId].push(ordine);
     return groups;
   }, {});
 }
 
-/**
- * Ordina gli ordini di un cliente per data decrescente
- */
 function sortOrdiniByDateDesc(ordini) {
-  return [...ordini].sort((a, b) => {
-    const dateA = new Date(a.data_movimento);
-    const dateB = new Date(b.data_movimento);
-    return dateB - dateA; // più recente prima
-  });
+  return [...ordini].sort((a, b) => new Date(b.data_movimento) - new Date(a.data_movimento));
 }
 
-/**
- * Piccolo helper se vuoi una formatData separata
- */
-function formatDataItStampa(dateString) {
-  if (!dateString) return '-';
-  const d = new Date(dateString);
-  return d.toLocaleDateString('it-IT', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-}
-
-/**
- * Intestazione HTML del PDF con logo e dati aziendali (presi da company-info)
- */
 function generatePrintHeader(company) {
   return `
     <div class="print-header" style="text-align:center;margin-bottom:30px;border-bottom:2px solid #333;padding-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div style="flex:1;text-align:left;">
-          <img src="${company.logo || 'img/Logo.png'}" alt="Logo" style="max-height:60px;width:auto;">
-        </div>
-        <div style="flex:2;text-align:center;">
-          <h1 style="margin:0;font-size:24px;font-weight:bold;color:#000;">${company.name || 'MAGAZZINO'}</h1>
-          <p style="margin:5px 0;font-size:12px;color:#666;">Registrazione ordini per cliente</p>
-        </div>
-        <div style="flex:1;"></div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:left;font-size:11px;color:#333;">
-        <div>
-          <p style="margin:3px 0;"><strong>Indirizzo:</strong> ${company.address || '-'}</p>
-          <p style="margin:3px 0;"><strong>Città:</strong> ${company.cap || ''} ${company.city || ''} (${company.province || ''})</p>
-          <p style="margin:3px 0;"><strong>Paese:</strong> ${company.country || 'Italia'}</p>
-        </div>
-        <div>
-          <p style="margin:3px 0;"><strong>P.IVA:</strong> ${company.piva || '-'}</p>
-          <p style="margin:3px 0;"><strong>Telefono:</strong> ${company.phone || '-'}</p>
-          <p style="margin:3px 0;"><strong>Email:</strong> ${company.email || '-'}</p>
-        </div>
-      </div>
-
-      <p style="margin-top:10px;font-size:10px;color:#999;">
-        Stampato il: ${formatDataItStampa(new Date().toISOString())}
-      </p>
+      <h1 style="margin:0;font-size:24px;font-weight:bold;">${company.name || 'MAGAZZINO'}</h1>
+      <p style="margin:5px 0;font-size:12px;">${company.address || ''}, ${company.cap || ''} ${company.city || ''}</p>
+      <p style="margin:5px 0;font-size:11px;">P.IVA: ${company.piva || ''} | Tel: ${company.phone || ''}</p>
     </div>
   `;
 }
 
-/**
- * Sezione HTML per un singolo cliente (ordini già passati e ordinati per data)
- */
 function generateClienteSection(cliente, ordiniCliente) {
   const ordiniOrdinati = sortOrdiniByDateDesc(ordiniCliente);
-
   return `
     <div class="cliente-section" style="margin-bottom:30px;page-break-inside:avoid;">
-      <div style="background-color:#f5f5f5;padding:12px;border-radius:4px;margin-bottom:15px;border-left:4px solid #2980b9;">
-        <h2 style="margin:0;font-size:16px;font-weight:bold;color:#2980b9;">
-          ${cliente.nome || 'N/A'}
-        </h2>
-        <p style="margin:5px 0 0 0;font-size:12px;color:#666;">
-          ${cliente.num_tel || '-'} | ${cliente.email || '-'}
-        </p>
-        <p style="margin:3px 0 0 0;font-size:10px;color:#999;">
-          Totale ordini: ${ordiniOrdinati.length}
-        </p>
+      <div style="background:#f5f5f5;padding:12px;border-radius:4px;margin-bottom:15px;border-left:4px solid #2980b9;">
+        <h2 style="margin:0;font-size:16px;color:#2980b9;">${cliente.nome || 'N/A'}</h2>
+        <p style="margin:5px 0 0 0;font-size:12px;">${cliente.num_tel || '-'} | ${cliente.email || '-'}</p>
+        <p style="margin:3px 0 0 0;font-size:10px;">Totale preventivi: ${ordiniOrdinati.length}</p>
       </div>
-
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>
-          <tr style="background-color:#ecf0f1;border-bottom:2px solid #34495e;">
+          <tr style="background:#ecf0f1;border-bottom:2px solid #34495e;">
             <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Data</th>
             <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Marca</th>
             <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Modello</th>
@@ -1212,110 +1154,43 @@ function generateClienteSection(cliente, ordiniCliente) {
           </tr>
         </thead>
         <tbody>
-          ${ordiniOrdinati
-            .map(
-              (o, i) => `
-            <tr style="border-bottom:1px solid #ecf0f1;${i % 2 === 0 ? 'background-color:#fafafa;' : ''}">
-              <td style="padding:8px;border:1px solid #ecf0f1;font-weight:bold;">
-                ${formatDataItStampa(o.data_movimento)}
-              </td>
-              <td style="padding:8px;border:1px solid #ecf0f1;">
-                ${o.marca_nome || '-'}
-              </td>
-              <td style="padding:8px;border:1px solid #ecf0f1;">
-                ${o.modello_nome || '-'}
-              </td>
-              <td style="padding:8px;border:1px solid #ecf0f1;">
-                ${o.note || '-'}
-              </td>
+          ${ordiniOrdinati.map((o, i) => `
+            <tr style="border-bottom:1px solid #ecf0f1;${i % 2 === 0 ? 'background:#fafafa;' : ''}">
+              <td style="padding:8px;border:1px solid #ecf0f1;font-weight:bold;">${formatDate(o.data_movimento)}</td>
+              <td style="padding:8px;border:1px solid #ecf0f1;">${o.marca_nome || '-'}</td>
+              <td style="padding:8px;border:1px solid #ecf0f1;">${o.modello_nome || '-'}</td>
+              <td style="padding:8px;border:1px solid #ecf0f1;">${o.note || '-'}</td>
             </tr>
-          `,
-            )
-            .join('')}
+          `).join('')}
         </tbody>
       </table>
     </div>
   `;
 }
 
-/**
- * Genera l'HTML completo per la stampa (raggruppato per cliente)
- * - clienti in ordine alfabetico
- * - ordini interni in ordine di data decrescente
- */
 function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
-  const company = companyWrapper.company || companyWrapper; // compatibile con company-info.json
-
+  const company = companyWrapper.company || companyWrapper;
   const gruppi = groupOrdiniByCliente(ordini);
-
-  // lista di clienti unici (id, nome, tel, email), ordinati per nome
   const clientiUnici = Array.from(
-    new Set(
-      ordini.map((o) =>
-        JSON.stringify({
-          id: o.cliente_id,
-          nome: o.cliente_nome,
-          num_tel: o.cliente_tel,
-          email: o.cliente_email,
-        }),
-      ),
-    ),
-  )
-    .map((s) => JSON.parse(s))
-    .sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
+    new Set(ordini.map((o) => JSON.stringify({ id: o.cliente_id, nome: o.cliente_nome, num_tel: o.cliente_tel, email: o.cliente_email })))
+  ).map((s) => JSON.parse(s)).sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
 
   const header = generatePrintHeader(company);
-
-  const bodyClienti = clientiUnici
-    .map((c) => {
-      const ordiniCliente = gruppi[c.id] || [];
-      return generateClienteSection(c, ordiniCliente);
-    })
-    .join('');
+  const bodyClienti = clientiUnici.map((c) => generateClienteSection(c, gruppi[c.id] || [])).join('');
 
   return `
     <!DOCTYPE html>
     <html lang="it">
       <head>
         <meta charset="UTF-8" />
-        <title>Stampa Ordini per Cliente</title>
+        <title>Stampa Preventivi per Cliente</title>
         <style>
-          body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #fff;
-            margin: 0;
-            padding: 0;
-          }
-          .print-container {
-            max-width: 210mm;
-            margin: 0 auto;
-            padding: 20mm;
-            background-color: #fff;
-          }
+          body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; }
+          .print-container { max-width: 210mm; margin: 0 auto; padding: 20mm; }
           @media print {
-            body {
-              margin: 0;
-              padding: 0;
-            }
-            .print-container {
-              max-width: 100%;
-              padding: 0;
-              margin: 0;
-            }
-            .cliente-section {
-              page-break-inside: avoid;
-              margin-bottom: 40px;
-            }
-          }
-          .timestamp {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 10px;
-            color: #999;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
+            body { margin: 0; padding: 0; }
+            .print-container { max-width: 100%; padding: 0; margin: 0; }
+            .cliente-section { page-break-inside: avoid; margin-bottom: 40px; }
           }
         </style>
       </head>
@@ -1323,7 +1198,7 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
         <div class="print-container">
           ${header}
           ${bodyClienti}
-          <div class="timestamp">
+          <div style="margin-top:20px;text-align:center;font-size:10px;color:#999;border-top:1px solid #ddd;padding-top:10px;">
             Documento generato il: ${new Date().toLocaleString('it-IT')}
           </div>
         </div>
@@ -1332,132 +1207,14 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
   `;
 }
 
-/**
- * Funzione principale: apre la finestra di stampa con ordini per cliente
- * - usa allOrdini già caricati da loadOrdini()
- */
-async function printOrdiniPerCliente(ordiniInput) {
-  try {
-    console.log('🚀 Inizio generazione stampa ordini per cliente...');
-    const ordiniDaStampare = ordiniInput || allOrdini;
-
-    if (!ordiniDaStampare || !ordiniDaStampare.length) {
-      showNotification('Nessun ordine da stampare', 'warning');
-      return;
-    }
-
-    const companyInfo = await loadCompanyInfoForPrint();
-    const html = generatePrintDocumentOrdiniPerCliente(ordiniDaStampare, companyInfo);
-
-    const w = window.open('', '_blank');
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-
-    w.onload = () => {
-      setTimeout(() => {
-        w.print();
-      }, 250);
-    };
-
-    console.log('✅ Finestra di stampa aperta');
-  } catch (err) {
-    console.error('❌ Errore nella stampa ordini per cliente:', err);
-    showNotification('Errore nella generazione della stampa', 'error');
-  }
-}
-
-// ==================== FUNZIONE EXPORT PDF (bonus) ====================
-async function exportOrdiniPDF() {
-  try {
-    console.log('📥 Inizio export PDF ordini...');
-    const ordiniDaEsportare = allOrdini;
-    
-    if (!ordiniDaEsportare || ordiniDaEsportare.length === 0) {
-      showNotification('Nessun ordine da esportare', 'warning');
-      return;
-    }
-    
-    const companyInfo = await loadCompanyInfoForPrint();
-    const html = generatePrintDocumentOrdiniPerCliente(ordiniDaEsportare, companyInfo);
-    
-    // Crea file HTML scaricabile (l'utente lo apre e stampa/salva come PDF)
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `ordini_per_cliente_${formatDataItStampa(new Date())}.html`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    showNotification('✅ File HTML scaricato! Aprilo e salva come PDF', 'success');
-  } catch (error) {
-    console.error('❌ Errore export PDF:', error);
-    showNotification('Errore nell\'export del file', 'error');
-  }
-}
-
-// ==================== AUTO-CARICA ORDINI ALL'AVVIO SEZIONE ORDINI ====================
-document.addEventListener('DOMContentLoaded', () => {
-  // Se l'utente apre direttamente sulla sezione ordini, carica subito
-  const savedSection = localStorage.getItem('activeSection') || 'clienti';
-  if (savedSection === 'ordini') {
-    setTimeout(() => {
-      loadOrdini();
-      addPrintButtonsToOrdiniSection(); // se hai questa funzione
-    }, 500);
-  }
-});
-
-/**
- * 🖨️ STAMPA DIRETTA - sostituisce contenuto e chiama window.print()
- */
 async function printOrdiniDiretta() {
   try {
-    console.log('🖨️ Stampa diretta ordini per cliente...');
-    
     if (!allOrdini || !allOrdini.length) {
-      showNotification('Nessun ordine da stampare', 'warning');
+      showNotification('Nessun preventivo da stampare', 'warning');
       return;
     }
-
     const companyInfo = await loadCompanyInfoForPrint();
     const htmlPrint = generatePrintDocumentOrdiniPerCliente(allOrdini, companyInfo);
-    
-    // Sostituisce TUTTO il contenuto della pagina con la stampa
-    document.body.innerHTML = htmlPrint;
-    
-    // Stampa immediatamente
-    setTimeout(() => {
-      window.print();
-    }, 100);
-    
-  } catch (err) {
-    console.error('❌ Errore stampa diretta:', err);
-    showNotification('Errore nella stampa', 'error');
-  }
-}
-
-// Esposizione globale
-window.printOrdiniDiretta = printOrdiniDiretta;
-
-/**
- * 🖨️ STAMPA DIRETTA - SOLO DIALOG STAMPA (niente web, niente sostituzione pagina)
- */
-async function printOrdiniDiretta() {
-  try {
-    console.log('🖨️ Preparazione stampa diretta...');
-    
-    if (!allOrdini || !allOrdini.length) {
-      showNotification('Nessun ordine da stampare', 'warning');
-      return;
-    }
-
-    const companyInfo = await loadCompanyInfoForPrint();
-    
-    // Crea un FRAME INVISIBILE per la stampa
     const printFrame = document.createElement('iframe');
     printFrame.style.position = 'absolute';
     printFrame.style.left = '-9999px';
@@ -1465,31 +1222,31 @@ async function printOrdiniDiretta() {
     printFrame.style.height = '0';
     printFrame.style.border = '0';
     document.body.appendChild(printFrame);
-    
-    // Genera HTML nel frame nascosto
-    const htmlPrint = generatePrintDocumentOrdiniPerCliente(allOrdini, companyInfo);
     printFrame.contentDocument.open();
     printFrame.contentDocument.write(htmlPrint);
     printFrame.contentDocument.close();
-    
-    // Aspetta caricamento e STAMPA DIRETTAMENTE
     printFrame.onload = () => {
       setTimeout(() => {
         printFrame.contentWindow.print();
-        // Rimuovi frame dopo stampa
         setTimeout(() => {
           document.body.removeChild(printFrame);
         }, 1000);
       }, 250);
     };
-    
-    showNotification('🖨️ Dialog stampa aperto!', 'success');
-    
+    showNotification('Dialog stampa aperto!', 'success');
   } catch (err) {
-    console.error('❌ Errore stampa:', err);
+    console.error('Errore stampa:', err);
     showNotification('Errore nella stampa', 'error');
   }
 }
 
-// Esposizione globale
 window.printOrdiniDiretta = printOrdiniDiretta;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const savedSection = localStorage.getItem('activeSection') || 'clienti';
+  if (savedSection === 'ordini') {
+    setTimeout(() => {
+      loadOrdini();
+    }, 500);
+  }
+});

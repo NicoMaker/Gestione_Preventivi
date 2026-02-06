@@ -3,14 +3,6 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../db/init");
 
-// Helper per formattare i decimali a 2 cifre
-function formatDecimal(value) {
-  if (value === null || value === undefined) return null;
-  const num = parseFloat(value);
-  if (isNaN(num)) return null;
-  return parseFloat(num.toFixed(2));
-}
-
 // GET - Lista tutti gli ordini con info cliente
 router.get("/", (req, res) => {
   const query = `

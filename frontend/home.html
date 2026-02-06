@@ -82,7 +82,7 @@
               />
               <path d="M9 12h6m-6 4h6" />
             </svg>
-            <span>Ordini</span>
+            <span>Preventivi</span>
           </a>
           <a href="#" class="nav-item" data-section="utenti">
             <svg
@@ -234,13 +234,15 @@
                     <th>Nome</th>
                     <th>Telefono</th>
                     <th>Email</th>
-                    <th style="text-align: center">Ordini</th>
+                    <th>Data Passaggio</th>
+                    <th style="text-align: center">Ricontatto</th>
+                    <th style="text-align: center">Preventivi</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
                 <tbody id="clientiTableBody">
                   <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="7" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -250,16 +252,14 @@
           </div>
         </section>
 
-        <!-- Sezione ORDINI -->
-        <!-- Sezione ORDINI -->
+        <!-- Sezione PREVENTIVI (ex ORDINI) -->
         <section id="section-ordini" class="content-section">
           <div class="section-header">
             <div>
-              <h1>Gestione Ordini</h1>
-              <p>Visualizza e gestisci gli ordini</p>
+              <h1>Gestione Preventivi</h1>
+              <p>Visualizza e gestisci i preventivi</p>
             </div>
             <div class="filter-controls">
-              <!-- 🔍 Campo ricerca -->
               <div class="search-wrapper">
                 <input
                   type="text"
@@ -269,12 +269,11 @@
                 />
               </div>
 
-              <!-- 🖨️ BOTTONE STAMPA PER CLIENTE (PRIMARIO) -->
               <button
                 type="button"
                 class="btn btn-secondary"
                 onclick="printOrdiniDiretta()"
-                title="Stampa ordini raggruppati per cliente"
+                title="Stampa preventivi raggruppati per cliente"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -292,7 +291,6 @@
                 <span>Stampa per Cliente</span>
               </button>
 
-              <!-- ➕ BOTTONE NUOVO ORDINE -->
               <button class="btn btn-primary" onclick="openOrdineModal()">
                 <svg
                   viewBox="0 0 24 24"
@@ -300,15 +298,14 @@
                   stroke="currentColor"
                   stroke-width="2"
                 >
-                  <line x1="12" y1="15" x2="12" y2="19"></line>
-                  <line x1="15" y1="12" x2="19" y2="12"></line>
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                <span>Nuovo Ordine</span>
+                <span>Nuovo Preventivo</span>
               </button>
             </div>
           </div>
 
-          <!-- 📊 TABELLA ORDINI -->
           <div class="card">
             <div class="table-container">
               <table>
@@ -318,7 +315,7 @@
                     <th>Cliente</th>
                     <th>Marca</th>
                     <th>Modello</th>
-                    <th>Note</th>
+                    <th>Note Preventivo</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
@@ -423,7 +420,7 @@
                   <tr>
                     <th>Nome Modello</th>
                     <th>Marca</th>
-                    <th class="text-center-badge">Ordini</th>
+                    <th class="text-center-badge">Preventivi</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
@@ -515,6 +512,16 @@
             <label for="clienteEmail">Email</label>
             <input type="email" id="clienteEmail" />
           </div>
+          <div class="form-group">
+            <label for="clienteDataPassaggio">Data Passaggio</label>
+            <input type="date" id="clienteDataPassaggio" />
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="clienteFlagRicontatto" style="width:20px;height:20px;cursor:pointer;" />
+              <span style="font-weight:600;">Ricontatto Cliente (Social) 📱</span>
+            </label>
+          </div>
           </div>
           <div class="modal-footer">
             <button
@@ -530,11 +537,11 @@
       </div>
     </div>
 
-    <!-- Modal Ordine -->
+    <!-- Modal Preventivo (ex Ordine) -->
     <div class="modal" id="modalOrdine">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="modalOrdineTitle">Nuovo Ordine</h3>
+          <h3 id="modalOrdineTitle">Nuovo Preventivo</h3>
           <button class="btn-close" onclick="closeOrdineModal()">
             <svg
               viewBox="0 0 24 24"
@@ -573,7 +580,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="ordineNote">Note</label>
+            <label for="ordineNote">Note Preventivo</label>
             <textarea id="ordineNote" rows="3"></textarea>
           </div>
           </div>
@@ -709,12 +716,27 @@
 
           <div class="form-group">
             <label for="utentePassword">Password *</label>
-            <input
-              type="password"
-              id="utentePassword"
-              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
-              title="Deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero"
-            />
+            <div class="input-container" style="position:relative;display:flex;align-items:center;">
+              <input
+                type="password"
+                id="utentePassword"
+                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                title="Deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero"
+                style="width:100%;padding-right:45px;"
+              />
+              <svg 
+                class="toggle-password" 
+                id="toggleUtentePassword" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2"
+                style="position:absolute;right:12px;width:22px;height:22px;cursor:pointer;color:#64748b;transition:color 0.2s;"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </div>
             <small
               id="passwordHelp"
               style="
@@ -725,8 +747,7 @@
               "
             >
               Requisiti minimi:
-              <strong>8 caratteri, 1 maiuscola, 1 minuscola e 1 numero.</strong
-              ><br />
+              <strong>8 caratteri, 1 maiuscola, 1 minuscola e 1 numero.</strong><br />
               <span id="editPasswordNote" style="font-style: italic"
                 >Lascia vuoto per mantenere la password esistente.</span
               >
@@ -745,6 +766,46 @@
             <button type="submit" class="btn btn-primary">Salva Utente</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- 🔥 MODALI MODERNE ALERT E CONFIRM -->
+    <div class="modal" id="confirmModal">
+      <div class="modal-content modal-small">
+        <div class="modal-header">
+          <h2>Conferma Eliminazione</h2>
+          <button class="modal-close" onclick="closeConfirmModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="confirm-content" style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;">
+            <div id="confirmIcon" class="confirm-icon" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(239,68,68,0.15);color:#ef4444;font-size:36px;">
+              🗑️
+            </div>
+            <p id="confirmMessage" style="font-size:17px;line-height:1.6;"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeConfirmModal()">Annulla</button>
+          <button id="confirmButton" class="btn btn-danger">Conferma</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="alertModal">
+      <div class="modal-content modal-small">
+        <div class="modal-header">
+          <h2 id="alertModalTitle">Informazione</h2>
+          <button class="modal-close" onclick="closeAlertModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-content" style="display:flex;gap:20px;align-items:flex-start;">
+            <div id="alertIcon" class="alert-icon"></div>
+            <div id="alertMessage" class="alert-message-text" style="flex:1;font-size:16px;line-height:1.6;"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="alertModalOkBtn" class="btn btn-primary" onclick="closeAlertModal()">OK</button>
+        </div>
       </div>
     </div>
 

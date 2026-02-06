@@ -89,13 +89,15 @@ function initDatabase() {
       }
     );
 
-    // ==================== TABELLA CLIENTI ====================
+    // ==================== TABELLA CLIENTI (AGGIORNATA) ====================
     db.run(
       `CREATE TABLE IF NOT EXISTS clienti (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL UNIQUE,
         num_tel TEXT,
         email TEXT,
+        data_passaggio DATE,
+        flag_ricontatto INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       (err) => {
@@ -103,6 +105,19 @@ function initDatabase() {
           console.error("Errore creazione tabella clienti:", err.message);
         } else {
           console.log("Tabella clienti OK");
+          
+          // Aggiungi colonne se non esistono (migrazione)
+          db.run("ALTER TABLE clienti ADD COLUMN data_passaggio DATE", (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+              console.error("Errore aggiunta data_passaggio:", err.message);
+            }
+          });
+          
+          db.run("ALTER TABLE clienti ADD COLUMN flag_ricontatto INTEGER DEFAULT 0", (err) => {
+            if (err && !err.message.includes("duplicate column")) {
+              console.error("Errore aggiunta flag_ricontatto:", err.message);
+            }
+          });
         }
       }
     );
@@ -125,7 +140,7 @@ function initDatabase() {
       }
     );
 
-    // ==================== TABELLA ORDINI (RICORDINI) ====================
+    // ==================== TABELLA PREVENTIVI (EX ORDINI) ====================
     db.run(
       `CREATE TABLE IF NOT EXISTS ordini (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
