@@ -1304,15 +1304,16 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
 
 async function printOrdiniDiretta() {
   try {
-    if (!allOrdini || !allOrdini.length) {
-      showNotification("Nessun preventivo da stampare", "warning");
-      return;
-    }
-    companyInfo = await loadCompanyInfoForPrint();
-    const htmlPrint = generatePrintDocumentOrdiniPerCliente(
-      allOrdini,
-      companyInfo,
-    );
+  // Usa 'ordini' (array filtrato) invece di 'allOrdini' per stampare solo ciò che è visibile
+  if (!ordini || !ordini.length) {
+  showNotification("Nessun preventivo da stampare. Controlla i filtri applicati.", "warning");
+  return;
+  }
+  companyInfo = await loadCompanyInfoForPrint();
+  const htmlPrint = generatePrintDocumentOrdiniPerCliente(
+  ordini,
+  companyInfo,
+  );
     const printFrame = document.createElement("iframe");
     printFrame.style.position = "absolute";
     printFrame.style.left = "-9999px";
