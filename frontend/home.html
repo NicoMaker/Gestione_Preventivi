@@ -211,7 +211,6 @@
                   placeholder="Cerca cliente..."
                 />
               </div>
-              <!-- NUOVO: Filtro Data Passaggio -->
               <div class="search-wrapper">
                 <input
                   type="date"
@@ -313,8 +312,8 @@
               <table>
                 <thead>
                   <tr>
+                    <th>Data</th>
                     <th>Cliente</th>
-                    <th>Data Movimento</th>
                     <th>Marca</th>
                     <th>Modello</th>
                     <th>Note</th>
@@ -555,6 +554,7 @@
       </div>
     </div>
 
+    <!-- Modal Preventivo -->
     <div class="modal" id="modalOrdine">
       <div class="modal-content">
         <div class="modal-header">
@@ -696,6 +696,7 @@
         <form id="formModello">
           <div class="modal-body">
             <input type="hidden" id="modelloId" />
+            
             <div class="form-group">
               <label for="modelloNome">Nome Modello *</label>
               <input type="text" id="modelloNome" required />
@@ -704,10 +705,7 @@
             <!-- SELECT SEARCHABLE PER MARCA NEL MODELLO -->
             <div class="form-group">
               <label for="modelloMarcaSearch">Marca *</label>
-              <div
-                class="select-search-container"
-                id="modelloMarcaSearch_container"
-              >
+              <div class="select-search-container" id="modelloMarcaSearch_container">
                 <!-- Popolato da JavaScript -->
               </div>
             </div>
@@ -797,18 +795,12 @@
                 style="
                   display: block;
                   color: #666;
-                  margin-top: 5px;
-                  line-height: 1.2;
+                  margin-top: 6px;
+                  font-size: 13px;
                 "
+                >Minimo 8 caratteri, una maiuscola, una minuscola e un
+                numero</small
               >
-                Requisiti minimi:
-                <strong
-                  >8 caratteri, 1 maiuscola, 1 minuscola e 1 numero.</strong
-                ><br />
-                <span id="editPasswordNote" style="font-style: italic"
-                  >Lascia vuoto per mantenere la password esistente.</span
-                >
-              </small>
             </div>
           </div>
           <div class="modal-footer">
@@ -819,95 +811,75 @@
             >
               Annulla
             </button>
-            <button type="submit" class="btn btn-primary">Salva Utente</button>
+            <button type="submit" class="btn btn-primary">Salva</button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- 🔥 MODALI MODERNE ALERT E CONFIRM -->
+    <!-- Modal Confirm -->
     <div class="modal" id="confirmModal">
-      <div class="modal-content modal-small">
+      <div class="modal-content">
         <div class="modal-header">
-          <h2>Conferma Eliminazione</h2>
+          <h2>Conferma</h2>
           <button class="modal-close" onclick="closeConfirmModal()">×</button>
         </div>
         <div class="modal-body">
           <div
-            class="confirm-content"
+            id="confirmIcon"
             style="
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 20px;
+              font-size: 48px;
               text-align: center;
+              margin-bottom: 16px;
+              padding: 16px;
+              border-radius: 12px;
             "
           >
-            <div
-              id="confirmIcon"
-              class="confirm-icon"
-              style="
-                width: 72px;
-                height: 72px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(239, 68, 68, 0.15);
-                color: #ef4444;
-                font-size: 36px;
-              "
-            >
-              🗑️
-            </div>
-            <p
-              id="confirmMessage"
-              style="font-size: 17px; line-height: 1.6"
-            ></p>
+            ❓
           </div>
+          <p id="confirmMessage" style="text-align: center; font-size: 16px">
+            Sei sicuro?
+          </p>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeConfirmModal()">
             Annulla
           </button>
-          <button id="confirmButton" class="btn btn-danger">Conferma</button>
+          <button class="btn btn-primary" id="confirmButton">Conferma</button>
         </div>
       </div>
     </div>
 
+    <!-- Modal Alert -->
     <div class="modal" id="alertModal">
-      <div class="modal-content modal-small">
+      <div class="modal-content">
         <div class="modal-header">
           <h2 id="alertModalTitle">Informazione</h2>
           <button class="modal-close" onclick="closeAlertModal()">×</button>
         </div>
         <div class="modal-body">
-          <div
-            class="alert-content"
-            style="display: flex; gap: 20px; align-items: flex-start"
-          >
-            <div id="alertIcon" class="alert-icon"></div>
-            <div
-              id="alertMessage"
-              class="alert-message-text"
-              style="flex: 1; font-size: 16px; line-height: 1.6"
-            ></div>
+          <div id="alertIcon" class="alert-icon info">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
           </div>
+          <p id="alertMessage"></p>
         </div>
         <div class="modal-footer">
-          <button
-            id="alertModalOkBtn"
-            class="btn btn-primary"
-            onclick="closeAlertModal()"
-          >
-            OK
-          </button>
+          <button class="btn btn-primary" id="alertModalOkBtn">OK</button>
         </div>
       </div>
     </div>
 
-    <script src="company-loader.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="company-loader.js"></script>
     <script src="realtime.js"></script>
     <script src="script.js"></script>
   </body>

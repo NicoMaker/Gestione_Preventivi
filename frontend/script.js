@@ -844,10 +844,6 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   const modello_id = document.getElementById("ordineModello").value || null; // Hidden input
   const note = document.getElementById("ordineNote").value.trim();
 
-  console.log("[v0] Cliente ID dal form:", cliente_id);
-  console.log("[v0] Select ordineCliente:", document.getElementById("ordineCliente"));
-  console.log("[v0] Select value:", document.getElementById("ordineCliente").value);
-
   // Validazione cliente
   if (!cliente_id) {
     showNotification("Seleziona un cliente dalla lista", "warning");
@@ -1113,7 +1109,8 @@ async function openModelloModal(modello = null) {
   const title = document.getElementById("modalModelloTitle");
   const form = document.getElementById("formModello");
 
-  await loadMarcheForSelect();
+  // Inizializza il campo di ricerca searchable per la marca
+  await initModelloSearchableSelect();
 
   form.reset();
 
@@ -1121,7 +1118,11 @@ async function openModelloModal(modello = null) {
     title.textContent = "Modifica Modello";
     document.getElementById("modelloId").value = modello.id;
     document.getElementById("modelloNome").value = modello.nome;
-    document.getElementById("modelloMarca").value = modello.marche_id || "";
+    
+    // Imposta la marca selezionata nel campo searchable
+    if (modello.marche_id && marcaSearchModello) {
+      marcaSearchModello.setValue(modello.marche_id);
+    }
   } else {
     title.textContent = "Nuovo Modello";
     document.getElementById("modelloId").value = "";
@@ -1947,9 +1948,7 @@ populateOrdineModelliByMarca = function (marcaId) {
 document.addEventListener("DOMContentLoaded", () => {
   // Aspetta un po' prima di inizializzare (per dare tempo ai dati di caricarsi)
   setTimeout(initSelectSearch, 1000);
-});
-
-console.log("✅ Ricerca autocomplete nei select attivata!");
+  });
 
 // ==================== 🆕 SELECT SEARCHABLE PER MARCA E MODELLO ====================
 
@@ -2241,6 +2240,30 @@ let marcaSearchOrdine = null;
 let modelloSearchOrdine = null;
 let marcaSearchModello = null;
 
+// Inizializza SELECT searchable per il form Modello
+async function initModelloSearchableSelect() {
+  // SELECT MARCA nel form Modello
+  marcaSearchModello = createSearchableSelect(
+    "modelloMarcaSearch_container",
+    "modelloMarca",
+    "Cerca marca...",
+    async () => {
+      const res = await fetch(`${API_URL}/marche`);
+      const marche = await res.json();
+      return marche.map((m) => ({ id: m.id, nome: m.nome }));
+    },
+    (id, nome) => {
+      console.log("Marca selezionata per modello:", nome);
+    },
+    true, // required
+  );
+
+  // Carica i dati
+  if (marcaSearchModello) {
+    await marcaSearchModello.refreshData();
+  }
+}
+
 // Inizializza SELECT searchable per il form Ordine
 async function initOrdineSearchableSelects() {
   // SELECT MARCA nel form Ordine
@@ -2432,132 +2455,6 @@ window.openModelloModal = async function (modello = null) {
 
   modal.classList.add("active");
 };
-
-console.log("✅ SELECT Searchable migliorati attivati!");
-
-
-// Funzione per inizializzare la ricerca cliente ogni volta che apri il modal
-function setupClienteSelection() {
-    const searchInput = document.getElementById('ordineClienteSearch');
-    const hiddenInput = document.getElementById('ordineCliente');
-    const resultsDiv = document.getElementById('clienteResults');
-
-    searchInput.addEventListener('input', function() {
-        const val = this.value.toLowerCase().trim();
-        resultsDiv.innerHTML = '';
-        
-        if (val.length < 1) {
-            resultsDiv.style.display = 'none';
-            hiddenInput.value = ''; // Reset ID se cancello
-            return;
-        }
-
-        const matches = allClienti.filter(c => 
-            (`${c.nome} ${c.cognome}`).toLowerCase().includes(val) || 
-            (c.ragione_sociale || "").toLowerCase().includes(val)
-        );
-
-        matches.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            div.textContent = c.ragione_sociale || `${c.nome} ${c.cognome}`;
-            div.onclick = () => {
-                searchInput.value = div.textContent;
-                hiddenInput.value = c.id; // ASSEGNAZIONE ID
-                resultsDiv.style.display = 'none';
-                searchInput.classList.add('has-selection');
-            };
-            resultsDiv.appendChild(div);
-        });
-        resultsDiv.style.display = matches.length ? 'block' : 'none';
-    });
-}
-
-// Gestione INVIO FORM
-document.getElementById('formOrdine').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const clienteId = document.getElementById('ordineCliente').value;
-    
-    // Controllo di sicurezza: se l'ID è vuoto, blocca tutto
-    if (!clienteId) {
-        alert("⚠️ Per favore, seleziona un cliente valido dalla lista suggerita.");
-        return;
-    }
-
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData.entries());
-
-    try {
-        const response = await fetch(`${API_URL}/ordini`, {
-            method: data.id ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            alert("✅ Preventivo salvato con successo!");
-            closeOrdineModal();
-            loadOrdini(); // Ricarica la tabella
-        } else {
-            const res = await response.json();
-            alert("❌ Errore: " + res.error);
-        }
-    } catch (error) {
-        console.error("Errore invio:", error);
-    }
-});
-
-document.getElementById('formOrdine').addEventListener('submit', async function(e) {
-    // 1. Ferma subito l'invio di default del browser
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 2. Recupera i valori dai campi nascosti
-    const clienteId = document.getElementById('ordineCliente').value;
-    const marcaId = document.getElementById('ordineMarca').value;
-    const modelloId = document.getElementById('ordineModello').value;
-    const dataOrdine = document.getElementById('ordineData').value;
-    const note = document.getElementById('ordineNote').value;
-    const idEsistente = document.getElementById('ordineId').value;
-
-    // 3. IL FILTRO: Se questi dati mancano, NON procedere
-    if (!clienteId || clienteId === "" || !marcaId || !modelloId) {
-        alert("⚠️ Errore: Devi selezionare obbligatoriamente Cliente, Marca e Modello dai suggerimenti.");
-        return; // BLOCCA l'esecuzione qui
-    }
-
-    // 4. Costruisci l'oggetto pulito
-    const data = {
-        cliente_id: clienteId,
-        marche_id: marcaId,
-        modelli_id: modelloId,
-        data_ordine: dataOrdine,
-        note: note
-    };
-    
-    if (idEsistente) data.id = idEsistente;
-
-    try {
-        const response = await fetch(`${API_URL}/ordini`, {
-            method: data.id ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            alert("✅ Preventivo salvato correttamente!");
-            closeOrdineModal();
-            if (typeof loadOrdini === 'function') loadOrdini();
-        } else {
-            const err = await response.json();
-            alert("❌ Errore dal server: " + err.error);
-        }
-    } catch (error) {
-        console.error("Errore invio:", error);
-        alert("❌ Errore di connessione al server.");
-    }
-});
 
 // Funzione da chiamare quando apri il modal
 async function initOrdineSelects() {
