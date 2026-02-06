@@ -1,3 +1,3 @@
 Deve esserci un solo cerca modello dove dentro ti prende il nome come per le marche e per i clienti 
 
-deve creare un solo elemento per ogni preventivo non 4
+deve creare un solo elemento per ogni preventivo non 2
