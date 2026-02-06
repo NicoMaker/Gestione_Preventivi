@@ -455,7 +455,7 @@ async function openOrdineModal(ordine = null) {
   } else {
     title.textContent = "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
-    
+
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("ordineData").value = today;
   }
@@ -845,7 +845,7 @@ async function openModelloModal(modello = null) {
     title.textContent = "Modifica Modello";
     document.getElementById("modelloId").value = modello.id;
     document.getElementById("modelloNome").value = modello.nome;
-    
+
     // Imposta la marca selezionata nel campo searchable
     if (modello.marche_id && marcaSearchModello) {
       marcaSearchModello.setValue(modello.marche_id);
@@ -1103,7 +1103,7 @@ function showConfirmModal(message, title = "Conferma") {
     const modal = document.createElement("div");
     modal.className = "modal active";
     modal.style.zIndex = "10000";
-    
+
     modal.innerHTML = `
       <div class="modal-content" style="max-width: 450px;">
         <div class="modal-header">
@@ -1122,22 +1122,22 @@ function showConfirmModal(message, title = "Conferma") {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     const btnCancel = modal.querySelector(".btn-cancel");
     const btnConfirm = modal.querySelector(".btn-confirm");
-    
+
     btnCancel.addEventListener("click", () => {
       modal.remove();
       resolve(false);
     });
-    
+
     btnConfirm.addEventListener("click", () => {
       modal.remove();
       resolve(true);
     });
-    
+
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
         modal.remove();
@@ -1211,10 +1211,10 @@ function generateClienteSection(cliente, ordiniCliente) {
   <strong>✉️ Email:</strong> ${cliente.email || "-"}
   </p>
   <p style="margin:4px 0;font-size:12px;color:#555;">
-  <strong>📅 Data passaggio:</strong> ${cliente.data_passaggio || "-"}
+  <strong>📅 Data passaggio:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "-"}
   </p>
   <p style="margin:4px 0;font-size:12px;color:#555;">
-  <strong>📞 Ricontattare:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
+  <strong>📞 Ricontatto:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
   </p>
   <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
   Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
@@ -1252,21 +1252,21 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
   const company = companyWrapper.company || companyWrapper;
   const gruppi = groupOrdiniByCliente(ordini);
   const clientiUnici = Array.from(
-  new Set(
-  ordini.map((o) =>
-  JSON.stringify({
-  id: o.cliente_id,
-  nome: o.cliente_nome,
-  num_tel: o.cliente_tel,
-  email: o.cliente_email,
-  data_passaggio: o.cliente_data_passaggio,
-  flag_ricontatto: o.cliente_flag_ricontatto,
-  }),
-  ),
-  ),
+    new Set(
+      ordini.map((o) =>
+        JSON.stringify({
+          id: o.cliente_id,
+          nome: o.cliente_nome,
+          num_tel: o.cliente_tel,
+          email: o.cliente_email,
+          data_passaggio: o.cliente_data_passaggio,
+          flag_ricontatto: o.cliente_flag_ricontatto,
+        }),
+      ),
+    ),
   )
-  .map((s) => JSON.parse(s))
-  .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
+    .map((s) => JSON.parse(s))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
 
   const header = generatePrintHeader(company);
   const bodyClienti = clientiUnici
@@ -1882,28 +1882,28 @@ window.openModelloModal = async function (modello = null) {
 
 // Funzione da chiamare quando apri il modal
 async function initOrdineSelects() {
-    // 1. Inizializza Ricerca CLIENTE (come concetto Marca)
-    if (window.clienteSearchOrdine) {
-        window.clienteSearchOrdine.onSelect = (id) => {
-            document.getElementById('ordineCliente').value = id;
-        };
-    }
+  // 1. Inizializza Ricerca CLIENTE (come concetto Marca)
+  if (window.clienteSearchOrdine) {
+    window.clienteSearchOrdine.onSelect = (id) => {
+      document.getElementById("ordineCliente").value = id;
+    };
+  }
 
-    // 2. Inizializza Ricerca MARCA
-    if (window.marcaSearchOrdine) {
-        window.marcaSearchOrdine.onSelect = (id) => {
-            document.getElementById('ordineMarca').value = id;
-            // Quando cambi marca, filtra i modelli
-            if (window.modelloSearchOrdine) {
-                window.modelloSearchOrdine.setFilter(m => m.marche_id == id);
-            }
-        };
-    }
+  // 2. Inizializza Ricerca MARCA
+  if (window.marcaSearchOrdine) {
+    window.marcaSearchOrdine.onSelect = (id) => {
+      document.getElementById("ordineMarca").value = id;
+      // Quando cambi marca, filtra i modelli
+      if (window.modelloSearchOrdine) {
+        window.modelloSearchOrdine.setFilter((m) => m.marche_id == id);
+      }
+    };
+  }
 
-    // 3. Inizializza Ricerca MODELLO
-    if (window.modelloSearchOrdine) {
-        window.modelloSearchOrdine.onSelect = (id) => {
-            document.getElementById('ordineModello').value = id;
-        };
-    }
+  // 3. Inizializza Ricerca MODELLO
+  if (window.modelloSearchOrdine) {
+    window.modelloSearchOrdine.onSelect = (id) => {
+      document.getElementById("ordineModello").value = id;
+    };
+  }
 }

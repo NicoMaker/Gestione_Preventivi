@@ -81,8 +81,8 @@ router.post("/", (req, res) => {
   const { cliente_id, data_movimento, modello_id, marca_id, note } = req.body;
 
   if (!cliente_id) {
-    return res.status(400).json({ 
-      error: "Cliente obbligatorio" 
+    return res.status(400).json({
+      error: "Cliente obbligatorio",
     });
   }
 
@@ -91,7 +91,13 @@ router.post("/", (req, res) => {
   db.run(
     `INSERT INTO ordini (cliente_id, data_movimento, modello_id, marca_id, note) 
      VALUES (?, ?, ?, ?, ?)`,
-    [cliente_id, dataMovimento, modello_id || null, marca_id || null, note || null],
+    [
+      cliente_id,
+      dataMovimento,
+      modello_id || null,
+      marca_id || null,
+      note || null,
+    ],
     function (err) {
       if (err) {
         console.error("Errore creazione ordine:", err);
@@ -134,12 +140,14 @@ router.post("/", (req, res) => {
             io.emit("ordini_aggiornati");
           }
 
-          console.log(`Ordine creato: ID ${ordineId} per cliente ${cliente_id}`);
+          console.log(
+            `Ordine creato: ID ${ordineId} per cliente ${cliente_id}`,
+          );
 
           res.json(ordine);
-        }
+        },
       );
-    }
+    },
   );
 });
 
@@ -149,8 +157,8 @@ router.put("/:id", (req, res) => {
   const { cliente_id, data_movimento, modello_id, marca_id, note } = req.body;
 
   if (!cliente_id) {
-    return res.status(400).json({ 
-      error: "Cliente obbligatorio" 
+    return res.status(400).json({
+      error: "Cliente obbligatorio",
     });
   }
 
@@ -158,7 +166,14 @@ router.put("/:id", (req, res) => {
     `UPDATE ordini 
      SET cliente_id = ?, data_movimento = ?, modello_id = ?, marca_id = ?, note = ? 
      WHERE id = ?`,
-    [cliente_id, data_movimento, modello_id || null, marca_id || null, note || null, id],
+    [
+      cliente_id,
+      data_movimento,
+      modello_id || null,
+      marca_id || null,
+      note || null,
+      id,
+    ],
     function (err) {
       if (err) {
         console.error("Errore aggiornamento ordine:", err);
@@ -177,7 +192,7 @@ router.put("/:id", (req, res) => {
 
       console.log(`Ordine aggiornato: ID ${id}`);
       res.json({ success: true });
-    }
+    },
   );
 });
 
