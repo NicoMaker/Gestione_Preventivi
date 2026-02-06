@@ -23,29 +23,6 @@ async function loadCompanyInfo() {
   } catch (error) {
     console.error('❌ Errore caricamento company-info.json:', error);
     
-    // Fallback con dati di default
-    companyInfo = {
-      company: {
-        name: "Magazzino Moto",
-        address: "Via prova 123",
-        city: "Milano",
-        cap: "20100",
-        province: "MI",
-        country: "Italia",
-        piva: "1234567890",
-        phone: "+39 02 1234567",
-        email: "info@magazzinomoto.it",
-        website: "www.magazzinomoto.it",
-        logo: "img/Logo.png"
-      },
-      settings: {
-        currency: "EUR",
-        currencySymbol: "€",
-        dateFormat: "DD/MM/YYYY",
-        decimalSeparator: ",",
-        thousandsSeparator: "."
-      }
-    };
     
     console.warn('⚠️ Uso dati di fallback');
     return companyInfo;
