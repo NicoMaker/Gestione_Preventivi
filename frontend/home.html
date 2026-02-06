@@ -211,6 +211,16 @@
                   placeholder="Cerca cliente..."
                 />
               </div>
+              <!-- NUOVO: Filtro Data Passaggio -->
+              <div class="search-wrapper">
+                <input
+                  type="date"
+                  id="filterDataPassaggio"
+                  class="filter-input"
+                  placeholder="Filtra per data passaggio"
+                  title="Filtra per data passaggio"
+                />
+              </div>
               <button class="btn btn-primary" onclick="openClienteModal()">
                 <svg
                   viewBox="0 0 24 24"
@@ -235,8 +245,8 @@
                     <th>Telefono</th>
                     <th>Email</th>
                     <th>Data Passaggio</th>
-                    <th style="text-align: center">Ricontatto</th>
-                    <th style="text-align: center">Preventivi</th>
+                    <th>Ricontatto</th>
+                    <th class="text-center">Preventivi</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
@@ -252,11 +262,11 @@
           </div>
         </section>
 
-        <!-- Sezione PREVENTIVI (ex ORDINI) -->
+        <!-- Sezione PREVENTIVI -->
         <section id="section-ordini" class="content-section">
           <div class="section-header">
             <div>
-              <h1>Gestione Preventivi</h1>
+              <h1>Preventivi</h1>
               <p>Visualizza e gestisci i preventivi</p>
             </div>
             <div class="filter-controls">
@@ -265,32 +275,24 @@
                   type="text"
                   id="filterOrdini"
                   class="filter-input"
-                  placeholder="Cerca per cliente, marca, modello..."
+                  placeholder="Cerca preventivo..."
                 />
               </div>
-
-              <button
-                type="button"
-                class="btn btn-secondary"
-                onclick="printOrdiniDiretta()"
-                title="Stampa preventivi raggruppati per cliente"
-              >
+              <button class="btn btn-secondary" onclick="printOrdiniDiretta()">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
                 >
-                  <path d="M6 19h4V9H6v10z" />
-                  <path d="M14 19h4V9h-4v10z" />
+                  <polyline points="6 9 6 2 18 2 18 9" />
                   <path
-                    d="M18 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"
+                    d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
                   />
-                  <polyline points="18,9 12,15 6,9" />
+                  <rect x="6" y="14" width="12" height="8" />
                 </svg>
                 <span>Stampa per Cliente</span>
               </button>
-
               <button class="btn btn-primary" onclick="openOrdineModal()">
                 <svg
                   viewBox="0 0 24 24"
@@ -298,8 +300,8 @@
                   stroke="currentColor"
                   stroke-width="2"
                 >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
                 <span>Nuovo Preventivo</span>
               </button>
@@ -311,11 +313,11 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Data</th>
                     <th>Cliente</th>
+                    <th>Data Movimento</th>
                     <th>Marca</th>
                     <th>Modello</th>
-                    <th>Note Preventivo</th>
+                    <th>Note</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
@@ -336,7 +338,7 @@
           <div class="section-header">
             <div>
               <h1>Gestione Marche</h1>
-              <p>Crea e gestisci le marche</p>
+              <p>Visualizza e gestisci le marche</p>
             </div>
             <div class="filter-controls">
               <div class="search-wrapper">
@@ -367,8 +369,8 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Nome Marca</th>
-                    <th class="text-center-badge">Prodotti Relazionati</th>
+                    <th>Nome</th>
+                    <th class="text-center">N° Prodotti</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
@@ -389,15 +391,17 @@
           <div class="section-header">
             <div>
               <h1>Gestione Modelli</h1>
-              <p>Crea e gestisci i modelli</p>
+              <p>Visualizza e gestisci i modelli</p>
             </div>
             <div class="filter-controls">
-              <input
-                type="text"
-                id="filterModelli"
-                class="filter-input"
-                placeholder="Cerca modello..."
-              />
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="filterModelli"
+                  class="filter-input"
+                  placeholder="Cerca modello..."
+                />
+              </div>
               <button class="btn btn-primary" onclick="openModelloModal()">
                 <svg
                   viewBox="0 0 24 24"
@@ -418,9 +422,9 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Nome Modello</th>
+                    <th>Nome</th>
                     <th>Marca</th>
-                    <th class="text-center-badge">Preventivi</th>
+                    <th class="text-center">N° Preventivi</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
@@ -441,7 +445,7 @@
           <div class="section-header">
             <div>
               <h1>Gestione Utenti</h1>
-              <p>Amministra gli utenti del sistema</p>
+              <p>Visualizza e gestisci gli utenti</p>
             </div>
             <button class="btn btn-primary" onclick="openUtenteModal()">
               <svg
@@ -499,29 +503,43 @@
         </div>
         <form id="formCliente">
           <div class="modal-body">
-          <input type="hidden" id="clienteId" />
-          <div class="form-group">
-            <label for="clienteNome">Nome Cliente *</label>
-            <input type="text" id="clienteNome" required />
-          </div>
-          <div class="form-group">
-            <label for="clienteTel">Telefono</label>
-            <input type="tel" id="clienteTel" />
-          </div>
-          <div class="form-group">
-            <label for="clienteEmail">Email</label>
-            <input type="email" id="clienteEmail" />
-          </div>
-          <div class="form-group">
-            <label for="clienteDataPassaggio">Data Passaggio</label>
-            <input type="date" id="clienteDataPassaggio" />
-          </div>
-          <div class="form-group">
-            <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-              <input type="checkbox" id="clienteFlagRicontatto" style="width:20px;height:20px;cursor:pointer;" />
-              <span style="font-weight:600;">Ricontatto Cliente (Social) 📱</span>
-            </label>
-          </div>
+            <input type="hidden" id="clienteId" />
+            <div class="form-group">
+              <label for="clienteNome">Nome Cliente *</label>
+              <input type="text" id="clienteNome" required />
+            </div>
+            <div class="form-group">
+              <label for="clienteTel">Telefono *</label>
+              <input type="tel" id="clienteTel" required />
+            </div>
+            <div class="form-group">
+              <label for="clienteEmail">Email *</label>
+              <input type="email" id="clienteEmail" required />
+            </div>
+            <div class="form-group">
+              <label for="clienteDataPassaggio">Data Passaggio</label>
+              <input type="date" id="clienteDataPassaggio" />
+            </div>
+            <div class="form-group">
+              <label
+                class="checkbox-label"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  id="clienteFlagRicontatto"
+                  style="width: 20px; height: 20px; cursor: pointer"
+                />
+                <span style="font-weight: 600"
+                  >Ricontatto Cliente (Social) 📱</span
+                >
+              </label>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -556,33 +574,44 @@
         </div>
         <form id="formOrdine">
           <div class="modal-body">
-          <input type="hidden" id="ordineId" />
-          <div class="form-group">
-            <label for="ordineCliente">Cliente *</label>
-            <select id="ordineCliente" required>
-              <option value="">Seleziona cliente</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="ordineData">Data Movimento</label>
-            <input type="date" id="ordineData" />
-          </div>
-          <div class="form-group">
-            <label for="ordineMarca">Marca</label>
-            <select id="ordineMarca">
-              <option value="">Seleziona marca</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="ordineModello">Modello</label>
-            <select id="ordineModello">
-              <option value="">Seleziona modello</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="ordineNote">Note Preventivo</label>
-            <textarea id="ordineNote" rows="3"></textarea>
-          </div>
+            <input type="hidden" id="ordineId" />
+            <div class="form-group">
+              <label for="ordineCliente">Cliente *</label>
+              <select id="ordineCliente">
+                <option value="">Seleziona cliente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ordineData">Data Movimento *</label>
+              <input type="date" id="ordineData" required />
+            </div>
+
+            <!-- SELECT SEARCHABLE PER MARCA -->
+            <div class="form-group">
+              <label for="ordineMarcaSearch">Marca *</label>
+              <div
+                class="select-search-container"
+                id="ordineMarcaSearch_container"
+              >
+                <!-- Popolato da JavaScript -->
+              </div>
+            </div>
+
+            <!-- SELECT SEARCHABLE PER MODELLO -->
+            <div class="form-group">
+              <label for="ordineModelloSearch">Modello *</label>
+              <div
+                class="select-search-container"
+                id="ordineModelloSearch_container"
+              >
+                <!-- Popolato da JavaScript -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ordineNote">Note Preventivo</label>
+              <textarea id="ordineNote" rows="3"></textarea>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -617,11 +646,11 @@
         </div>
         <form id="formMarca">
           <div class="modal-body">
-          <input type="hidden" id="marcaId" />
-          <div class="form-group">
-            <label for="marcaNome">Nome Marca *</label>
-            <input type="text" id="marcaNome" required />
-          </div>
+            <input type="hidden" id="marcaId" />
+            <div class="form-group">
+              <label for="marcaNome">Nome Marca *</label>
+              <input type="text" id="marcaNome" required />
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -656,17 +685,22 @@
         </div>
         <form id="formModello">
           <div class="modal-body">
-          <input type="hidden" id="modelloId" />
-          <div class="form-group">
-            <label for="modelloNome">Nome Modello *</label>
-            <input type="text" id="modelloNome" required />
-          </div>
-          <div class="form-group">
-            <label for="modelloMarca">Marca</label>
-            <select id="modelloMarca">
-              <option value="">Seleziona marca</option>
-            </select>
-          </div>
+            <input type="hidden" id="modelloId" />
+            <div class="form-group">
+              <label for="modelloNome">Nome Modello *</label>
+              <input type="text" id="modelloNome" required />
+            </div>
+
+            <!-- SELECT SEARCHABLE PER MARCA NEL MODELLO -->
+            <div class="form-group">
+              <label for="modelloMarcaSearch">Marca *</label>
+              <div
+                class="select-search-container"
+                id="modelloMarcaSearch_container"
+              >
+                <!-- Popolato da JavaScript -->
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -701,59 +735,71 @@
         </div>
         <form id="formUtente">
           <div class="modal-body">
-          <input type="hidden" id="utenteId" />
+            <input type="hidden" id="utenteId" />
 
-          <div class="form-group">
-            <label for="utenteNome">Nome Utente *</label>
-            <input
-              type="text"
-              id="utenteNome"
-              required
-              minlength="3"
-              placeholder="Es. MarioRossi"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="utentePassword">Password *</label>
-            <div class="input-container" style="position:relative;display:flex;align-items:center;">
+            <div class="form-group">
+              <label for="utenteNome">Nome Utente *</label>
               <input
-                type="password"
-                id="utentePassword"
-                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
-                title="Deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero"
-                style="width:100%;padding-right:45px;"
+                type="text"
+                id="utenteNome"
+                required
+                minlength="3"
+                placeholder="Es. MarioRossi"
               />
-              <svg 
-                class="toggle-password" 
-                id="toggleUtentePassword" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                stroke-width="2"
-                style="position:absolute;right:12px;width:22px;height:22px;cursor:pointer;color:#64748b;transition:color 0.2s;"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
             </div>
-            <small
-              id="passwordHelp"
-              style="
-                display: block;
-                color: #666;
-                margin-top: 5px;
-                line-height: 1.2;
-              "
-            >
-              Requisiti minimi:
-              <strong>8 caratteri, 1 maiuscola, 1 minuscola e 1 numero.</strong><br />
-              <span id="editPasswordNote" style="font-style: italic"
-                >Lascia vuoto per mantenere la password esistente.</span
-              >
-            </small>
-          </div>
 
+            <div class="form-group">
+              <label for="utentePassword">Password *</label>
+              <div
+                class="input-container"
+                style="position: relative; display: flex; align-items: center"
+              >
+                <input
+                  type="password"
+                  id="utentePassword"
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                  title="Deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero"
+                  style="width: 100%; padding-right: 45px"
+                />
+                <svg
+                  class="toggle-password"
+                  id="toggleUtentePassword"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  style="
+                    position: absolute;
+                    right: 12px;
+                    width: 22px;
+                    height: 22px;
+                    cursor: pointer;
+                    color: #64748b;
+                    transition: color 0.2s;
+                  "
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+              <small
+                id="passwordHelp"
+                style="
+                  display: block;
+                  color: #666;
+                  margin-top: 5px;
+                  line-height: 1.2;
+                "
+              >
+                Requisiti minimi:
+                <strong
+                  >8 caratteri, 1 maiuscola, 1 minuscola e 1 numero.</strong
+                ><br />
+                <span id="editPasswordNote" style="font-style: italic"
+                  >Lascia vuoto per mantenere la password esistente.</span
+                >
+              </small>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -777,15 +823,43 @@
           <button class="modal-close" onclick="closeConfirmModal()">×</button>
         </div>
         <div class="modal-body">
-          <div class="confirm-content" style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;">
-            <div id="confirmIcon" class="confirm-icon" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(239,68,68,0.15);color:#ef4444;font-size:36px;">
+          <div
+            class="confirm-content"
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 20px;
+              text-align: center;
+            "
+          >
+            <div
+              id="confirmIcon"
+              class="confirm-icon"
+              style="
+                width: 72px;
+                height: 72px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(239, 68, 68, 0.15);
+                color: #ef4444;
+                font-size: 36px;
+              "
+            >
               🗑️
             </div>
-            <p id="confirmMessage" style="font-size:17px;line-height:1.6;"></p>
+            <p
+              id="confirmMessage"
+              style="font-size: 17px; line-height: 1.6"
+            ></p>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeConfirmModal()">Annulla</button>
+          <button class="btn btn-secondary" onclick="closeConfirmModal()">
+            Annulla
+          </button>
           <button id="confirmButton" class="btn btn-danger">Conferma</button>
         </div>
       </div>
@@ -798,13 +872,26 @@
           <button class="modal-close" onclick="closeAlertModal()">×</button>
         </div>
         <div class="modal-body">
-          <div class="alert-content" style="display:flex;gap:20px;align-items:flex-start;">
+          <div
+            class="alert-content"
+            style="display: flex; gap: 20px; align-items: flex-start"
+          >
             <div id="alertIcon" class="alert-icon"></div>
-            <div id="alertMessage" class="alert-message-text" style="flex:1;font-size:16px;line-height:1.6;"></div>
+            <div
+              id="alertMessage"
+              class="alert-message-text"
+              style="flex: 1; font-size: 16px; line-height: 1.6"
+            ></div>
           </div>
         </div>
         <div class="modal-footer">
-          <button id="alertModalOkBtn" class="btn btn-primary" onclick="closeAlertModal()">OK</button>
+          <button
+            id="alertModalOkBtn"
+            class="btn btn-primary"
+            onclick="closeAlertModal()"
+          >
+            OK
+          </button>
         </div>
       </div>
     </div>

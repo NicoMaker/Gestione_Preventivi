@@ -4115,3 +4115,259 @@ tbody tr:hover {
 .text-left {
   text-align: left;
 }
+
+/* ==================== AUTOCOMPLETE SELECT STYLES ==================== */
+/* Aggiungi questo CSS al tuo file styles.css */
+
+.select-search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-search-input {
+  width: 100%;
+  padding: 12px 40px 12px 18px;
+  border: 2px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  background: white;
+  color: var(--text-primary, #1e293b);
+  outline: none;
+}
+
+.select-search-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.select-search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.select-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 2px solid #6366f1;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  margin-top: -2px;
+}
+
+.select-search-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.select-search-results::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 0 0 12px 0;
+}
+
+.select-search-results::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.select-search-results::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.select-search-result-item {
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.select-search-result-item:last-child {
+  border-bottom: none;
+}
+
+.select-search-result-item:hover {
+  background: #f8fafc;
+  padding-left: 22px;
+  color: #6366f1;
+}
+
+.select-search-result-item:active {
+  background: #ede9fe;
+}
+
+/* Stile quando selezionato */
+.select-search-input.selected {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: #10b981;
+  font-weight: 600;
+  color: #065f46;
+}
+
+/* Icona ricerca */
+.select-search-wrapper .search-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+/* Animazione dropdown */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.select-search-results[style*="display: block"] {
+  animation: slideDown 0.2s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .select-search-input {
+    padding: 10px 35px 10px 14px;
+    font-size: 14px;
+  }
+  
+  .select-search-result-item {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .select-search-results {
+    max-height: 250px;
+  }
+}
+/* ==================== 🆕 SELECT SEARCHABLE MIGLIORATO ==================== */
+.searchable-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.searchable-select-input {
+  width: 100%;
+  padding: 12px 40px 12px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  color: #334155;
+}
+
+.searchable-select-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+.searchable-select-input::placeholder {
+  color: #94a3b8;
+}
+
+.searchable-select-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 2px solid #6366f1;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  margin-top: -2px;
+}
+
+.searchable-select-results .result-item {
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #334155;
+}
+
+.searchable-select-results .result-item:hover {
+  background: #f8fafc;
+  padding-left: 22px;
+  color: #6366f1;
+}
+
+.searchable-select-results .result-item:last-child {
+  border-bottom: none;
+}
+
+/* Scrollbar personalizzata per risultati */
+.searchable-select-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.searchable-select-results::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 0 0 12px 0;
+}
+
+.searchable-select-results::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 10px;
+}
+
+.searchable-select-results::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+}
+
+/* Animazione slide down */
+@keyframes slideDownSearch {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.searchable-select-results[style*="display: block"] {
+  animation: slideDownSearch 0.2s ease;
+}
+
+/* Responsive per searchable select */
+@media (max-width: 768px) {
+  .searchable-select-input {
+    padding: 10px 35px 10px 14px;
+    font-size: 14px;
+  }
+  
+  .searchable-select-results .result-item {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .searchable-select-results {
+    max-height: 250px;
+  }
+}

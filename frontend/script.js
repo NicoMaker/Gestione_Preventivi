@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const modelloId = ordineModelloSelect.value;
       if (!modelloId) return;
       const modello = allModelli.find(
-        (m) => String(m.id) === String(modelloId)
+        (m) => String(m.id) === String(modelloId),
       );
       if (modello && modello.marche_id) {
         ordineMarcaSelect.value = String(modello.marche_id);
@@ -114,26 +114,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 🔥 TOGGLE PASSWORD UTENTI
-  const togglePassword = document.getElementById('toggleUtentePassword');
-  const passwordInput = document.getElementById('utentePassword');
-  
+  const togglePassword = document.getElementById("toggleUtentePassword");
+  const passwordInput = document.getElementById("utentePassword");
+
   if (togglePassword && passwordInput) {
-    togglePassword.addEventListener('click', () => {
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
+    togglePassword.addEventListener("click", () => {
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
         togglePassword.innerHTML = `
           <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
           <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.08 2.58" />
           <line x1="1" y1="1" x2="23" y2="23" />
         `;
-        togglePassword.style.color = '#6366f1';
+        togglePassword.style.color = "#6366f1";
       } else {
-        passwordInput.type = 'password';
+        passwordInput.type = "password";
         togglePassword.innerHTML = `
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
           <circle cx="12" cy="12" r="3" />
         `;
-        togglePassword.style.color = '#64748b';
+        togglePassword.style.color = "#64748b";
       }
     });
   }
@@ -201,9 +201,9 @@ function renderClienti() {
             : "-"
         }
       </td>
-      <td>${c.data_passaggio ? formatDate(c.data_passaggio) : '-'}</td>
+      <td>${c.data_passaggio ? formatDate(c.data_passaggio) : "-"}</td>
       <td style="text-align:center;">
-        ${c.flag_ricontatto ? '<span class="badge-ricontatto" style="font-size:22px;" title="Ricontatto Social">📱</span>' : '-'}
+        ${c.flag_ricontatto ? '<span class="badge-ricontatto" style="font-size:22px;" title="Ricontatto Social">📱</span>' : "-"}
       </td>
       <td style="text-align: center">
         <span class="badge-count">${c.ordini_count || 0}</span>
@@ -222,22 +222,49 @@ function renderClienti() {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 }
 
+// Filtro testo clienti
 document.getElementById("filterClienti")?.addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
-  clienti = allClienti.filter(
-    (c) =>
-      c.nome.toLowerCase().includes(searchTerm) ||
-      (c.email && c.email.toLowerCase().includes(searchTerm)) ||
-      (c.num_tel && c.num_tel.includes(searchTerm)) ||
-      (c.data_passaggio && c.data_passaggio.includes(searchTerm))
-  );
-  renderClienti();
+  applyClientiFilters();
 });
+
+// 🆕 FILTRO DATA PASSAGGIO
+document
+  .getElementById("filterDataPassaggio")
+  ?.addEventListener("change", (e) => {
+    applyClientiFilters();
+  });
+
+// Funzione per applicare tutti i filtri clienti
+function applyClientiFilters() {
+  const searchTerm =
+    document.getElementById("filterClienti")?.value.toLowerCase() || "";
+  const dataPassaggio =
+    document.getElementById("filterDataPassaggio")?.value || "";
+
+  clienti = allClienti.filter((c) => {
+    // Filtro testo
+    const matchesText =
+      !searchTerm ||
+      c.nome.toLowerCase().includes(searchTerm) ||
+      (c.num_tel && c.num_tel.toLowerCase().includes(searchTerm)) ||
+      (c.email && c.email.toLowerCase().includes(searchTerm)) ||
+      (c.data_passaggio && c.data_passaggio.includes(searchTerm));
+
+    // Filtro data passaggio
+    const matchesData =
+      !dataPassaggio ||
+      (c.data_passaggio && c.data_passaggio.startsWith(dataPassaggio));
+
+    return matchesText && matchesData;
+  });
+
+  renderClienti();
+}
 
 function openClienteModal(cliente = null) {
   const modal = document.getElementById("modalCliente");
@@ -252,8 +279,10 @@ function openClienteModal(cliente = null) {
     document.getElementById("clienteNome").value = cliente.nome;
     document.getElementById("clienteTel").value = cliente.num_tel || "";
     document.getElementById("clienteEmail").value = cliente.email || "";
-    document.getElementById("clienteDataPassaggio").value = cliente.data_passaggio || "";
-    document.getElementById("clienteFlagRicontatto").checked = cliente.flag_ricontatto == 1;
+    document.getElementById("clienteDataPassaggio").value =
+      cliente.data_passaggio || "";
+    document.getElementById("clienteFlagRicontatto").checked =
+      cliente.flag_ricontatto == 1;
   } else {
     title.textContent = "Nuovo Cliente";
     document.getElementById("clienteId").value = "";
@@ -276,9 +305,9 @@ function editCliente(id) {
 async function deleteCliente(id) {
   const conferma = await showConfirmModal(
     "Sei sicuro di voler eliminare questo cliente?",
-    "Conferma Eliminazione"
+    "Conferma Eliminazione",
   );
-  
+
   if (!conferma) return;
 
   try {
@@ -296,47 +325,50 @@ async function deleteCliente(id) {
   }
 }
 
-document
-  .getElementById("formCliente")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById("formCliente").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const id = document.getElementById("clienteId").value;
-    const nome = document.getElementById("clienteNome").value.trim();
-    const num_tel = document.getElementById("clienteTel").value.trim();
-    const email = document.getElementById("clienteEmail").value.trim();
-    const data_passaggio = document.getElementById("clienteDataPassaggio").value;
-    const flag_ricontatto = document.getElementById("clienteFlagRicontatto").checked;
+  const id = document.getElementById("clienteId").value;
+  const nome = document.getElementById("clienteNome").value.trim();
+  const num_tel = document.getElementById("clienteTel").value.trim();
+  const email = document.getElementById("clienteEmail").value.trim();
+  const data_passaggio = document.getElementById("clienteDataPassaggio").value;
+  const flag_ricontatto = document.getElementById(
+    "clienteFlagRicontatto",
+  ).checked;
 
-    const method = id ? "PUT" : "POST";
-    const url = id ? `${API_URL}/clienti/${id}` : `${API_URL}/clienti`;
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${API_URL}/clienti/${id}` : `${API_URL}/clienti`;
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto }),
-      });
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nome,
+        num_tel,
+        email,
+        data_passaggio,
+        flag_ricontatto,
+      }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        showNotification(
-          id ? "Cliente aggiornato!" : "Cliente creato!",
-          "success"
-        );
-        closeClienteModal();
-        loadClienti();
-      } else {
-        showNotification(
-          data.error || "Errore durante il salvataggio",
-          "error"
-        );
-      }
-    } catch (error) {
-      showNotification("Errore di connessione", "error");
+    if (res.ok) {
+      showNotification(
+        id ? "Cliente aggiornato!" : "Cliente creato!",
+        "success",
+      );
+      closeClienteModal();
+      loadClienti();
+    } else {
+      showNotification(data.error || "Errore durante il salvataggio", "error");
     }
-  });
+  } catch (error) {
+    showNotification("Errore di connessione", "error");
+  }
+});
 
 // ==================== PREVENTIVI (EX ORDINI) ====================
 async function loadOrdini() {
@@ -383,7 +415,7 @@ function renderOrdini() {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 }
@@ -394,7 +426,7 @@ document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
     (o) =>
       o.cliente_nome.toLowerCase().includes(searchTerm) ||
       (o.marca_nome && o.marca_nome.toLowerCase().includes(searchTerm)) ||
-      (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm))
+      (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm)),
   );
   renderOrdini();
 });
@@ -415,22 +447,44 @@ async function openOrdineModal(ordine = null) {
   if (ordine) {
     title.textContent = "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
+
+    // Imposta cliente
     document.getElementById("ordineCliente").value = ordine.cliente_id;
+    const cliente = allClienti.find((c) => c.id === ordine.cliente_id);
+    if (cliente) {
+      document.getElementById("ordineClienteSearch").value = cliente.nome;
+    }
+
     document.getElementById("ordineData").value = formatDateForInput(
-      ordine.data_movimento
+      ordine.data_movimento,
     );
     document.getElementById("ordineMarca").value = ordine.marca_id || "";
+
+    // Imposta modello
     document.getElementById("ordineModello").value = ordine.modello_id || "";
+    const modello = allModelli.find((m) => m.id === ordine.modello_id);
+    if (modello) {
+      document.getElementById("ordineModelloSearch").value = modello.nome;
+    }
+
     document.getElementById("ordineNote").value = ordine.note || "";
   } else {
     title.textContent = "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
     document.getElementById("ordineData").value = formatDateForInput(
-      new Date().toISOString()
+      new Date().toISOString(),
     );
+    document.getElementById("ordineClienteSearch").value = "";
+    document.getElementById("ordineModelloSearch").value = "";
   }
 
   modal.classList.add("active");
+
+  // Setup autocomplete Cliente
+  setupClienteAutocomplete();
+
+  // Setup autocomplete Modello
+  setupModelloAutocomplete();
 }
 
 function closeOrdineModal() {
@@ -440,14 +494,259 @@ function closeOrdineModal() {
 async function loadClientiForSelect() {
   try {
     const res = await fetch(`${API_URL}/clienti`);
-    const clienti = await res.json();
-    const select = document.getElementById("ordineCliente");
-    select.innerHTML =
-      '<option value="">Seleziona cliente</option>' +
-      clienti.map((c) => `<option value="${c.id}">${c.nome}</option>`).join("");
+    allClienti = await res.json();
   } catch (error) {
     console.error("Errore caricamento clienti:", error);
   }
+}
+
+// 🔥 AUTOCOMPLETE CLIENTE
+function setupClienteAutocomplete() {
+  const searchInput = document.getElementById("ordineClienteSearch");
+  const hiddenInput = document.getElementById("ordineCliente");
+  const resultsDiv = document.getElementById("clienteSearchResults");
+
+  if (!searchInput || !resultsDiv) return;
+
+  // Rimuovi listener precedenti
+  const newSearchInput = searchInput.cloneNode(true);
+  searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+  newSearchInput.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+
+    if (searchTerm === "") {
+      // Mostra tutti i clienti
+      displayClienteResults(
+        allClienti,
+        resultsDiv,
+        hiddenInput,
+        newSearchInput,
+      );
+    } else {
+      // Filtra clienti
+      const filtered = allClienti.filter(
+        (c) =>
+          c.nome.toLowerCase().includes(searchTerm) ||
+          (c.email && c.email.toLowerCase().includes(searchTerm)) ||
+          (c.num_tel && c.num_tel.includes(searchTerm)),
+      );
+      displayClienteResults(filtered, resultsDiv, hiddenInput, newSearchInput);
+    }
+  });
+
+  newSearchInput.addEventListener("focus", () => {
+    displayClienteResults(allClienti, resultsDiv, hiddenInput, newSearchInput);
+  });
+
+  // Chiudi risultati se clicco fuori
+  document.addEventListener("click", (e) => {
+    if (!newSearchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+      resultsDiv.classList.remove("show");
+    }
+  });
+}
+
+function displayClienteResults(clienti, resultsDiv, hiddenInput, searchInput) {
+  if (clienti.length === 0) {
+    resultsDiv.innerHTML = `
+      <div class="search-no-results">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <strong>Nessun cliente trovato</strong>
+      </div>
+    `;
+    resultsDiv.classList.add("show");
+    return;
+  }
+
+  resultsDiv.innerHTML = clienti
+    .map(
+      (c) => `
+    <div class="search-result-item" data-id="${c.id}" data-nome="${c.nome}">
+      <div class="search-result-name">${highlightMatch(c.nome, searchInput.value)}</div>
+      <div class="search-result-meta">
+        ${c.num_tel ? `📞 ${c.num_tel}` : ""}
+        ${c.email ? `📧 ${c.email}` : ""}
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+
+  resultsDiv.classList.add("show");
+
+  // Click su risultato
+  resultsDiv.querySelectorAll(".search-result-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const id = item.dataset.id;
+      const nome = item.dataset.nome;
+      hiddenInput.value = id;
+      searchInput.value = nome;
+      searchInput.classList.add("has-selection");
+      resultsDiv.classList.remove("show");
+    });
+  });
+}
+
+// 🔥 AUTOCOMPLETE MODELLO
+function setupModelloAutocomplete() {
+  const searchInput = document.getElementById("ordineModelloSearch");
+  const hiddenInput = document.getElementById("ordineModello");
+  const resultsDiv = document.getElementById("modelloSearchResults");
+  const marcaSelect = document.getElementById("ordineMarca");
+
+  if (!searchInput || !resultsDiv) return;
+
+  // Rimuovi listener precedenti
+  const newSearchInput = searchInput.cloneNode(true);
+  searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+  newSearchInput.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    const marcaId = marcaSelect.value;
+
+    let modelliToShow = allModelli;
+
+    // Filtra per marca se selezionata
+    if (marcaId) {
+      modelliToShow = modelliToShow.filter(
+        (m) => m.marche_id && String(m.marche_id) === String(marcaId),
+      );
+    }
+
+    // Filtra per testo
+    if (searchTerm !== "") {
+      modelliToShow = modelliToShow.filter(
+        (m) =>
+          m.nome.toLowerCase().includes(searchTerm) ||
+          (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm)),
+      );
+    }
+
+    displayModelloResults(
+      modelliToShow,
+      resultsDiv,
+      hiddenInput,
+      newSearchInput,
+      marcaSelect,
+    );
+  });
+
+  newSearchInput.addEventListener("focus", () => {
+    const marcaId = marcaSelect.value;
+    let modelliToShow = marcaId
+      ? allModelli.filter(
+          (m) => m.marche_id && String(m.marche_id) === String(marcaId),
+        )
+      : allModelli;
+    displayModelloResults(
+      modelliToShow,
+      resultsDiv,
+      hiddenInput,
+      newSearchInput,
+      marcaSelect,
+    );
+  });
+
+  // Quando cambia marca, aggiorna lista modelli
+  if (marcaSelect) {
+    marcaSelect.addEventListener("change", () => {
+      newSearchInput.value = "";
+      hiddenInput.value = "";
+      newSearchInput.classList.remove("has-selection");
+      const marcaId = marcaSelect.value;
+      const modelliToShow = marcaId
+        ? allModelli.filter(
+            (m) => m.marche_id && String(m.marche_id) === String(marcaId),
+          )
+        : allModelli;
+      displayModelloResults(
+        modelliToShow,
+        resultsDiv,
+        hiddenInput,
+        newSearchInput,
+        marcaSelect,
+      );
+    });
+  }
+
+  // Chiudi risultati se clicco fuori
+  document.addEventListener("click", (e) => {
+    if (!newSearchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+      resultsDiv.classList.remove("show");
+    }
+  });
+}
+
+function displayModelloResults(
+  modelli,
+  resultsDiv,
+  hiddenInput,
+  searchInput,
+  marcaSelect,
+) {
+  if (modelli.length === 0) {
+    resultsDiv.innerHTML = `
+      <div class="search-no-results">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <strong>Nessun modello trovato</strong>
+      </div>
+    `;
+    resultsDiv.classList.add("show");
+    return;
+  }
+
+  resultsDiv.innerHTML = modelli
+    .map(
+      (m) => `
+    <div class="search-result-item" data-id="${m.id}" data-nome="${m.nome}" data-marca-id="${m.marche_id || ""}">
+      <div class="search-result-name">${highlightMatch(m.nome, searchInput.value)}</div>
+      <div class="search-result-meta">
+        ${m.marca_nome ? `<span class="search-result-marca">${m.marca_nome}</span>` : ""}
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+
+  resultsDiv.classList.add("show");
+
+  // Click su risultato
+  resultsDiv.querySelectorAll(".search-result-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const id = item.dataset.id;
+      const nome = item.dataset.nome;
+      const marcaId = item.dataset.marcaId;
+
+      hiddenInput.value = id;
+      searchInput.value = nome;
+      searchInput.classList.add("has-selection");
+
+      // Imposta anche la marca se presente
+      if (marcaId && marcaSelect) {
+        marcaSelect.value = marcaId;
+      }
+
+      resultsDiv.classList.remove("show");
+    });
+  });
+}
+
+// Funzione per evidenziare il testo cercato
+function highlightMatch(text, search) {
+  if (!search || search.trim() === "") return text;
+  const regex = new RegExp(`(${escapeRegex(search)})`, "gi");
+  return text.replace(regex, "<mark>$1</mark>");
+}
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 async function loadMarcheForSelect() {
@@ -462,9 +761,9 @@ async function loadMarcheForSelect() {
       if (select) {
         select.innerHTML =
           '<option value="">Seleziona marca</option>' +
-          marche.map((m) => `<option value="${m.id}">${m.nome}</option>`).join(
-            ""
-          );
+          marche
+            .map((m) => `<option value="${m.id}">${m.nome}</option>`)
+            .join("");
       }
     });
   } catch (error) {
@@ -476,8 +775,7 @@ async function loadModelliForSelect() {
   try {
     const res = await fetch(`${API_URL}/modelli`);
     allModelli = await res.json();
-    const currentMarcaId =
-      document.getElementById("ordineMarca")?.value || "";
+    const currentMarcaId = document.getElementById("ordineMarca")?.value || "";
     populateOrdineModelliByMarca(currentMarcaId);
   } catch (error) {
     console.error("Errore caricamento modelli:", error);
@@ -492,7 +790,7 @@ function populateOrdineModelliByMarca(marcaId) {
   const filtered =
     marcaId && marcaId !== ""
       ? source.filter(
-          (m) => m.marche_id && String(m.marche_id) === String(marcaId)
+          (m) => m.marche_id && String(m.marche_id) === String(marcaId),
         )
       : source;
 
@@ -503,7 +801,7 @@ function populateOrdineModelliByMarca(marcaId) {
         (m) =>
           `<option value="${m.id}">${m.nome}${
             m.marca_nome ? ` (${m.marca_nome})` : ""
-          }</option>`
+          }</option>`,
       )
       .join("");
 }
@@ -516,9 +814,9 @@ function editOrdine(id) {
 async function deleteOrdine(id) {
   const conferma = await showConfirmModal(
     "Sei sicuro di voler eliminare questo preventivo?",
-    "Conferma Eliminazione"
+    "Conferma Eliminazione",
   );
-  
+
   if (!conferma) return;
 
   try {
@@ -540,16 +838,24 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const id = document.getElementById("ordineId").value;
-  const cliente_id = document.getElementById("ordineCliente").value;
+  const cliente_id = document.getElementById("ordineCliente").value; // Hidden input
   const data_movimento = document.getElementById("ordineData").value;
   const marca_id = document.getElementById("ordineMarca").value || null;
-  const modello_id = document.getElementById("ordineModello").value || null;
+  const modello_id = document.getElementById("ordineModello").value || null; // Hidden input
   const note = document.getElementById("ordineNote").value.trim();
 
+  console.log("[v0] Cliente ID dal form:", cliente_id);
+  console.log("[v0] Select ordineCliente:", document.getElementById("ordineCliente"));
+  console.log("[v0] Select value:", document.getElementById("ordineCliente").value);
+
+  // Validazione cliente
+  if (!cliente_id) {
+    showNotification("Seleziona un cliente dalla lista", "warning");
+    return;
+  }
+
   if (modello_id) {
-    const modello = allModelli.find(
-      (m) => String(m.id) === String(modello_id)
-    );
+    const modello = allModelli.find((m) => String(m.id) === String(modello_id));
     if (!modello) {
       showNotification("Modello selezionato non valido.", "error");
       return;
@@ -558,7 +864,7 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
       if (String(modello.marche_id) !== String(marca_id)) {
         showNotification(
           "Il modello selezionato non appartiene alla marca indicata.",
-          "error"
+          "error",
         );
         return;
       }
@@ -588,7 +894,7 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
     if (res.ok) {
       showNotification(
         id ? "Preventivo aggiornato!" : "Preventivo creato!",
-        "success"
+        "success",
       );
       closeOrdineModal();
       loadOrdini();
@@ -647,7 +953,7 @@ function renderMarche() {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 }
@@ -689,9 +995,9 @@ function editMarca(id) {
 async function deleteMarca(id) {
   const conferma = await showConfirmModal(
     "Sei sicuro di voler eliminare questa marca?",
-    "Conferma Eliminazione"
+    "Conferma Eliminazione",
   );
-  
+
   if (!conferma) return;
 
   try {
@@ -787,7 +1093,7 @@ function renderModelli() {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 }
@@ -797,7 +1103,7 @@ document.getElementById("filterModelli")?.addEventListener("input", (e) => {
   modelli = allModelli.filter(
     (m) =>
       m.nome.toLowerCase().includes(searchTerm) ||
-      (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm))
+      (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm)),
   );
   renderModelli();
 });
@@ -836,9 +1142,9 @@ function editModello(id) {
 async function deleteModello(id) {
   const conferma = await showConfirmModal(
     "Sei sicuro di voler eliminare questo modello?",
-    "Conferma Eliminazione"
+    "Conferma Eliminazione",
   );
-  
+
   if (!conferma) return;
 
   try {
@@ -858,44 +1164,39 @@ async function deleteModello(id) {
   }
 }
 
-document
-  .getElementById("formModello")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById("formModello").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const id = document.getElementById("modelloId").value;
-    const nome = document.getElementById("modelloNome").value.trim();
-    const marche_id = document.getElementById("modelloMarca").value || null;
+  const id = document.getElementById("modelloId").value;
+  const nome = document.getElementById("modelloNome").value.trim();
+  const marche_id = document.getElementById("modelloMarca").value || null;
 
-    const method = id ? "PUT" : "POST";
-    const url = id ? `${API_URL}/modelli/${id}` : `${API_URL}/modelli`;
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${API_URL}/modelli/${id}` : `${API_URL}/modelli`;
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, marche_id }),
-      });
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, marche_id }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        showNotification(
-          id ? "Modello aggiornato!" : "Modello creato!",
-          "success"
-        );
-        closeModelloModal();
-        loadModelli();
-      } else {
-        showNotification(
-          data.error || "Errore durante il salvataggio",
-          "error"
-        );
-      }
-    } catch (error) {
-      showNotification("Errore di connessione", "error");
+    if (res.ok) {
+      showNotification(
+        id ? "Modello aggiornato!" : "Modello creato!",
+        "success",
+      );
+      closeModelloModal();
+      loadModelli();
+    } else {
+      showNotification(data.error || "Errore durante il salvataggio", "error");
     }
-  });
+  } catch (error) {
+    showNotification("Errore di connessione", "error");
+  }
+});
 
 // ==================== UTENTI ====================
 async function loadUtenti() {
@@ -936,7 +1237,7 @@ function renderUtenti() {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
     .join("");
 }
@@ -975,9 +1276,9 @@ function editUtente(id) {
 async function deleteUtente(id) {
   const conferma = await showConfirmModal(
     "Sei sicuro di voler eliminare questo utente?",
-    "Conferma Eliminazione"
+    "Conferma Eliminazione",
   );
-  
+
   if (!conferma) return;
 
   try {
@@ -995,47 +1296,39 @@ async function deleteUtente(id) {
   }
 }
 
-document
-  .getElementById("formUtente")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById("formUtente").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const id = document.getElementById("utenteId").value;
-    const nome = document.getElementById("utenteNome").value.trim();
-    const password = document.getElementById("utentePassword").value;
+  const id = document.getElementById("utenteId").value;
+  const nome = document.getElementById("utenteNome").value.trim();
+  const password = document.getElementById("utentePassword").value;
 
-    const method = id ? "PUT" : "POST";
-    const url = id ? `${API_URL}/utenti/${id}` : `${API_URL}/utenti`;
+  const method = id ? "PUT" : "POST";
+  const url = id ? `${API_URL}/utenti/${id}` : `${API_URL}/utenti`;
 
-    const body = { nome };
-    if (password) body.password = password;
+  const body = { nome };
+  if (password) body.password = password;
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        showNotification(
-          id ? "Utente aggiornato!" : "Utente creato!",
-          "success"
-        );
-        closeUtenteModal();
-        loadUtenti();
-      } else {
-        showNotification(
-          data.error || "Errore durante il salvataggio",
-          "error"
-        );
-      }
-    } catch (error) {
-      showNotification("Errore di connessione", "error");
+    if (res.ok) {
+      showNotification(id ? "Utente aggiornato!" : "Utente creato!", "success");
+      closeUtenteModal();
+      loadUtenti();
+    } else {
+      showNotification(data.error || "Errore durante il salvataggio", "error");
     }
-  });
+  } catch (error) {
+    showNotification("Errore di connessione", "error");
+  }
+});
 
 // ==================== UTILITY ====================
 function formatDate(dateString) {
@@ -1077,36 +1370,85 @@ function showNotification(message, type = "info", duration = 5000) {
   }, duration);
 }
 
+function showConfirmModal(message, title = "Conferma") {
+  return new Promise((resolve) => {
+    const modal = document.createElement("div");
+    modal.className = "modal active";
+    modal.style.zIndex = "10000";
+    
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+          <h2>${title}</h2>
+        </div>
+        <div class="modal-body">
+          <p style="font-size: 16px; line-height: 1.6; color: #334155;">${message}</p>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button type="button" class="btn-cancel" style="padding: 10px 24px; border: 2px solid #e2e8f0; background: white; color: #64748b; border-radius: 8px; cursor: pointer; font-weight: 600;">
+            Annulla
+          </button>
+          <button type="button" class="btn-confirm" style="padding: 10px 24px; border: none; background: #ef4444; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+            Conferma
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const btnCancel = modal.querySelector(".btn-cancel");
+    const btnConfirm = modal.querySelector(".btn-confirm");
+    
+    btnCancel.addEventListener("click", () => {
+      modal.remove();
+      resolve(false);
+    });
+    
+    btnConfirm.addEventListener("click", () => {
+      modal.remove();
+      resolve(true);
+    });
+    
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.remove();
+        resolve(false);
+      }
+    });
+  });
+}
+
 // ==================== STAMPA PREVENTIVI PER CLIENTE ====================
 let companyInfoPrintCache = null;
 
 async function loadCompanyInfoForPrint() {
   try {
     if (companyInfoPrintCache) return companyInfoPrintCache;
-    if (typeof companyInfo !== 'undefined' && companyInfo) {
+    if (typeof companyInfo !== "undefined" && companyInfo) {
       companyInfoPrintCache = companyInfo;
       return companyInfoPrintCache;
     }
-    const response = await fetch('company-info.json');
+    const response = await fetch("company-info.json");
     if (!response.ok) throw new Error(`Errore caricamento: ${response.status}`);
     companyInfoPrintCache = await response.json();
     return companyInfoPrintCache;
   } catch (error) {
-    console.error('Errore caricamento company-info.json:', error);
+    console.error("Errore caricamento company-info.json:", error);
     companyInfoPrintCache = {
       company: {
-        name: 'Magazzino Moto',
-        address: 'Via prova 123',
-        city: 'Milano',
-        cap: '20100',
-        province: 'MI',
-        country: 'Italia',
-        piva: '1234567890',
-        phone: '+39 02 1234567',
-        email: 'info@magazzinomoto.it',
-        logo: 'img/Logo.png',
+        name: "Magazzino Moto",
+        address: "Via prova 123",
+        city: "Milano",
+        cap: "20100",
+        province: "MI",
+        country: "Italia",
+        piva: "1234567890",
+        phone: "+39 02 1234567",
+        email: "info@magazzinomoto.it",
+        logo: "img/Logo.png",
       },
-      settings: { currency: 'EUR', currencySymbol: '€' },
+      settings: { currency: "EUR", currencySymbol: "€" },
     };
     return companyInfoPrintCache;
   }
@@ -1122,15 +1464,23 @@ function groupOrdiniByCliente(ordini) {
 }
 
 function sortOrdiniByDateDesc(ordini) {
-  return [...ordini].sort((a, b) => new Date(b.data_movimento) - new Date(a.data_movimento));
+  return [...ordini].sort(
+    (a, b) => new Date(b.data_movimento) - new Date(a.data_movimento),
+  );
 }
 
 function generatePrintHeader(company) {
+  const logoPath = company.logo || "img/Logo.png";
   return `
-    <div class="print-header" style="text-align:center;margin-bottom:30px;border-bottom:2px solid #333;padding-bottom:20px;">
-      <h1 style="margin:0;font-size:24px;font-weight:bold;">${company.name || 'MAGAZZINO'}</h1>
-      <p style="margin:5px 0;font-size:12px;">${company.address || ''}, ${company.cap || ''} ${company.city || ''}</p>
-      <p style="margin:5px 0;font-size:11px;">P.IVA: ${company.piva || ''} | Tel: ${company.phone || ''}</p>
+    <div class="print-header" style="text-align:center;margin-bottom:30px;border-bottom:3px solid #333;padding-bottom:25px;">
+      <img src="${logoPath}" alt="Logo Azienda" style="max-width:200px;height:auto;margin-bottom:15px;display:block;margin-left:auto;margin-right:auto;" />
+      <h1 style="margin:10px 0 5px 0;font-size:26px;font-weight:bold;color:#2c3e50;">${company.name || "MAGAZZINO"}</h1>
+      <p style="margin:3px 0;font-size:13px;color:#555;">${company.address || ""}, ${company.cap || ""} ${company.city || ""} (${company.province || ""})</p>
+      <p style="margin:3px 0;font-size:12px;color:#555;">${company.country || "Italia"}</p>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #ddd;">
+        <p style="margin:3px 0;font-size:11px;color:#666;"><strong>P.IVA:</strong> ${company.piva || ""}</p>
+        <p style="margin:3px 0;font-size:11px;color:#666;"><strong>Tel:</strong> ${company.phone || ""} | <strong>Email:</strong> ${company.email || ""}</p>
+      </div>
     </div>
   `;
 }
@@ -1139,29 +1489,40 @@ function generateClienteSection(cliente, ordiniCliente) {
   const ordiniOrdinati = sortOrdiniByDateDesc(ordiniCliente);
   return `
     <div class="cliente-section" style="margin-bottom:30px;page-break-inside:avoid;">
-      <div style="background:#f5f5f5;padding:12px;border-radius:4px;margin-bottom:15px;border-left:4px solid #2980b9;">
-        <h2 style="margin:0;font-size:16px;color:#2980b9;">${cliente.nome || 'N/A'}</h2>
-        <p style="margin:5px 0 0 0;font-size:12px;">${cliente.num_tel || '-'} | ${cliente.email || '-'}</p>
-        <p style="margin:3px 0 0 0;font-size:10px;">Totale preventivi: ${ordiniOrdinati.length}</p>
+      <div style="background:#f5f5f5;padding:15px;border-radius:6px;margin-bottom:15px;border-left:5px solid #2980b9;">
+        <h2 style="margin:0 0 8px 0;font-size:17px;color:#2980b9;font-weight:bold;">${cliente.nome || "N/A"}</h2>
+        <p style="margin:4px 0;font-size:12px;color:#555;">
+          <strong>📱 Cellulare:</strong> ${cliente.num_tel || "-"}
+        </p>
+        <p style="margin:4px 0;font-size:12px;color:#555;">
+          <strong>✉️ Email:</strong> ${cliente.email || "-"}
+        </p>
+        <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
+          Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
+        </p>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>
           <tr style="background:#ecf0f1;border-bottom:2px solid #34495e;">
-            <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Data</th>
-            <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Marca</th>
-            <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Modello</th>
-            <th style="padding:8px;text-align:left;border:1px solid #bdc3c7;">Note</th>
+            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Data</th>
+            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Marca</th>
+            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Modello</th>
+            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Note</th>
           </tr>
         </thead>
         <tbody>
-          ${ordiniOrdinati.map((o, i) => `
-            <tr style="border-bottom:1px solid #ecf0f1;${i % 2 === 0 ? 'background:#fafafa;' : ''}">
-              <td style="padding:8px;border:1px solid #ecf0f1;font-weight:bold;">${formatDate(o.data_movimento)}</td>
-              <td style="padding:8px;border:1px solid #ecf0f1;">${o.marca_nome || '-'}</td>
-              <td style="padding:8px;border:1px solid #ecf0f1;">${o.modello_nome || '-'}</td>
-              <td style="padding:8px;border:1px solid #ecf0f1;">${o.note || '-'}</td>
+          ${ordiniOrdinati
+            .map(
+              (o, i) => `
+            <tr style="border-bottom:1px solid #ecf0f1;${i % 2 === 0 ? "background:#fafafa;" : ""}">
+              <td style="padding:10px;border:1px solid #ecf0f1;font-weight:bold;white-space:nowrap;">${formatDate(o.data_movimento)}</td>
+              <td style="padding:10px;border:1px solid #ecf0f1;">${o.marca_nome || "-"}</td>
+              <td style="padding:10px;border:1px solid #ecf0f1;">${o.modello_nome || "-"}</td>
+              <td style="padding:10px;border:1px solid #ecf0f1;">${o.note || "-"}</td>
             </tr>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </tbody>
       </table>
     </div>
@@ -1172,11 +1533,24 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
   const company = companyWrapper.company || companyWrapper;
   const gruppi = groupOrdiniByCliente(ordini);
   const clientiUnici = Array.from(
-    new Set(ordini.map((o) => JSON.stringify({ id: o.cliente_id, nome: o.cliente_nome, num_tel: o.cliente_tel, email: o.cliente_email })))
-  ).map((s) => JSON.parse(s)).sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
+    new Set(
+      ordini.map((o) =>
+        JSON.stringify({
+          id: o.cliente_id,
+          nome: o.cliente_nome,
+          num_tel: o.cliente_tel,
+          email: o.cliente_email,
+        }),
+      ),
+    ),
+  )
+    .map((s) => JSON.parse(s))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
 
   const header = generatePrintHeader(company);
-  const bodyClienti = clientiUnici.map((c) => generateClienteSection(c, gruppi[c.id] || [])).join('');
+  const bodyClienti = clientiUnici
+    .map((c) => generateClienteSection(c, gruppi[c.id] || []))
+    .join("");
 
   return `
     <!DOCTYPE html>
@@ -1199,7 +1573,7 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
           ${header}
           ${bodyClienti}
           <div style="margin-top:20px;text-align:center;font-size:10px;color:#999;border-top:1px solid #ddd;padding-top:10px;">
-            Documento generato il: ${new Date().toLocaleString('it-IT')}
+            Documento generato il: ${new Date().toLocaleString("it-IT")}
           </div>
         </div>
       </body>
@@ -1210,17 +1584,20 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
 async function printOrdiniDiretta() {
   try {
     if (!allOrdini || !allOrdini.length) {
-      showNotification('Nessun preventivo da stampare', 'warning');
+      showNotification("Nessun preventivo da stampare", "warning");
       return;
     }
-    const companyInfo = await loadCompanyInfoForPrint();
-    const htmlPrint = generatePrintDocumentOrdiniPerCliente(allOrdini, companyInfo);
-    const printFrame = document.createElement('iframe');
-    printFrame.style.position = 'absolute';
-    printFrame.style.left = '-9999px';
-    printFrame.style.width = '0';
-    printFrame.style.height = '0';
-    printFrame.style.border = '0';
+    companyInfo = await loadCompanyInfoForPrint();
+    const htmlPrint = generatePrintDocumentOrdiniPerCliente(
+      allOrdini,
+      companyInfo,
+    );
+    const printFrame = document.createElement("iframe");
+    printFrame.style.position = "absolute";
+    printFrame.style.left = "-9999px";
+    printFrame.style.width = "0";
+    printFrame.style.height = "0";
+    printFrame.style.border = "0";
     document.body.appendChild(printFrame);
     printFrame.contentDocument.open();
     printFrame.contentDocument.write(htmlPrint);
@@ -1233,20 +1610,828 @@ async function printOrdiniDiretta() {
         }, 1000);
       }, 250);
     };
-    showNotification('Dialog stampa aperto!', 'success');
+    showNotification("Dialog stampa aperto!", "success");
   } catch (err) {
-    console.error('Errore stampa:', err);
-    showNotification('Errore nella stampa', 'error');
+    console.error("Errore stampa:", err);
+    showNotification("Errore nella stampa", "error");
   }
 }
 
 window.printOrdiniDiretta = printOrdiniDiretta;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedSection = localStorage.getItem('activeSection') || 'clienti';
-  if (savedSection === 'ordini') {
+document.addEventListener("DOMContentLoaded", () => {
+  const savedSection = localStorage.getItem("activeSection") || "clienti";
+  if (savedSection === "ordini") {
     setTimeout(() => {
       loadOrdini();
     }, 500);
   }
 });
+// ==================== RICERCA AUTOCOMPLETE NEI SELECT ====================
+// Aggiungi questo codice DOPO le funzioni esistenti in script.js
+
+/**
+ * Trasforma un <select> in un campo di ricerca con autocomplete
+ * @param {string} selectId - ID del select
+ * @param {Array} data - Array di oggetti con id e nome
+ * @param {string} placeholder - Testo placeholder
+ */
+function makeSelectSearchable(selectId, data, placeholder = "Cerca...") {
+  const selectElement = document.getElementById(selectId);
+  if (!selectElement) return;
+
+  // Crea wrapper
+  const wrapper = document.createElement("div");
+  wrapper.className = "select-search-wrapper";
+  wrapper.style.position = "relative";
+
+  // Crea input di ricerca
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.className = "select-search-input";
+  searchInput.placeholder = placeholder;
+  searchInput.style.cssText = `
+    width: 100%;
+    padding: 12px 40px 12px 18px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.25s ease;
+    background: white;
+  `;
+
+  // Icona lente di ricerca
+  const searchIcon = document.createElement("span");
+  searchIcon.innerHTML = "🔍";
+  searchIcon.style.cssText = `
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 16px;
+  `;
+
+  // Dropdown risultati
+  const resultsDropdown = document.createElement("div");
+  resultsDropdown.className = "select-search-results";
+  resultsDropdown.style.cssText = `
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border: 2px solid #6366f1;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 1000;
+    margin-top: -2px;
+  `;
+
+  // Hidden input per valore
+  const hiddenInput = document.createElement("input");
+  hiddenInput.type = "hidden";
+  hiddenInput.id = `${selectId}_value`;
+
+  // Nascondi select originale
+  selectElement.style.display = "none";
+
+  // Inserisci wrapper
+  selectElement.parentNode.insertBefore(wrapper, selectElement);
+  wrapper.appendChild(searchInput);
+  wrapper.appendChild(searchIcon);
+  wrapper.appendChild(resultsDropdown);
+  wrapper.appendChild(hiddenInput);
+  wrapper.appendChild(selectElement);
+
+  // Dati completi
+  let allData = data;
+  let selectedValue = null;
+
+  // Funzione per popolare dropdown
+  function populateResults(filteredData) {
+    resultsDropdown.innerHTML = "";
+
+    if (filteredData.length === 0) {
+      resultsDropdown.innerHTML = `
+        <div style="padding:20px;text-align:center;color:#64748b;">
+          Nessun risultato trovato
+        </div>
+      `;
+      resultsDropdown.style.display = "block";
+      return;
+    }
+
+    filteredData.forEach((item) => {
+      const resultItem = document.createElement("div");
+      resultItem.className = "select-search-result-item";
+      resultItem.textContent = item.nome;
+      resultItem.dataset.value = item.id;
+      resultItem.style.cssText = `
+        padding: 12px 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f5f9;
+      `;
+
+      resultItem.addEventListener("mouseenter", () => {
+        resultItem.style.background = "#f8fafc";
+        resultItem.style.paddingLeft = "22px";
+      });
+
+      resultItem.addEventListener("mouseleave", () => {
+        resultItem.style.background = "white";
+        resultItem.style.paddingLeft = "18px";
+      });
+
+      resultItem.addEventListener("click", () => {
+        selectValue(item.id, item.nome);
+      });
+
+      resultsDropdown.appendChild(resultItem);
+    });
+
+    resultsDropdown.style.display = "block";
+  }
+
+  // Funzione per selezionare valore
+  function selectValue(id, nome) {
+    selectedValue = id;
+    searchInput.value = nome;
+    hiddenInput.value = id;
+    selectElement.value = id;
+
+    console.log("[v0] selectValue called - ID:", id, "Nome:", nome);
+    console.log("[v0] selectElement.value after set:", selectElement.value);
+    console.log("[v0] selectElement.id:", selectElement.id);
+
+    // Trigger change event sul select originale
+    const event = new Event("change", { bubbles: true });
+    selectElement.dispatchEvent(event);
+
+    resultsDropdown.style.display = "none";
+
+    // Stile selezionato
+    searchInput.style.background =
+      "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)";
+    searchInput.style.borderColor = "#10b981";
+    searchInput.style.fontWeight = "600";
+    searchInput.style.color = "#065f46";
+  }
+
+  // Funzione per resettare
+  function resetSearch() {
+    searchInput.value = "";
+    hiddenInput.value = "";
+    selectedValue = null;
+    selectElement.value = "";
+    searchInput.style.background = "white";
+    searchInput.style.borderColor = "var(--border)";
+    searchInput.style.fontWeight = "500";
+    searchInput.style.color = "var(--text-primary)";
+    resultsDropdown.style.display = "none";
+  }
+
+  // Event listener input
+  searchInput.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+
+    if (searchTerm === "") {
+      // Se vuoto, mostra tutti
+      populateResults(allData);
+      resetSearch();
+    } else {
+      // Filtra risultati
+      const filtered = allData.filter((item) =>
+        item.nome.toLowerCase().includes(searchTerm),
+      );
+      populateResults(filtered);
+    }
+  });
+
+  // Focus mostra tutti
+  searchInput.addEventListener("focus", () => {
+    if (searchInput.value === "") {
+      populateResults(allData);
+    }
+    searchInput.style.borderColor = "#6366f1";
+    searchInput.style.boxShadow = "0 0 0 4px rgba(99, 102, 241, 0.1)";
+  });
+
+  // Blur nasconde dropdown
+  searchInput.addEventListener("blur", () => {
+    setTimeout(() => {
+      resultsDropdown.style.display = "none";
+      searchInput.style.borderColor = "var(--border)";
+      searchInput.style.boxShadow = "none";
+    }, 200);
+  });
+
+  // Click fuori chiude dropdown
+  document.addEventListener("click", (e) => {
+    if (!wrapper.contains(e.target)) {
+      resultsDropdown.style.display = "none";
+    }
+  });
+
+  // Metodo pubblico per aggiornare dati
+  wrapper.updateData = (newData) => {
+    allData = newData;
+    if (resultsDropdown.style.display === "block") {
+      populateResults(newData);
+    }
+  };
+
+  // Metodo pubblico per resettare
+  wrapper.reset = resetSearch;
+
+  // Metodo pubblico per impostare valore
+  wrapper.setValue = (id) => {
+    const item = allData.find((d) => d.id == id);
+    if (item) {
+      selectValue(item.id, item.nome);
+    }
+  };
+
+  return wrapper;
+}
+
+// ==================== APPLICA RICERCA AI SELECT ====================
+
+// Variabili globali per i wrapper
+let clienteSearchWrapper = null;
+let modelloSearchWrapper = null;
+
+// Funzione per inizializzare ricerca select
+async function initSelectSearch() {
+  // Aspetta che i dati siano caricati
+  if (!allClienti.length) await loadClienti();
+  if (!allModelli.length) await loadModelli();
+
+  // Applica ricerca al select Cliente
+  if (document.getElementById("ordineCliente")) {
+    clienteSearchWrapper = makeSelectSearchable(
+      "ordineCliente",
+      allClienti.map((c) => ({ id: c.id, nome: c.nome })),
+      "Cerca cliente...",
+    );
+  }
+
+  // Applica ricerca al select Modello
+  if (document.getElementById("ordineModello")) {
+    modelloSearchWrapper = makeSelectSearchable(
+      "ordineModello",
+      allModelli.map((m) => ({
+        id: m.id,
+        nome: m.marca_nome ? `${m.nome} (${m.marca_nome})` : m.nome,
+      })),
+      "Cerca modello...",
+    );
+  }
+}
+
+// Override della funzione openOrdineModal per supportare ricerca
+const originalOpenOrdineModal = openOrdineModal;
+openOrdineModal = async function (ordine = null) {
+  await originalOpenOrdineModal(ordine);
+
+  // Inizializza ricerca se non già fatto
+  if (!clienteSearchWrapper || !modelloSearchWrapper) {
+    await initSelectSearch();
+  }
+
+  // Se in modifica, imposta valori
+  if (ordine) {
+    if (clienteSearchWrapper && ordine.cliente_id) {
+      clienteSearchWrapper.setValue(ordine.cliente_id);
+    }
+    if (modelloSearchWrapper && ordine.modello_id) {
+      modelloSearchWrapper.setValue(ordine.modello_id);
+    }
+  } else {
+    // Reset in creazione
+    if (clienteSearchWrapper) clienteSearchWrapper.reset();
+    if (modelloSearchWrapper) modelloSearchWrapper.reset();
+  }
+};
+
+// Override populateOrdineModelliByMarca per supportare ricerca
+const originalPopulateOrdineModelliByMarca = populateOrdineModelliByMarca;
+populateOrdineModelliByMarca = function (marcaId) {
+  // Prima esegui la funzione originale
+  originalPopulateOrdineModelliByMarca(marcaId);
+
+  // Poi aggiorna i dati del wrapper se esiste
+  if (modelloSearchWrapper) {
+    const filtered =
+      marcaId && marcaId !== ""
+        ? allModelli.filter(
+            (m) => m.marche_id && String(m.marche_id) === String(marcaId),
+          )
+        : allModelli;
+
+    modelloSearchWrapper.updateData(
+      filtered.map((m) => ({
+        id: m.id,
+        nome: m.marca_nome ? `${m.nome} (${m.marca_nome})` : m.nome,
+      })),
+    );
+  }
+};
+
+// Inizializza al caricamento
+document.addEventListener("DOMContentLoaded", () => {
+  // Aspetta un po' prima di inizializzare (per dare tempo ai dati di caricarsi)
+  setTimeout(initSelectSearch, 1000);
+});
+
+console.log("✅ Ricerca autocomplete nei select attivata!");
+
+// ==================== 🆕 SELECT SEARCHABLE PER MARCA E MODELLO ====================
+
+/**
+ * Crea un campo di ricerca searchable per select
+ * Versione migliorata con validazione e visual feedback
+ */
+function createSearchableSelect(
+  containerId,
+  inputId,
+  placeholder,
+  getData,
+  onSelect,
+  required = false,
+) {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`Container ${containerId} non trovato`);
+    return null;
+  }
+
+  // Crea struttura HTML
+  container.innerHTML = `
+    <div class="searchable-select-wrapper" style="position:relative;">
+      <div class="searchable-input-wrapper" style="position:relative;">
+        <input 
+          type="text" 
+          id="${inputId}_search"
+          class="searchable-select-input" 
+          placeholder="${placeholder}"
+          autocomplete="off"
+          style="width:100%;padding:12px 80px 12px 18px;border:2px solid #e2e8f0;border-radius:12px;font-size:15px;transition:all 0.25s ease;background:white;"
+        />
+        <span class="search-icon" style="position:absolute;right:50px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:16px;color:#94a3b8;">🔍</span>
+        <button 
+          type="button"
+          class="clear-selection-btn" 
+          style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#ef4444;color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;display:none;font-size:14px;font-weight:bold;transition:all 0.2s;"
+        >×</button>
+      </div>
+      <input type="hidden" id="${inputId}" name="${inputId}" />
+      <div class="searchable-select-results" style="position:absolute;top:100%;left:0;right:0;max-height:300px;overflow-y:auto;background:white;border:2px solid #6366f1;border-top:none;border-radius:0 0 12px 12px;box-shadow:0 8px 20px rgba(0,0,0,0.15);display:none;z-index:1000;margin-top:-2px;"></div>
+      <div class="selection-display" style="margin-top:8px;display:none;">
+        <div style="background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);padding:10px 14px;border-radius:8px;border-left:4px solid #10b981;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <span style="font-size:11px;color:#065f46;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Selezionato</span>
+              <div class="selected-value-display" style="font-size:15px;color:#065f46;font-weight:700;margin-top:2px;"></div>
+            </div>
+            <span style="font-size:24px;">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const searchInput = container.querySelector(`#${inputId}_search`);
+  const hiddenInput = container.querySelector(`#${inputId}`);
+  const results = container.querySelector(".searchable-select-results");
+  const clearBtn = container.querySelector(".clear-selection-btn");
+  const selectionDisplay = container.querySelector(".selection-display");
+  const selectedValueDisplay = container.querySelector(
+    ".selected-value-display",
+  );
+
+  let allData = [];
+  let currentData = [];
+  let selectedValue = null;
+  let selectedName = null;
+
+  // Carica dati
+  async function loadData() {
+    allData = await getData();
+    currentData = allData;
+  }
+
+  // Mostra risultati
+  function showResults(filteredData) {
+    if (filteredData.length === 0) {
+      results.innerHTML =
+        '<div style="padding:20px;text-align:center;color:#64748b;">Nessun risultato trovato</div>';
+      results.style.display = "block";
+      return;
+    }
+
+    results.innerHTML = filteredData
+      .map(
+        (item) => `
+      <div class="result-item" data-id="${item.id}" data-nome="${item.nome}" style="padding:12px 18px;cursor:pointer;transition:all 0.2s ease;border-bottom:1px solid #f1f5f9;">
+        <div style="font-weight:600;color:#334155;">${highlightText(item.nome, searchInput.value)}</div>
+        ${item.extra ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">${item.extra}</div>` : ""}
+      </div>
+    `,
+      )
+      .join("");
+
+    results.style.display = "block";
+
+    // Event listeners sui risultati
+    results.querySelectorAll(".result-item").forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        el.style.background = "#f8fafc";
+        el.style.paddingLeft = "22px";
+      });
+      el.addEventListener("mouseleave", () => {
+        el.style.background = "white";
+        el.style.paddingLeft = "18px";
+      });
+      el.addEventListener("click", () => {
+        selectItem(el.dataset.id, el.dataset.nome);
+      });
+    });
+  }
+
+  // Evidenzia testo cercato
+  function highlightText(text, search) {
+    if (!search) return text;
+    const regex = new RegExp(
+      `(${search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi",
+    );
+    return text.replace(
+      regex,
+      '<mark style="background:#fef08a;color:#713f12;padding:2px 4px;border-radius:3px;font-weight:700;">$1</mark>',
+    );
+  }
+
+  // Seleziona item
+  function selectItem(id, nome) {
+    selectedValue = id;
+    selectedName = nome;
+
+    // Aggiorna campi
+    searchInput.value = "";
+    hiddenInput.value = id;
+    results.style.display = "none";
+
+    // Mostra selezione
+    searchInput.style.display = "none";
+    selectionDisplay.style.display = "block";
+    selectedValueDisplay.textContent = nome;
+    clearBtn.style.display = "block";
+
+    // Nascondi icona ricerca
+    container.querySelector(".search-icon").style.display = "none";
+
+    // Callback
+    if (onSelect) onSelect(id, nome);
+  }
+
+  // Reset/Clear
+  function reset() {
+    selectedValue = null;
+    selectedName = null;
+    searchInput.value = "";
+    hiddenInput.value = "";
+    searchInput.style.display = "block";
+    selectionDisplay.style.display = "none";
+    selectedValueDisplay.textContent = "";
+    clearBtn.style.display = "none";
+    results.style.display = "none";
+    container.querySelector(".search-icon").style.display = "block";
+
+    // Reset validazione
+    searchInput.setCustomValidity("");
+    hiddenInput.setCustomValidity("");
+  }
+
+  // Click sul pulsante clear
+  clearBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    reset();
+    searchInput.focus();
+  });
+
+  // Event input
+  searchInput.addEventListener("input", async (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+
+    // Carica dati se necessario
+    if (allData.length === 0) await loadData();
+
+    if (searchTerm === "") {
+      showResults(currentData);
+    } else {
+      const filtered = currentData.filter((item) =>
+        item.nome.toLowerCase().includes(searchTerm),
+      );
+      showResults(filtered);
+    }
+  });
+
+  // Focus
+  searchInput.addEventListener("focus", async () => {
+    if (allData.length === 0) await loadData();
+
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const filtered =
+      searchTerm === ""
+        ? currentData
+        : currentData.filter((item) =>
+            item.nome.toLowerCase().includes(searchTerm),
+          );
+
+    showResults(filtered);
+    searchInput.style.borderColor = "#6366f1";
+    searchInput.style.boxShadow = "0 0 0 4px rgba(99, 102, 241, 0.1)";
+  });
+
+  // Blur
+  searchInput.addEventListener("blur", () => {
+    setTimeout(() => {
+      results.style.display = "none";
+      searchInput.style.borderColor = "#e2e8f0";
+      searchInput.style.boxShadow = "none";
+    }, 200);
+  });
+
+  // Click fuori
+  document.addEventListener("click", (e) => {
+    if (!container.contains(e.target)) {
+      results.style.display = "none";
+    }
+  });
+
+  // Validazione custom per campo required
+  if (required) {
+    // Gestisci validazione manuale sul form submit
+    const form = container.closest("form");
+    if (form) {
+      form.addEventListener(
+        "submit",
+        (e) => {
+          if (!hiddenInput.value) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            // Mostra messaggio di errore
+            searchInput.style.borderColor = "#ef4444";
+            searchInput.style.boxShadow = "0 0 0 4px rgba(239, 68, 68, 0.1)";
+            searchInput.placeholder = "⚠️ Campo obbligatorio!";
+            searchInput.focus();
+
+            // Ripristina dopo 3 secondi
+            setTimeout(() => {
+              searchInput.style.borderColor = "#e2e8f0";
+              searchInput.style.boxShadow = "none";
+              searchInput.placeholder = placeholder;
+            }, 3000);
+
+            return false;
+          }
+        },
+        true,
+      );
+    }
+
+    // Reset validazione su selezione
+    searchInput.addEventListener("input", () => {
+      if (hiddenInput.value) {
+        searchInput.style.borderColor = "#e2e8f0";
+        searchInput.style.boxShadow = "none";
+      }
+    });
+  }
+
+  return {
+    loadData,
+    reset,
+    setValue: (id) => {
+      const item = allData.find((d) => String(d.id) === String(id));
+      if (item) selectItem(item.id, item.nome);
+    },
+    getValue: () => selectedValue,
+    updateData: (newData) => {
+      currentData = newData;
+      allData = newData;
+    },
+    filterData: (newData) => {
+      currentData = newData;
+    },
+    getSelectedName: () => selectedName,
+  };
+}
+
+// Variabili globali per i searchable selects
+let marcaSearchOrdine = null;
+let modelloSearchOrdine = null;
+let marcaSearchModello = null;
+
+// Inizializza SELECT searchable per il form Ordine
+async function initOrdineSearchableSelects() {
+  // SELECT MARCA nel form Ordine
+  marcaSearchOrdine = createSearchableSelect(
+    "ordineMarcaSearch_container",
+    "ordineMarca",
+    "Cerca marca...",
+    async () => {
+      const res = await fetch(`${API_URL}/marche`);
+      const marche = await res.json();
+      return marche.map((m) => ({ id: m.id, nome: m.nome }));
+    },
+    async (id, nome) => {
+      console.log("Marca selezionata:", nome);
+      // Quando seleziono una marca, filtro i modelli
+      if (modelloSearchOrdine) {
+        await updateModelloByMarca(id);
+      }
+    },
+    true, // required
+  );
+
+  // SELECT MODELLO nel form Ordine
+  modelloSearchOrdine = createSearchableSelect(
+    "ordineModelloSearch_container",
+    "ordineModello",
+    "Cerca modello...",
+    async () => {
+      const res = await fetch(`${API_URL}/modelli`);
+      const modelli = await res.json();
+      return modelli.map((m) => ({
+        id: m.id,
+        nome: m.nome,
+        extra: m.marca_nome || "",
+        marche_id: m.marche_id,
+      }));
+    },
+    (id, nome) => {
+      console.log("Modello selezionato:", nome);
+      // Quando seleziono un modello, aggiorno la marca se non già selezionata
+      const modelloCompleto = allModelli.find(
+        (m) => String(m.id) === String(id),
+      );
+      if (
+        modelloCompleto &&
+        modelloCompleto.marche_id &&
+        marcaSearchOrdine &&
+        !marcaSearchOrdine.getValue()
+      ) {
+        marcaSearchOrdine.setValue(modelloCompleto.marche_id);
+      }
+    },
+    true, // required
+  );
+
+  // Carica dati iniziali
+  if (marcaSearchOrdine) await marcaSearchOrdine.loadData();
+  if (modelloSearchOrdine) await modelloSearchOrdine.loadData();
+}
+
+// Funzione per aggiornare modelli in base alla marca selezionata
+async function updateModelloByMarca(marcaId) {
+  if (!modelloSearchOrdine) return;
+
+  const res = await fetch(`${API_URL}/modelli`);
+  const modelli = await res.json();
+
+  const filtered = marcaId
+    ? modelli.filter((m) => String(m.marche_id) === String(marcaId))
+    : modelli;
+
+  console.log(`Filtrati ${filtered.length} modelli per marca ${marcaId}`);
+
+  modelloSearchOrdine.filterData(
+    filtered.map((m) => ({
+      id: m.id,
+      nome: m.nome,
+      extra: m.marca_nome || "",
+      marche_id: m.marche_id,
+    })),
+  );
+
+  // Reset selezione modello se cambia marca
+  modelloSearchOrdine.reset();
+}
+
+// Inizializza SELECT searchable per il form Modello
+async function initModelloSearchableSelects() {
+  marcaSearchModello = createSearchableSelect(
+    "modelloMarcaSearch_container",
+    "modelloMarca",
+    "Cerca marca...",
+    async () => {
+      const res = await fetch(`${API_URL}/marche`);
+      const marche = await res.json();
+      return marche.map((m) => ({ id: m.id, nome: m.nome }));
+    },
+    (id, nome) => {
+      console.log("Marca selezionata nel modello:", nome);
+    },
+    true, // required
+  );
+
+  if (marcaSearchModello) await marcaSearchModello.loadData();
+}
+
+// Override openOrdineModal per inizializzare i searchable selects
+const _originalOpenOrdineModal = window.openOrdineModal;
+window.openOrdineModal = async function (ordine = null) {
+  await loadClientiForSelect();
+
+  const modal = document.getElementById("modalOrdine");
+  const title = document.getElementById("modalOrdineTitle");
+  const form = document.getElementById("formOrdine");
+
+  form.reset();
+
+  // Inizializza searchable selects se non già fatto
+  if (!marcaSearchOrdine || !modelloSearchOrdine) {
+    await initOrdineSearchableSelects();
+  } else {
+    // Reset se già esistono
+    marcaSearchOrdine.reset();
+    modelloSearchOrdine.reset();
+    await marcaSearchOrdine.loadData();
+    await modelloSearchOrdine.loadData();
+  }
+
+  if (ordine) {
+    title.textContent = "Modifica Preventivo";
+    document.getElementById("ordineId").value = ordine.id;
+    document.getElementById("ordineCliente").value = ordine.cliente_id;
+    document.getElementById("ordineData").value = formatDateForInput(
+      ordine.data_movimento,
+    );
+    document.getElementById("ordineNote").value = ordine.note || "";
+
+    // Imposta valori nei searchable selects
+    if (ordine.marca_id && marcaSearchOrdine) {
+      await marcaSearchOrdine.loadData();
+      marcaSearchOrdine.setValue(ordine.marca_id);
+    }
+    if (ordine.modello_id && modelloSearchOrdine) {
+      await modelloSearchOrdine.loadData();
+      modelloSearchOrdine.setValue(ordine.modello_id);
+    }
+  } else {
+    title.textContent = "Nuovo Preventivo";
+    document.getElementById("ordineId").value = "";
+
+    // Imposta data odierna
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("ordineData").value = today;
+  }
+
+  modal.classList.add("active");
+};
+
+// Override openModelloModal per inizializzare searchable select marca
+const _originalOpenModelloModal = window.openModelloModal;
+window.openModelloModal = async function (modello = null) {
+  const modal = document.getElementById("modalModello");
+  const title = document.getElementById("modalModelloTitle");
+  const form = document.getElementById("formModello");
+
+  form.reset();
+
+  // Inizializza searchable select se non già fatto
+  if (!marcaSearchModello) {
+    await initModelloSearchableSelects();
+  } else {
+    marcaSearchModello.reset();
+    await marcaSearchModello.loadData();
+  }
+
+  if (modello) {
+    title.textContent = "Modifica Modello";
+    document.getElementById("modelloId").value = modello.id;
+    document.getElementById("modelloNome").value = modello.nome;
+
+    if (modello.marche_id && marcaSearchModello) {
+      await marcaSearchModello.loadData();
+      marcaSearchModello.setValue(modello.marche_id);
+    }
+  } else {
+    title.textContent = "Nuovo Modello";
+    document.getElementById("modelloId").value = "";
+  }
+
+  modal.classList.add("active");
+};
+
+console.log("✅ SELECT Searchable migliorati attivati!");
+
