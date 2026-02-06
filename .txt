@@ -1,17 +1,3 @@
-cambiare testi
+Deve esserci un solo cerca modello dove dentro ti prende il nome come per le marche e per i clienti 
 
-- al posto di ordini -> preventivi
-- e note preventivo
-- ricerca in nuvo preventivo per cliente e modello 
-
-e non riesci a vedere la password nella parte uteneti nella home
-
-ricerca dentro i menu a tendina in base a cosa scrivi se non scrivi niente ti mostra tutti i dati corrispondenti 
-
-alert moderne 
-
-nella parte clienti aggiungere data passaggio e flag ricontatto cliente (social) con ckeckbox cliccato se si altrimenti no (bool in db -> true or false -> 0 0 1)
-
-ricerca in clienti anche per data passaggio 
-
-se modifico utente/elimino devi uscire in tutti gli utenti che è collegato 
+deve creare un solo elemento per ogni preventivo non 4
