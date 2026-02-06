@@ -2507,3 +2507,185 @@ document.getElementById('formOrdine').addEventListener('submit', async function(
         console.error("Errore invio:", error);
     }
 });
+
+document.getElementById('formOrdine').addEventListener('submit', async function(e) {
+    // 1. Ferma subito l'invio di default del browser
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 2. Recupera i valori dai campi nascosti
+    const clienteId = document.getElementById('ordineCliente').value;
+    const marcaId = document.getElementById('ordineMarca').value;
+    const modelloId = document.getElementById('ordineModello').value;
+    const dataOrdine = document.getElementById('ordineData').value;
+    const note = document.getElementById('ordineNote').value;
+    const idEsistente = document.getElementById('ordineId').value;
+
+    // 3. IL FILTRO: Se questi dati mancano, NON procedere
+    if (!clienteId || clienteId === "" || !marcaId || !modelloId) {
+        alert("⚠️ Errore: Devi selezionare obbligatoriamente Cliente, Marca e Modello dai suggerimenti.");
+        return; // BLOCCA l'esecuzione qui
+    }
+
+    // 4. Costruisci l'oggetto pulito
+    const data = {
+        cliente_id: clienteId,
+        marche_id: marcaId,
+        modelli_id: modelloId,
+        data_ordine: dataOrdine,
+        note: note
+    };
+    
+    if (idEsistente) data.id = idEsistente;
+
+    try {
+        const response = await fetch(`${API_URL}/ordini`, {
+            method: data.id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert("✅ Preventivo salvato correttamente!");
+            closeOrdineModal();
+            if (typeof loadOrdini === 'function') loadOrdini();
+        } else {
+            const err = await response.json();
+            alert("❌ Errore dal server: " + err.error);
+        }
+    } catch (error) {
+        console.error("Errore invio:", error);
+        alert("❌ Errore di connessione al server.");
+    }
+});
+
+// Funzione da chiamare quando apri il modal
+async function initOrdineSelects() {
+    // 1. Inizializza Ricerca CLIENTE (come concetto Marca)
+    if (window.clienteSearchOrdine) {
+        window.clienteSearchOrdine.onSelect = (id) => {
+            document.getElementById('ordineCliente').value = id;
+        };
+    }
+
+    // 2. Inizializza Ricerca MARCA
+    if (window.marcaSearchOrdine) {
+        window.marcaSearchOrdine.onSelect = (id) => {
+            document.getElementById('ordineMarca').value = id;
+            // Quando cambi marca, filtra i modelli
+            if (window.modelloSearchOrdine) {
+                window.modelloSearchOrdine.setFilter(m => m.marche_id == id);
+            }
+        };
+    }
+
+    // 3. Inizializza Ricerca MODELLO
+    if (window.modelloSearchOrdine) {
+        window.modelloSearchOrdine.onSelect = (id) => {
+            document.getElementById('ordineModello').value = id;
+        };
+    }
+}
+
+// GESTIONE INVIO (ANTI-DUPLICATO)
+document.getElementById('formOrdine').addEventListener('submit', async function(e) {
+    // Blocca l'invio standard del browser per evitare il doppio invio
+    e.preventDefault();
+    e.stopPropagation();
+
+    const btnSalva = this.querySelector('button[type="submit"]');
+    
+    // Recupero ID dai campi hidden
+    const payload = {
+        id: document.getElementById('ordineId').value || null,
+        cliente_id: document.getElementById('ordineCliente').value,
+        marche_id: document.getElementById('ordineMarca').value,
+        modelli_id: document.getElementById('ordineModello').value,
+        data_ordine: document.getElementById('ordineData').value,
+        note: document.getElementById('ordineNote').value
+    };
+
+    // VALIDAZIONE: Se mancano i dati fondamentali, non inviare NULLA
+    if (!payload.cliente_id || !payload.marche_id || !payload.modelli_id) {
+        alert("⚠️ Seleziona Cliente, Marca e Modello dai suggerimenti!");
+        return;
+    }
+
+    try {
+        btnSalva.disabled = true; // Disabilita bottone per sicurezza extra
+        
+        const response = await fetch(`${API_URL}/ordini`, {
+            method: payload.id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert("✅ Preventivo salvato!");
+            closeOrdineModal();
+            loadOrdini(); 
+        } else {
+            const err = await response.json();
+            alert("❌ Errore: " + err.error);
+        }
+    } catch (error) {
+        console.error("Errore invio:", error);
+    } finally {
+        btnSalva.disabled = false;
+    }
+});
+
+// Funzione per gestire l'invio unico e validato
+function setupOrdineForm() {
+    const form = document.getElementById('formOrdine');
+    const btnSalva = document.getElementById('btnSalvaOrdine');
+
+    // Rimuoviamo eventuali listener precedenti per evitare invii multipli
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    newForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Recuperiamo i dati dagli input HIDDEN
+        const payload = {
+            id: document.getElementById('ordineId').value || null,
+            cliente_id: document.getElementById('ordineCliente').value,
+            marche_id: document.getElementById('ordineMarca').value,
+            modelli_id: document.getElementById('ordineModello').value,
+            data_ordine: document.getElementById('ordineData').value,
+            note: document.getElementById('ordineNote').value
+        };
+
+        // BLOCCANTE: Se mancano i dati, non fa la chiamata al server
+        if (!payload.cliente_id || !payload.marche_id || !payload.modelli_id) {
+            alert("⚠️ Errore: Devi selezionare Cliente, Marca e Modello dai suggerimenti!");
+            return;
+        }
+
+        try {
+            btnSalva.disabled = true; // Impedisce click multipli
+            
+            const method = payload.id ? 'PUT' : 'POST';
+            const response = await fetch(`${API_URL}/ordini`, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("✅ Preventivo salvato con successo!");
+                closeOrdineModal();
+                loadOrdini(); 
+            } else {
+                const err = await response.json();
+                alert("❌ Errore: " + err.error);
+            }
+        } catch (error) {
+            console.error("Errore invio:", error);
+        } finally {
+            btnSalva.disabled = false;
+        }
+    });
+}

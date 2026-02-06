@@ -563,45 +563,42 @@
     </div>
     
     <div class="modal-body">
-      <form id="formOrdine">
-        <input type="hidden" id="ordineId" name="id" />
-        
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="ordineClienteSearch">Cliente *</label>
-            <div class="search-container">
-              <input type="text" id="ordineClienteSearch" class="form-control" placeholder="Cerca cliente..." autocomplete="off" required>
-              <input type="hidden" id="ordineCliente" name="cliente_id" required>
-              <div id="clienteResults" class="searchable-select-results" style="display: none;"></div>
-            </div>
-          </div>
+<form id="formOrdine">
+    <input type="hidden" id="ordineId" name="id" />
+    <div class="form-grid">
+        <div class="form-group full-width">
+            <label>Cliente *</label>
+            <div id="ordineClienteSearch_container"></div>
+            <input type="hidden" id="ordineCliente" name="cliente_id" required>
+        </div>
 
-          <div class="form-group">
-            <label for="ordineData">Data *</label>
+        <div class="form-group">
+            <label>Data *</label>
             <input type="date" id="ordineData" name="data_ordine" class="form-control" required>
-          </div>
+        </div>
 
-          <div class="form-group">
+        <div class="form-group">
             <label>Marca *</label>
             <div id="ordineMarcaSearch_container"></div>
-          </div>
+            <input type="hidden" id="ordineMarca" name="marche_id" required>
+        </div>
 
-          <div class="form-group">
+        <div class="form-group">
             <label>Modello *</label>
             <div id="ordineModelloSearch_container"></div>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="ordineNote">Note / Lavoro da eseguire</label>
-            <textarea id="ordineNote" name="note" class="form-control" rows="3"></textarea>
-          </div>
+            <input type="hidden" id="ordineModello" name="modelli_id" required>
         </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" onclick="closeOrdineModal()">Annulla</button>
-          <button type="submit" class="btn btn-primary">Salva Preventivo</button>
+        <div class="form-group full-width">
+            <label>Note</label>
+            <textarea id="ordineNote" name="note" class="form-control" rows="2"></textarea>
         </div>
-      </form>
+    </div>
+    <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeOrdineModal()">Annulla</button>
+        <button type="submit" id="btnSalvaOrdine" class="btn btn-primary">Salva Preventivo</button>
+    </div>
+</form>
     </div>
   </div>
 </div>
