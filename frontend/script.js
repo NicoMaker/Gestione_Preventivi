@@ -1201,19 +1201,25 @@ function generatePrintHeader(company) {
 function generateClienteSection(cliente, ordiniCliente) {
   const ordiniOrdinati = sortOrdiniByDateDesc(ordiniCliente);
   return `
-    <div class="cliente-section" style="margin-bottom:30px;page-break-inside:avoid;">
-      <div style="background:#f5f5f5;padding:15px;border-radius:6px;margin-bottom:15px;border-left:5px solid #2980b9;">
-        <h2 style="margin:0 0 8px 0;font-size:17px;color:#2980b9;font-weight:bold;">${cliente.nome || "N/A"}</h2>
-        <p style="margin:4px 0;font-size:12px;color:#555;">
-          <strong>📱 Cellulare:</strong> ${cliente.num_tel || "-"}
-        </p>
-        <p style="margin:4px 0;font-size:12px;color:#555;">
-          <strong>✉️ Email:</strong> ${cliente.email || "-"}
-        </p>
-        <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
-          Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
-        </p>
-      </div>
+  <div class="cliente-section" style="margin-bottom:30px;page-break-inside:avoid;">
+  <div style="background:#f5f5f5;padding:15px;border-radius:6px;margin-bottom:15px;border-left:5px solid #2980b9;">
+  <h2 style="margin:0 0 8px 0;font-size:17px;color:#2980b9;font-weight:bold;">${cliente.nome || "N/A"}</h2>
+  <p style="margin:4px 0;font-size:12px;color:#555;">
+  <strong>📱 Cellulare:</strong> ${cliente.num_tel || "-"}
+  </p>
+  <p style="margin:4px 0;font-size:12px;color:#555;">
+  <strong>✉️ Email:</strong> ${cliente.email || "-"}
+  </p>
+  <p style="margin:4px 0;font-size:12px;color:#555;">
+  <strong>📅 Data passaggio:</strong> ${cliente.data_passaggio || "-"}
+  </p>
+  <p style="margin:4px 0;font-size:12px;color:#555;">
+  <strong>📞 Ricontattare:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
+  </p>
+  <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
+  Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
+  </p>
+  </div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>
           <tr style="background:#ecf0f1;border-bottom:2px solid #34495e;">
@@ -1246,19 +1252,21 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
   const company = companyWrapper.company || companyWrapper;
   const gruppi = groupOrdiniByCliente(ordini);
   const clientiUnici = Array.from(
-    new Set(
-      ordini.map((o) =>
-        JSON.stringify({
-          id: o.cliente_id,
-          nome: o.cliente_nome,
-          num_tel: o.cliente_tel,
-          email: o.cliente_email,
-        }),
-      ),
-    ),
+  new Set(
+  ordini.map((o) =>
+  JSON.stringify({
+  id: o.cliente_id,
+  nome: o.cliente_nome,
+  num_tel: o.cliente_tel,
+  email: o.cliente_email,
+  data_passaggio: o.cliente_data_passaggio,
+  flag_ricontatto: o.cliente_flag_ricontatto,
+  }),
+  ),
+  ),
   )
-    .map((s) => JSON.parse(s))
-    .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
+  .map((s) => JSON.parse(s))
+  .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
 
   const header = generatePrintHeader(company);
   const bodyClienti = clientiUnici
