@@ -145,7 +145,9 @@ async function loadClienti() {
     const res = await fetch(`${API_URL}/clienti`);
     allClienti = await res.json();
     clienti = allClienti;
-    renderClienti();
+    
+    // 🔥 Ripristina i filtri salvati
+    restoreClientiFilters();
   } catch (error) {
     console.error("Errore caricamento clienti:", error);
     showNotification("Errore caricamento clienti", "error");
@@ -233,8 +235,32 @@ function renderClienti() {
     .join("");
 }
 
+// 🔥 SALVA E RIPRISTINA FILTRI CLIENTI
+function saveClientiFilters() {
+  const searchTerm = document.getElementById("filterClienti")?.value || "";
+  const dataPassaggio = document.getElementById("filterDataPassaggio")?.value || "";
+  
+  localStorage.setItem("filter_clienti_search", searchTerm);
+  localStorage.setItem("filter_clienti_data", dataPassaggio);
+}
+
+function restoreClientiFilters() {
+  const savedSearch = localStorage.getItem("filter_clienti_search") || "";
+  const savedData = localStorage.getItem("filter_clienti_data") || "";
+  
+  const searchInput = document.getElementById("filterClienti");
+  const dataInput = document.getElementById("filterDataPassaggio");
+  
+  if (searchInput) searchInput.value = savedSearch;
+  if (dataInput) dataInput.value = savedData;
+  
+  // Applica sempre i filtri (anche se vuoti) per mostrare i dati
+  applyClientiFilters();
+}
+
 // Filtro testo clienti
 document.getElementById("filterClienti")?.addEventListener("input", (e) => {
+  saveClientiFilters();
   applyClientiFilters();
 });
 
@@ -242,6 +268,7 @@ document.getElementById("filterClienti")?.addEventListener("input", (e) => {
 document
   .getElementById("filterDataPassaggio")
   ?.addEventListener("change", (e) => {
+    saveClientiFilters();
     applyClientiFilters();
   });
 
@@ -419,7 +446,9 @@ async function loadOrdini() {
     const res = await fetch(`${API_URL}/ordini`);
     allOrdini = await res.json();
     ordini = allOrdini;
-    renderOrdini();
+    
+    // 🔥 Ripristina il filtro salvato
+    restoreOrdiniFilter();
   } catch (error) {
     console.error("Errore caricamento preventivi:", error);
     showNotification("Errore caricamento preventivi", "error");
@@ -463,8 +492,25 @@ function renderOrdini() {
     .join("");
 }
 
-document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
+// 🔥 SALVA E RIPRISTINA FILTRI ORDINI
+function saveOrdiniFilter() {
+  const searchTerm = document.getElementById("filterOrdini")?.value || "";
+  localStorage.setItem("filter_ordini_search", searchTerm);
+}
+
+function restoreOrdiniFilter() {
+  const savedSearch = localStorage.getItem("filter_ordini_search") || "";
+  const searchInput = document.getElementById("filterOrdini");
+  
+  if (searchInput) {
+    searchInput.value = savedSearch;
+  }
+  
+  // Applica sempre i filtri (anche se vuoti) per mostrare i dati
+  applyOrdiniFilter(savedSearch.toLowerCase());
+}
+
+function applyOrdiniFilter(searchTerm) {
   ordini = allOrdini.filter(
     (o) =>
       o.cliente_nome.toLowerCase().includes(searchTerm) ||
@@ -472,6 +518,12 @@ document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
       (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm)),
   );
   renderOrdini();
+}
+
+document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
+  const searchTerm = e.target.value.toLowerCase();
+  saveOrdiniFilter();
+  applyOrdiniFilter(searchTerm);
 });
 
 async function openOrdineModal(ordine = null) {
@@ -678,7 +730,9 @@ async function loadMarche() {
     const res = await fetch(`${API_URL}/marche`);
     allMarche = await res.json();
     marche = allMarche;
-    renderMarche();
+    
+    // 🔥 Ripristina il filtro salvato
+    restoreMarcheFilter();
   } catch (error) {
     console.error("Errore caricamento marche:", error);
   }
@@ -724,10 +778,33 @@ function renderMarche() {
     .join("");
 }
 
-document.getElementById("filterMarche")?.addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
+// 🔥 SALVA E RIPRISTINA FILTRI MARCHE
+function saveMarcheFilter() {
+  const searchTerm = document.getElementById("filterMarche")?.value || "";
+  localStorage.setItem("filter_marche_search", searchTerm);
+}
+
+function restoreMarcheFilter() {
+  const savedSearch = localStorage.getItem("filter_marche_search") || "";
+  const searchInput = document.getElementById("filterMarche");
+  
+  if (searchInput) {
+    searchInput.value = savedSearch;
+  }
+  
+  // Applica sempre i filtri (anche se vuoti) per mostrare i dati
+  applyMarcheFilter(savedSearch.toLowerCase());
+}
+
+function applyMarcheFilter(searchTerm) {
   marche = allMarche.filter((m) => m.nome.toLowerCase().includes(searchTerm));
   renderMarche();
+}
+
+document.getElementById("filterMarche")?.addEventListener("input", (e) => {
+  const searchTerm = e.target.value.toLowerCase();
+  saveMarcheFilter();
+  applyMarcheFilter(searchTerm);
 });
 
 function openMarcaModal(marca = null) {
@@ -817,7 +894,9 @@ async function loadModelli() {
     const res = await fetch(`${API_URL}/modelli`);
     allModelli = await res.json();
     modelli = allModelli;
-    renderModelli();
+    
+    // 🔥 Ripristina il filtro salvato
+    restoreModelliFilter();
   } catch (error) {
     console.error("Errore caricamento modelli:", error);
   }
@@ -864,14 +943,37 @@ function renderModelli() {
     .join("");
 }
 
-document.getElementById("filterModelli")?.addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
+// 🔥 SALVA E RIPRISTINA FILTRI MODELLI
+function saveModelliFilter() {
+  const searchTerm = document.getElementById("filterModelli")?.value || "";
+  localStorage.setItem("filter_modelli_search", searchTerm);
+}
+
+function restoreModelliFilter() {
+  const savedSearch = localStorage.getItem("filter_modelli_search") || "";
+  const searchInput = document.getElementById("filterModelli");
+  
+  if (searchInput) {
+    searchInput.value = savedSearch;
+  }
+  
+  // Applica sempre i filtri (anche se vuoti) per mostrare i dati
+  applyModelliFilter(savedSearch.toLowerCase());
+}
+
+function applyModelliFilter(searchTerm) {
   modelli = allModelli.filter(
     (m) =>
       m.nome.toLowerCase().includes(searchTerm) ||
       (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm)),
   );
   renderModelli();
+}
+
+document.getElementById("filterModelli")?.addEventListener("input", (e) => {
+  const searchTerm = e.target.value.toLowerCase();
+  saveModelliFilter();
+  applyModelliFilter(searchTerm);
 });
 
 async function openModelloModal(modello = null) {
