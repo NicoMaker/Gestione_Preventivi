@@ -93,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("ordini_filter_search");
     localStorage.removeItem("marche_filter_search");
     localStorage.removeItem("modelli_filter_search");
+    // Rimuovi l'ultima data passaggio salvata
+    localStorage.removeItem("last_data_passaggio");
     window.location.href = "index.html";
   });
 
@@ -325,7 +327,9 @@ function openClienteModal(cliente = null) {
   } else {
     title.textContent = "Nuovo Cliente";
     document.getElementById("clienteId").value = "";
-    document.getElementById("clienteDataPassaggio").value = "";
+    // Mantieni l'ultima data inserita dal localStorage
+    const lastDataPassaggio = localStorage.getItem("last_data_passaggio") || "";
+    document.getElementById("clienteDataPassaggio").value = lastDataPassaggio;
     document.getElementById("clienteFlagRicontatto").checked = false;
   }
 
@@ -412,6 +416,11 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
   const flag_ricontatto = document.getElementById(
     "clienteFlagRicontatto",
   ).checked;
+
+  // Salva l'ultima data inserita per riutilizzarla nei prossimi inserimenti
+  if (data_passaggio) {
+    localStorage.setItem("last_data_passaggio", data_passaggio);
+  }
 
   const method = id ? "PUT" : "POST";
   const url = id ? `${API_URL}/clienti/${id}` : `${API_URL}/clienti`;
