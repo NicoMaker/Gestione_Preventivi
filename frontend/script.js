@@ -145,7 +145,7 @@ async function loadClienti() {
     const res = await fetch(`${API_URL}/clienti`);
     allClienti = await res.json();
     clienti = allClienti;
-    
+
     // 🔥 Ripristina i filtri salvati
     restoreClientiFilters();
   } catch (error) {
@@ -204,7 +204,7 @@ function renderClienti() {
         }
       </td>
       <td style="position: relative;">
-        <div class="editable-date-cell" onclick="toggleDateEdit(${c.id}, '${c.data_passaggio || ''}', event)">
+        <div class="editable-date-cell" onclick="toggleDateEdit(${c.id}, '${c.data_passaggio || ""}', event)">
           <span class="date-display">${c.data_passaggio ? formatDate(c.data_passaggio) : "-"}</span>
           <svg class="edit-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; margin-left: 6px; opacity: 0.5;">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -215,8 +215,8 @@ function renderClienti() {
           type="date" 
           class="inline-date-input" 
           id="dateInput_${c.id}"
-          value="${c.data_passaggio || ''}"
-          data-original-value="${c.data_passaggio || ''}"
+          value="${c.data_passaggio || ""}"
+          data-original-value="${c.data_passaggio || ""}"
           onblur="saveAndHideDateInput(${c.id})"
           onkeydown="handleDateKeydown(event, ${c.id})"
           style="display: none; width: 100%; padding: 4px; border: 2px solid #6366f1; border-radius: 4px;"
@@ -256,8 +256,9 @@ function renderClienti() {
 // 🔥 SALVA E RIPRISTINA FILTRI CLIENTI
 function saveClientiFilters() {
   const searchTerm = document.getElementById("filterClienti")?.value || "";
-  const dataPassaggio = document.getElementById("filterDataPassaggio")?.value || "";
-  
+  const dataPassaggio =
+    document.getElementById("filterDataPassaggio")?.value || "";
+
   localStorage.setItem("filter_clienti_search", searchTerm);
   localStorage.setItem("filter_clienti_data", dataPassaggio);
 }
@@ -265,13 +266,13 @@ function saveClientiFilters() {
 function restoreClientiFilters() {
   const savedSearch = localStorage.getItem("filter_clienti_search") || "";
   const savedData = localStorage.getItem("filter_clienti_data") || "";
-  
+
   const searchInput = document.getElementById("filterClienti");
   const dataInput = document.getElementById("filterDataPassaggio");
-  
+
   if (searchInput) searchInput.value = savedSearch;
   if (dataInput) dataInput.value = savedData;
-  
+
   // Applica sempre i filtri (anche se vuoti) per mostrare i dati
   applyClientiFilters();
 }
@@ -390,31 +391,30 @@ async function toggleRicontatto(clienteId, isChecked) {
   }
 }
 
-
 // 📅 FUNZIONI PER EDITING INLINE DATA PASSAGGIO
 function toggleDateEdit(clienteId, currentDate, event) {
   event.stopPropagation();
-  
+
   // Nascondi tutti gli altri input date eventualmente aperti
-  document.querySelectorAll('.inline-date-input').forEach(input => {
-    input.style.display = 'none';
-    const parentCell = input.closest('td');
+  document.querySelectorAll(".inline-date-input").forEach((input) => {
+    input.style.display = "none";
+    const parentCell = input.closest("td");
     if (parentCell) {
-      const dateCell = parentCell.querySelector('.editable-date-cell');
-      if (dateCell) dateCell.style.display = 'flex';
+      const dateCell = parentCell.querySelector(".editable-date-cell");
+      if (dateCell) dateCell.style.display = "flex";
     }
   });
-  
+
   const dateInput = document.getElementById(`dateInput_${clienteId}`);
   const dateCell = dateInput.previousElementSibling;
-  
+
   if (dateInput && dateCell) {
-    dateCell.style.display = 'none';
-    dateInput.style.display = 'block';
-    
+    dateCell.style.display = "none";
+    dateInput.style.display = "block";
+
     // Salva il valore originale per poterlo ripristinare con ESC
-    dateInput.setAttribute('data-original-value', dateInput.value);
-    
+    dateInput.setAttribute("data-original-value", dateInput.value);
+
     // Focus sull'input e apri il calendar picker
     setTimeout(() => {
       dateInput.focus();
@@ -429,17 +429,17 @@ function toggleDateEdit(clienteId, currentDate, event) {
 
 function handleDateKeydown(event, clienteId) {
   // ESC - Annulla la modifica
-  if (event.key === 'Escape') {
+  if (event.key === "Escape") {
     const dateInput = document.getElementById(`dateInput_${clienteId}`);
     if (dateInput) {
       // Ripristina il valore originale
-      dateInput.value = dateInput.getAttribute('data-original-value') || '';
+      dateInput.value = dateInput.getAttribute("data-original-value") || "";
       // Chiudi l'input senza salvare
       cancelDateEdit(clienteId);
     }
   }
   // ENTER - Salva la modifica
-  else if (event.key === 'Enter') {
+  else if (event.key === "Enter") {
     event.preventDefault();
     const dateInput = document.getElementById(`dateInput_${clienteId}`);
     if (dateInput) {
@@ -451,18 +451,18 @@ function handleDateKeydown(event, clienteId) {
 function cancelDateEdit(clienteId) {
   const dateInput = document.getElementById(`dateInput_${clienteId}`);
   const dateCell = dateInput?.previousElementSibling;
-  
+
   if (dateInput && dateCell) {
-    dateInput.style.display = 'none';
-    dateCell.style.display = 'flex';
+    dateInput.style.display = "none";
+    dateCell.style.display = "flex";
   }
 }
 
 function saveAndHideDateInput(clienteId) {
   const dateInput = document.getElementById(`dateInput_${clienteId}`);
-  const originalValue = dateInput?.getAttribute('data-original-value') || '';
-  const newValue = dateInput?.value || '';
-  
+  const originalValue = dateInput?.getAttribute("data-original-value") || "";
+  const newValue = dateInput?.value || "";
+
   // Salva solo se il valore è cambiato
   if (newValue !== originalValue) {
     updateDataPassaggio(clienteId, newValue);
@@ -494,20 +494,20 @@ async function updateDataPassaggio(clienteId, newDate) {
       if (clienteFiltered) {
         clienteFiltered.data_passaggio = newDate || null;
       }
-      
+
       // Aggiorna la visualizzazione della data
       const dateInput = document.getElementById(`dateInput_${clienteId}`);
       const dateCell = dateInput?.previousElementSibling;
       if (dateCell) {
-        const dateDisplay = dateCell.querySelector('.date-display');
+        const dateDisplay = dateCell.querySelector(".date-display");
         if (dateDisplay) {
-          dateDisplay.textContent = newDate ? formatDate(newDate) : '-';
+          dateDisplay.textContent = newDate ? formatDate(newDate) : "-";
         }
       }
-      
+
       // Nascondi l'input
       cancelDateEdit(clienteId);
-      
+
       showNotification(
         newDate ? "Data passaggio aggiornata" : "Data passaggio rimossa",
         "success",
@@ -597,7 +597,7 @@ async function loadOrdini() {
     const res = await fetch(`${API_URL}/ordini`);
     allOrdini = await res.json();
     ordini = allOrdini;
-    
+
     // 🔥 Ripristina il filtro salvato
     restoreOrdiniFilter();
   } catch (error) {
@@ -652,11 +652,11 @@ function saveOrdiniFilter() {
 function restoreOrdiniFilter() {
   const savedSearch = localStorage.getItem("filter_ordini_search") || "";
   const searchInput = document.getElementById("filterOrdini");
-  
+
   if (searchInput) {
     searchInput.value = savedSearch;
   }
-  
+
   // Applica sempre i filtri (anche se vuoti) per mostrare i dati
   applyOrdiniFilter(savedSearch.toLowerCase());
 }
@@ -881,7 +881,7 @@ async function loadMarche() {
     const res = await fetch(`${API_URL}/marche`);
     allMarche = await res.json();
     marche = allMarche;
-    
+
     // 🔥 Ripristina il filtro salvato
     restoreMarcheFilter();
   } catch (error) {
@@ -938,11 +938,11 @@ function saveMarcheFilter() {
 function restoreMarcheFilter() {
   const savedSearch = localStorage.getItem("filter_marche_search") || "";
   const searchInput = document.getElementById("filterMarche");
-  
+
   if (searchInput) {
     searchInput.value = savedSearch;
   }
-  
+
   // Applica sempre i filtri (anche se vuoti) per mostrare i dati
   applyMarcheFilter(savedSearch.toLowerCase());
 }
@@ -1045,7 +1045,7 @@ async function loadModelli() {
     const res = await fetch(`${API_URL}/modelli`);
     allModelli = await res.json();
     modelli = allModelli;
-    
+
     // 🔥 Ripristina il filtro salvato
     restoreModelliFilter();
   } catch (error) {
@@ -1103,11 +1103,11 @@ function saveModelliFilter() {
 function restoreModelliFilter() {
   const savedSearch = localStorage.getItem("filter_modelli_search") || "";
   const searchInput = document.getElementById("filterModelli");
-  
+
   if (searchInput) {
     searchInput.value = savedSearch;
   }
-  
+
   // Applica sempre i filtri (anche se vuoti) per mostrare i dati
   applyModelliFilter(savedSearch.toLowerCase());
 }
@@ -1600,16 +1600,19 @@ function generatePrintDocumentOrdiniPerCliente(ordini, companyWrapper) {
 
 async function printOrdiniDiretta() {
   try {
-  // Usa 'ordini' (array filtrato) invece di 'allOrdini' per stampare solo ciò che è visibile
-  if (!ordini || !ordini.length) {
-  showNotification("Nessun preventivo da stampare. Controlla i filtri applicati.", "warning");
-  return;
-  }
-  companyInfo = await loadCompanyInfoForPrint();
-  const htmlPrint = generatePrintDocumentOrdiniPerCliente(
-  ordini,
-  companyInfo,
-  );
+    // Usa 'ordini' (array filtrato) invece di 'allOrdini' per stampare solo ciò che è visibile
+    if (!ordini || !ordini.length) {
+      showNotification(
+        "Nessun preventivo da stampare. Controlla i filtri applicati.",
+        "warning",
+      );
+      return;
+    }
+    companyInfo = await loadCompanyInfoForPrint();
+    const htmlPrint = generatePrintDocumentOrdiniPerCliente(
+      ordini,
+      companyInfo,
+    );
     const printFrame = document.createElement("iframe");
     printFrame.style.position = "absolute";
     printFrame.style.left = "-9999px";
@@ -1836,13 +1839,15 @@ function createSearchableSelect(
       const filtered = currentData.filter((item) => {
         // Cerca nel nome
         if (item.nome.toLowerCase().includes(searchTerm)) return true;
-        
+
         // Cerca nell'email se presente
-        if (item.email && item.email.toLowerCase().includes(searchTerm)) return true;
-        
+        if (item.email && item.email.toLowerCase().includes(searchTerm))
+          return true;
+
         // Cerca nel numero di telefono se presente
-        if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm)) return true;
-        
+        if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm))
+          return true;
+
         return false;
       });
       showResults(filtered);
@@ -1860,13 +1865,15 @@ function createSearchableSelect(
         : currentData.filter((item) => {
             // Cerca nel nome
             if (item.nome.toLowerCase().includes(searchTerm)) return true;
-            
+
             // Cerca nell'email se presente
-            if (item.email && item.email.toLowerCase().includes(searchTerm)) return true;
-            
+            if (item.email && item.email.toLowerCase().includes(searchTerm))
+              return true;
+
             // Cerca nel numero di telefono se presente
-            if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm)) return true;
-            
+            if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm))
+              return true;
+
             return false;
           });
 
@@ -1996,13 +2003,13 @@ async function initOrdineSearchableSelects() {
         const extraParts = [];
         if (c.num_tel) extraParts.push(`📞 ${c.num_tel}`);
         if (c.email) extraParts.push(`✉️ ${c.email}`);
-        
+
         return {
           id: c.id,
           nome: c.nome,
-          extra: extraParts.join(' • '),
-          num_tel: c.num_tel || '',
-          email: c.email || ''
+          extra: extraParts.join(" • "),
+          num_tel: c.num_tel || "",
+          email: c.email || "",
         };
       });
     },
