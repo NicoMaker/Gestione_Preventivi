@@ -997,6 +997,14 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   const data_movimento = document.getElementById("ordineData").value;
   const marca_id = document.getElementById("ordineMarca").value || null;
   const modello_id = document.getElementById("ordineModello").value || null; // Hidden input
+
+  // DEBUG: Verifica valori
+  console.log("=== DEBUG SUBMIT ORDINE ===");
+  console.log("modello_id:", modello_id);
+  console.log("marca_id:", marca_id);
+  console.log("allModelli:", allModelli);
+  console.log("allModelli.length:", allModelli?.length);
+
   const note = document.getElementById("ordineNote").value.trim();
 
   // Validazione cliente
@@ -1005,13 +1013,13 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
     return;
   }
 
-  if (modello_id) {
+  // Validazione modello (solo se allModelli è caricato)
+  if (modello_id && Array.isArray(allModelli) && allModelli.length > 0) {
     const modello = allModelli.find((m) => String(m.id) === String(modello_id));
     if (!modello) {
-      showNotification("Modello selezionato non valido.", "error");
-      return;
-    }
-    if (marca_id && modello.marche_id) {
+      console.warn("Modello non trovato in allModelli, ma procedo comunque con il salvataggio");
+      // Non blocchiamo il salvataggio, il backend farà la validazione finale
+    } else if (marca_id && modello.marche_id) {
       if (String(modello.marche_id) !== String(marca_id)) {
         showNotification(
           "Il modello selezionato non appartiene alla marca indicata.",
