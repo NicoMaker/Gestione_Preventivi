@@ -1737,7 +1737,7 @@ function createSearchableSelect(
         (item) => `
       <div class="result-item" data-id="${item.id}" data-nome="${item.nome}" style="padding:12px 18px;cursor:pointer;transition:all 0.2s ease;border-bottom:1px solid #f1f5f9;">
         <div style="font-weight:600;color:#334155;">${highlightText(item.nome, searchInput.value)}</div>
-        ${item.extra ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">${item.extra}</div>` : ""}
+        ${item.extra ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">${highlightText(item.extra, searchInput.value)}</div>` : ""}
       </div>
     `,
       )
@@ -1833,9 +1833,18 @@ function createSearchableSelect(
     if (searchTerm === "") {
       showResults(currentData);
     } else {
-      const filtered = currentData.filter((item) =>
-        item.nome.toLowerCase().includes(searchTerm),
-      );
+      const filtered = currentData.filter((item) => {
+        // Cerca nel nome
+        if (item.nome.toLowerCase().includes(searchTerm)) return true;
+        
+        // Cerca nell'email se presente
+        if (item.email && item.email.toLowerCase().includes(searchTerm)) return true;
+        
+        // Cerca nel numero di telefono se presente
+        if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm)) return true;
+        
+        return false;
+      });
       showResults(filtered);
     }
   });
@@ -1848,9 +1857,18 @@ function createSearchableSelect(
     const filtered =
       searchTerm === ""
         ? currentData
-        : currentData.filter((item) =>
-            item.nome.toLowerCase().includes(searchTerm),
-          );
+        : currentData.filter((item) => {
+            // Cerca nel nome
+            if (item.nome.toLowerCase().includes(searchTerm)) return true;
+            
+            // Cerca nell'email se presente
+            if (item.email && item.email.toLowerCase().includes(searchTerm)) return true;
+            
+            // Cerca nel numero di telefono se presente
+            if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm)) return true;
+            
+            return false;
+          });
 
     showResults(filtered);
     searchInput.style.borderColor = "#6366f1";
