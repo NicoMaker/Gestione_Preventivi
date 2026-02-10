@@ -400,23 +400,23 @@ async function seedClienti() {
       flag_ricontatto: 0,
     },
     
-    // Clienti solo con telefono
+    // Clienti SENZA email (solo telefono)
     {
       nome: "Anna Verdi",
       num_tel: "3391234567",
-      email: "anna.verdi@gmail.com",
+      email: null,
       data_passaggio: "2024-01-25",
       flag_ricontatto: 1,
     },
     {
       nome: "Marco Neri",
       num_tel: "3478901234",
-      email: "marco.neri@hotmail.it",
+      email: null,
       data_passaggio: null,
       flag_ricontatto: 0,
     },
     
-    // Clienti solo con email
+    // Clienti con email
     {
       nome: "Silvia Conti",
       num_tel: "3486111039",
@@ -432,18 +432,18 @@ async function seedClienti() {
       flag_ricontatto: 0,
     },
     
-    // Clienti minimal (solo nome)
+    // Clienti SENZA email
     {
       nome: "Francesca Moretti",
       num_tel: "3500228246",
-      email: "francesca.moretti@libero.it",
+      email: null,
       data_passaggio: null,
       flag_ricontatto: 0,
     },
     {
       nome: "Roberto Colombo",
       num_tel: "3356998375",
-      email: "roberto.colombo@email.it",
+      email: null,
       data_passaggio: "2024-03-01",
       flag_ricontatto: 1,
     },
@@ -459,7 +459,7 @@ async function seedClienti() {
     {
       nome: "Andrea Santoro",
       num_tel: "3497654321",
-      email: "andrea.santoro@gmail.com",
+      email: null,
       data_passaggio: "2024-12-28",
       flag_ricontatto: 1,
     },
@@ -475,7 +475,7 @@ async function seedClienti() {
     {
       nome: "Matteo Romano",
       num_tel: "3489012345",
-      email: "matteo.romano@yahoo.it",
+      email: null,
       data_passaggio: "2024-10-15",
       flag_ricontatto: 0,
     },
@@ -489,7 +489,7 @@ async function seedClienti() {
     {
       nome: "Davide Costa",
       num_tel: "3338765432",
-      email: "davide.costa@email.it",
+      email: null,
       data_passaggio: null,
       flag_ricontatto: 0,
     },
@@ -503,7 +503,7 @@ async function seedClienti() {
     {
       nome: "Stefano Fontana",
       num_tel: "3345641621",
-      email: "stefano.fontana@outlook.com",
+      email: null,
       data_passaggio: "2024-07-12",
       flag_ricontatto: 0,
     },
@@ -517,7 +517,7 @@ async function seedClienti() {
     {
       nome: "Alessandro Greco",
       num_tel: "3384567890",
-      email: "alessandro.greco@gmail.com",
+      email: null,
       data_passaggio: "2024-05-22",
       flag_ricontatto: 1,
     },
@@ -533,7 +533,7 @@ async function seedClienti() {
     {
       nome: "Simone Caruso",
       num_tel: "3336789012",
-      email: "simone.caruso@outlook.com",
+      email: null,
       data_passaggio: null,
       flag_ricontatto: 0,
     },
@@ -547,14 +547,14 @@ async function seedClienti() {
     {
       nome: "Claudio Battaglia",
       num_tel: "3447890123",
-      email: "claudio.battaglia@live.it",
+      email: null,
       data_passaggio: null,
       flag_ricontatto: 0,
     },
     {
       nome: "Monica Martini",
       num_tel: "3356942968",
-      email: "monica.martini@libero.it",
+      email: null,
       data_passaggio: null,
       flag_ricontatto: 1,
     },
@@ -583,7 +583,7 @@ async function seedClienti() {
       );
       clientiIds.push({ id, ...cliente });
       console.log(
-        `  ✓ Cliente: ${cliente.nome} | Tel: ${cliente.num_tel || "N/A"} | Email: ${cliente.email || "N/A"} | Flag: ${cliente.flag_ricontatto} (ID: ${id})`
+        `  ✓ Cliente: ${cliente.nome} | Tel: ${cliente.num_tel || "N/A"} | Email: ${cliente.email || "NO MAIL"} | Flag: ${cliente.flag_ricontatto} (ID: ${id})`
       );
     } catch (err) {
       if (err.message.includes("UNIQUE")) {
