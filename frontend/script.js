@@ -200,7 +200,7 @@ function renderClienti() {
             </svg>
             ${c.email}
           </a>`
-            : "NO MAIL"
+            : "NO"
         }
       </td>
       <td style="position: relative;">
