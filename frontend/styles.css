@@ -306,7 +306,8 @@ body {
   margin-left: 280px;
   flex: 1;
   /* Added more padding-top to move sections lower */
-  padding: 100px 40px 40px;
+  /* ✅ INCREASED bottom padding to 120px to prevent last element cutoff */
+  padding: 100px 40px 120px;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -1003,7 +1004,7 @@ tbody tr:hover {
 /* Responsive Design */
 @media (max-width: 1200px) {
   .main-content {
-    padding: 32px;
+    padding: 32px 32px 120px;
   }
 
   .section-header h1 {
@@ -1050,7 +1051,7 @@ tbody tr:hover {
     margin-left: 0;
     width: 100%;
     /* Adjusted mobile padding to keep logo visible below hamburger */
-    padding: 100px 20px 20px;
+    padding: 100px 20px 120px;
   }
 
   /* Added more padding-top for mobile sidebar header */
@@ -1196,7 +1197,7 @@ tbody tr:hover {
   .main-content {
     margin-left: 0;
     width: 100%;
-    padding: 100px 32px 32px;
+    padding: 100px 32px 120px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -1242,7 +1243,7 @@ tbody tr:hover {
     margin-left: 0;
     width: 100%;
     /* Adjusted mobile padding to keep logo visible below hamburger */
-    padding: 100px 20px 20px;
+    padding: 100px 20px 120px;
   }
 
   /* Added more padding-top for mobile sidebar header */
@@ -1327,7 +1328,7 @@ tbody tr:hover {
 
 @media (max-width: 480px) {
   .main-content {
-    padding: 70px 16px 16px;
+    padding: 70px 16px 100px;
   }
 
   .section-header h1 {
