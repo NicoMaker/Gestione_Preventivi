@@ -232,7 +232,11 @@ function renderClienti() {
         />
       </td>
       <td style="text-align: center">
-        <span class="badge-count">${c.ordini_count || 0}</span>
+        <span class="prodotti-badge ${
+          c.ordini_count > 0 ? "has-products" : "empty"
+        }">
+          ${c.ordini_count || 0}
+        </span>
       </td>
       <td class="text-right">
         <button class="btn-icon" onclick="editCliente(${c.id})" title="Modifica cliente">
@@ -606,7 +610,6 @@ async function loadOrdini() {
   }
 }
 
-
 function renderOrdini() {
   const tbody = document.getElementById("ordiniTableBody");
 
@@ -617,22 +620,23 @@ function renderOrdini() {
   }
 
   tbody.innerHTML = ordini
-    .map(
-      (o) => {
-        const telefono = o.cliente_tel || "-";
-        const email = o.cliente_email || "NO MAIL";
-        const dataPassaggio = o.cliente_data_passaggio || "";
-        const flagRicontatto = o.cliente_flag_ricontatto || 0;
-        
-        const whatsappLink = telefono !== "-" 
-          ? `<a href="https://wa.me/${telefono.replace(/[^0-9]/g, '')}" target="_blank" class="contact-link whatsapp" title="Apri WhatsApp">
+    .map((o) => {
+      const telefono = o.cliente_tel || "-";
+      const email = o.cliente_email || "NO MAIL";
+      const dataPassaggio = o.cliente_data_passaggio || "";
+      const flagRicontatto = o.cliente_flag_ricontatto || 0;
+
+      const whatsappLink =
+        telefono !== "-"
+          ? `<a href="https://wa.me/${telefono.replace(/[^0-9]/g, "")}" target="_blank" class="contact-link whatsapp" title="Apri WhatsApp">
               <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
               </svg>
             </a>`
           : "-";
-        
-        const emailLink = email !== "NO MAIL"
+
+      const emailLink =
+        email !== "NO MAIL"
           ? `<a href="mailto:${email}" class="contact-link email" title="Invia Email">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -640,8 +644,9 @@ function renderOrdini() {
               </svg>
             </a>`
           : "NO MAIL";
-        
-        const telLink = telefono !== "-"
+
+      const telLink =
+        telefono !== "-"
           ? `<a href="tel:${telefono}" class="contact-link phone" title="Chiama">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -649,7 +654,7 @@ function renderOrdini() {
             </a>`
           : "-";
 
-        return `
+      return `
     <tr>
       <td>${formatDate(o.data_movimento)}</td>
       <td><strong>${o.cliente_nome}</strong></td>
@@ -675,7 +680,7 @@ function renderOrdini() {
         <input 
           type="checkbox" 
           class="inline-checkbox" 
-          ${flagRicontatto ? 'checked' : ''} 
+          ${flagRicontatto ? "checked" : ""} 
           onchange="updateClienteFlagRicontatto(${o.cliente_id}, this.checked)"
           title="Ricontatto cliente"
         />
@@ -698,28 +703,27 @@ function renderOrdini() {
       </td>
     </tr>
   `;
-      }
-    )
+    })
     .join("");
 }
 
 async function updateClienteDataPassaggio(clienteId, newDate) {
   try {
     const response = await fetch(`${API_URL}/clienti/${clienteId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data_passaggio: newDate })
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data_passaggio: newDate }),
     });
 
     if (!response.ok) {
-      throw new Error('Errore aggiornamento data passaggio');
+      throw new Error("Errore aggiornamento data passaggio");
     }
 
-    showNotification('Data passaggio aggiornata', 'success');
+    showNotification("Data passaggio aggiornata", "success");
     await loadOrdini();
   } catch (error) {
-    console.error('Errore:', error);
-    showNotification('Errore aggiornamento data passaggio', 'error');
+    console.error("Errore:", error);
+    showNotification("Errore aggiornamento data passaggio", "error");
     await loadOrdini();
   }
 }
@@ -727,45 +731,49 @@ async function updateClienteDataPassaggio(clienteId, newDate) {
 async function updateClienteFlagRicontatto(clienteId, checked) {
   try {
     const response = await fetch(`${API_URL}/clienti/${clienteId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ flag_ricontatto: checked })
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ flag_ricontatto: checked }),
     });
 
     if (!response.ok) {
-      throw new Error('Errore aggiornamento flag ricontatto');
+      throw new Error("Errore aggiornamento flag ricontatto");
     }
 
     showNotification(
-      checked ? 'Cliente da ricontattare' : 'Flag ricontatto rimosso', 
-      'success'
+      checked ? "Cliente da ricontattare" : "Flag ricontatto rimosso",
+      "success",
     );
     await loadOrdini();
   } catch (error) {
-    console.error('Errore:', error);
-    showNotification('Errore aggiornamento flag ricontatto', 'error');
+    console.error("Errore:", error);
+    showNotification("Errore aggiornamento flag ricontatto", "error");
     await loadOrdini();
   }
 }
 
 function saveOrdiniFilter() {
   const searchTerm = document.getElementById("filterOrdini")?.value || "";
-  const dataPassaggio = document.getElementById("filterOrdiniDataPassaggio")?.value || "";
+  const dataPassaggio =
+    document.getElementById("filterOrdiniDataPassaggio")?.value || "";
   localStorage.setItem("filter_ordini_search", searchTerm);
   localStorage.setItem("filter_ordini_data_passaggio", dataPassaggio);
 }
 
 function restoreOrdiniFilter() {
   const savedSearch = localStorage.getItem("filter_ordini_search") || "";
-  const savedDataPassaggio = localStorage.getItem("filter_ordini_data_passaggio") || "";
-  
+  const savedDataPassaggio =
+    localStorage.getItem("filter_ordini_data_passaggio") || "";
+
   const searchInput = document.getElementById("filterOrdini");
-  const dataPassaggioInput = document.getElementById("filterOrdiniDataPassaggio");
+  const dataPassaggioInput = document.getElementById(
+    "filterOrdiniDataPassaggio",
+  );
 
   if (searchInput) {
     searchInput.value = savedSearch;
   }
-  
+
   if (dataPassaggioInput) {
     dataPassaggioInput.value = savedDataPassaggio;
   }
@@ -773,37 +781,43 @@ function restoreOrdiniFilter() {
   applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio);
 }
 
-function applyOrdiniFilter(searchTerm = '', dataPassaggio = '') {
+function applyOrdiniFilter(searchTerm = "", dataPassaggio = "") {
   ordini = allOrdini.filter((o) => {
-    const matchText = !searchTerm || 
+    const matchText =
+      !searchTerm ||
       o.cliente_nome.toLowerCase().includes(searchTerm) ||
       (o.cliente_tel && o.cliente_tel.toLowerCase().includes(searchTerm)) ||
       (o.cliente_email && o.cliente_email.toLowerCase().includes(searchTerm)) ||
       (o.marca_nome && o.marca_nome.toLowerCase().includes(searchTerm)) ||
       (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm));
-    
-    const matchData = !dataPassaggio || 
+
+    const matchData =
+      !dataPassaggio ||
       (o.cliente_data_passaggio && o.cliente_data_passaggio === dataPassaggio);
-    
+
     return matchText && matchData;
   });
-  
+
   renderOrdini();
 }
 
 document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
   const searchTerm = e.target.value.toLowerCase();
-  const dataPassaggio = document.getElementById("filterOrdiniDataPassaggio")?.value || '';
+  const dataPassaggio =
+    document.getElementById("filterOrdiniDataPassaggio")?.value || "";
   saveOrdiniFilter();
   applyOrdiniFilter(searchTerm, dataPassaggio);
 });
 
-document.getElementById("filterOrdiniDataPassaggio")?.addEventListener("change", (e) => {
-  const searchTerm = document.getElementById("filterOrdini")?.value.toLowerCase() || '';
-  const dataPassaggio = e.target.value;
-  saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio);
-});
+document
+  .getElementById("filterOrdiniDataPassaggio")
+  ?.addEventListener("change", (e) => {
+    const searchTerm =
+      document.getElementById("filterOrdini")?.value.toLowerCase() || "";
+    const dataPassaggio = e.target.value;
+    saveOrdiniFilter();
+    applyOrdiniFilter(searchTerm, dataPassaggio);
+  });
 
 async function openOrdineModal(ordine = null) {
   await loadClientiForSelect();
@@ -819,77 +833,79 @@ async function openOrdineModal(ordine = null) {
   if (ordine) {
     title.textContent = "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
-    
+
     document.getElementById("ordineCliente").value = ordine.cliente_id;
-    document.getElementById("ordineData").value = formatDateForInput(ordine.data_movimento);
+    document.getElementById("ordineData").value = formatDateForInput(
+      ordine.data_movimento,
+    );
     document.getElementById("ordineMarca").value = ordine.marca_id || "";
     document.getElementById("ordineModello").value = ordine.modello_id || "";
     document.getElementById("ordineNote").value = ordine.note || "";
-    
+
     setTimeout(() => {
       initSelectSearch(
-        'ordineClienteSearch',
-        allClienti.map(c => ({ value: c.id, label: c.nome })),
-        'ordineCliente',
-        ordine.cliente_id
+        "ordineClienteSearch",
+        allClienti.map((c) => ({ value: c.id, label: c.nome })),
+        "ordineCliente",
+        ordine.cliente_id,
       );
-      
+
       const marche = allModelli
-        .map(m => ({ id: m.marche_id, nome: m.marca_nome }))
-        .filter((m, i, arr) => m.id && arr.findIndex(x => x.id === m.id) === i);
-      
+        .map((m) => ({ id: m.marche_id, nome: m.marca_nome }))
+        .filter(
+          (m, i, arr) => m.id && arr.findIndex((x) => x.id === m.id) === i,
+        );
+
       initSelectSearch(
-        'ordineMarcaSearch',
-        marche.map(m => ({ value: m.id, label: m.nome })),
-        'ordineMarca',
-        ordine.marca_id
+        "ordineMarcaSearch",
+        marche.map((m) => ({ value: m.id, label: m.nome })),
+        "ordineMarca",
+        ordine.marca_id,
       );
-      
-      const modelliFiltered = allModelli.filter(m => m.marche_id == ordine.marca_id);
-      
+
+      const modelliFiltered = allModelli.filter(
+        (m) => m.marche_id == ordine.marca_id,
+      );
+
       initSelectSearch(
-        'ordineModelloSearch',
-        modelliFiltered.map(m => ({ value: m.id, label: m.nome })),
-        'ordineModello',
-        ordine.modello_id
+        "ordineModelloSearch",
+        modelliFiltered.map((m) => ({ value: m.id, label: m.nome })),
+        "ordineModello",
+        ordine.modello_id,
       );
     }, 100);
-    
   } else {
     title.textContent = "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
 
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("ordineData").value = today;
-    
+
     setTimeout(() => {
       initSelectSearch(
-        'ordineClienteSearch',
-        allClienti.map(c => ({ value: c.id, label: c.nome })),
-        'ordineCliente'
+        "ordineClienteSearch",
+        allClienti.map((c) => ({ value: c.id, label: c.nome })),
+        "ordineCliente",
       );
-      
+
       const marche = allModelli
-        .map(m => ({ id: m.marche_id, nome: m.marca_nome }))
-        .filter((m, i, arr) => m.id && arr.findIndex(x => x.id === m.id) === i);
-      
+        .map((m) => ({ id: m.marche_id, nome: m.marca_nome }))
+        .filter(
+          (m, i, arr) => m.id && arr.findIndex((x) => x.id === m.id) === i,
+        );
+
       initSelectSearch(
-        'ordineMarcaSearch',
-        marche.map(m => ({ value: m.id, label: m.nome })),
-        'ordineMarca'
+        "ordineMarcaSearch",
+        marche.map((m) => ({ value: m.id, label: m.nome })),
+        "ordineMarca",
       );
-      
-      initSelectSearch(
-        'ordineModelloSearch',
-        [],
-        'ordineModello'
-      );
+
+      initSelectSearch("ordineModelloSearch", [], "ordineModello");
     }, 100);
   }
 
   modal.classList.add("active");
 }
-
 
 function closeOrdineModal() {
   document.getElementById("modalOrdine").classList.remove("active");
@@ -1017,7 +1033,9 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   if (modello_id && Array.isArray(allModelli) && allModelli.length > 0) {
     const modello = allModelli.find((m) => String(m.id) === String(modello_id));
     if (!modello) {
-      console.warn("Modello non trovato in allModelli, ma procedo comunque con il salvataggio");
+      console.warn(
+        "Modello non trovato in allModelli, ma procedo comunque con il salvataggio",
+      );
       // Non blocchiamo il salvataggio, il backend farà la validazione finale
     } else if (marca_id && modello.marche_id) {
       if (String(modello.marche_id) !== String(marca_id)) {
