@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
     LEFT JOIN marche ma ON m.marche_id = ma.id
     LEFT JOIN ordini o ON o.modello_id = m.id
     GROUP BY m.id, m.nome, m.marche_id, m.created_at, ma.nome
-    ORDER BY m.nome
+    ORDER BY m.nome COLLATE NOCASE, m.nome
   `;
   
   db.all(query, (err, rows) => {

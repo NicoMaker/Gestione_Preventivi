@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
     FROM clienti c
     LEFT JOIN ordini o ON c.id = o.cliente_id
     GROUP BY c.id, c.nome, c.num_tel, c.email, c.data_passaggio, c.flag_ricontatto, c.created_at
-    ORDER BY c.nome ASC
+    ORDER BY c.nome COLLATE NOCASE, c.nome
   `;
 
   db.all(query, (err, rows) => {

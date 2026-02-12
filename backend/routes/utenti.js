@@ -14,7 +14,7 @@ function isPasswordStrong(password) {
 // GET /api/utenti - lista utenti
 router.get("/", (req, res) => {
   db.all(
-    "SELECT id, nome, created_at FROM utenti ORDER BY nome ASC",
+    "SELECT id, nome, created_at FROM utenti ORDER BY nome COLLATE NOCASE, nome",
     [],
     (err, rows) => {
       if (err) {

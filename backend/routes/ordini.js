@@ -25,7 +25,7 @@ router.get("/", (req, res) => {
     JOIN clienti c ON o.cliente_id = c.id
     LEFT JOIN modelli m ON o.modello_id = m.id
     LEFT JOIN marche ma ON o.marca_id = ma.id
-    ORDER BY o.data_movimento DESC, m.nome ASC
+    ORDER BY o.data_movimento DESC, m.nome COLLATE NOCASE, m.nome
   `;
 
   db.all(query, (err, rows) => {
