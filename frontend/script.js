@@ -1408,7 +1408,13 @@ document.getElementById("formModello").addEventListener("submit", async (e) => {
 
   const id = document.getElementById("modelloId").value;
   const nome = document.getElementById("modelloNome").value.trim();
-  const marche_id = document.getElementById("modelloMarca").value || null;
+  const marche_id = document.getElementById("modelloMarca").value;
+
+  // ⚠️ VALIDAZIONE OBBLIGATORIA: La marca deve essere sempre selezionata
+  if (!marche_id || marche_id === "" || marche_id === "null") {
+    showNotification("Seleziona una marca per il modello", "error");
+    return;
+  }
 
   const method = id ? "PUT" : "POST";
   const url = id ? `${API_URL}/modelli/${id}` : `${API_URL}/modelli`;
@@ -1722,7 +1728,7 @@ function generateClienteSection(cliente, ordiniCliente) {
   <strong>✉️ Email:</strong> ${cliente.email || "NO"}
   </p>
   <p style="margin:4px 0;font-size:12px;color:#555;">
-  <strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "-"}
+  <strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "NO"}
   </p>
   <p style="margin:4px 0;font-size:12px;color:#555;">
   <strong>📞 Ricontattato:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
