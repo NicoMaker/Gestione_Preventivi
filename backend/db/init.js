@@ -89,7 +89,7 @@ function initDatabase() {
       }
     );
 
-    // ==================== TABELLA CLIENTI (AGGIORNATA) ====================
+    // ==================== TABELLA CLIENTI ====================
     db.run(
       `CREATE TABLE IF NOT EXISTS clienti (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,14 +105,14 @@ function initDatabase() {
           console.error("Errore creazione tabella clienti:", err.message);
         } else {
           console.log("Tabella clienti OK");
-          
-          // Aggiungi colonne se non esistono (migrazione)
+
+          // Migrazione: aggiungi colonne se non esistono
           db.run("ALTER TABLE clienti ADD COLUMN data_passaggio DATE", (err) => {
             if (err && !err.message.includes("duplicate column")) {
               console.error("Errore aggiunta data_passaggio:", err.message);
             }
           });
-          
+
           db.run("ALTER TABLE clienti ADD COLUMN flag_ricontatto INTEGER DEFAULT 0", (err) => {
             if (err && !err.message.includes("duplicate column")) {
               console.error("Errore aggiunta flag_ricontatto:", err.message);
@@ -149,6 +149,7 @@ function initDatabase() {
         cliente_id INTEGER NOT NULL,
         marca_id INTEGER,
         note TEXT,
+        contratto_finito INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (modello_id) REFERENCES modelli(id),
         FOREIGN KEY (cliente_id) REFERENCES clienti(id),
@@ -159,6 +160,24 @@ function initDatabase() {
           console.error("Errore creazione tabella ordini:", err.message);
         } else {
           console.log("Tabella ordini OK");
+
+          // ⚠️ MIGRAZIONE SICURA: aggiunge contratto_finito se il DB esiste già
+          // Non perde nessun dato esistente - i record già presenti avranno valore 0 (No)
+          db.run(
+            "ALTER TABLE ordini ADD COLUMN contratto_finito INTEGER DEFAULT 0",
+            (err) => {
+              if (err) {
+                if (err.message.includes("duplicate column")) {
+                  // Colonna già presente, tutto ok
+                  console.log("Colonna contratto_finito già presente");
+                } else {
+                  console.error("Errore aggiunta contratto_finito:", err.message);
+                }
+              } else {
+                console.log("Colonna contratto_finito aggiunta con successo (tutti i record esistenti impostati a 0 = No)");
+              }
+            }
+          );
         }
       }
     );

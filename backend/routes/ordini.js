@@ -20,6 +20,7 @@ router.get("/", (req, res) => {
       o.marca_id,
       ma.nome as marca_nome,
       o.note,
+      o.contratto_finito,
       o.created_at
     FROM ordini o
     JOIN clienti c ON o.cliente_id = c.id
@@ -58,6 +59,7 @@ router.get("/cliente/:clienteId", (req, res) => {
       o.marca_id,
       ma.nome as marca_nome,
       o.note,
+      o.contratto_finito,
       o.created_at
     FROM ordini o
     JOIN clienti c ON o.cliente_id = c.id
@@ -78,7 +80,7 @@ router.get("/cliente/:clienteId", (req, res) => {
 
 // POST - Crea nuovo ordine
 router.post("/", (req, res) => {
-  const { cliente_id, data_movimento, modello_id, marca_id, note } = req.body;
+  const { cliente_id, data_movimento, modello_id, marca_id, note, contratto_finito } = req.body;
 
   if (!cliente_id) {
     return res.status(400).json({
@@ -89,14 +91,15 @@ router.post("/", (req, res) => {
   const dataMovimento = data_movimento || new Date().toISOString();
 
   db.run(
-    `INSERT INTO ordini (cliente_id, data_movimento, modello_id, marca_id, note) 
-     VALUES (?, ?, ?, ?, ?)`,
+    `INSERT INTO ordini (cliente_id, data_movimento, modello_id, marca_id, note, contratto_finito) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
     [
       cliente_id,
       dataMovimento,
       modello_id || null,
       marca_id || null,
       note || null,
+      contratto_finito ? 1 : 0,
     ],
     function (err) {
       if (err) {
@@ -122,6 +125,7 @@ router.post("/", (req, res) => {
           o.marca_id,
           ma.nome as marca_nome,
           o.note,
+          o.contratto_finito,
           o.created_at
         FROM ordini o
         JOIN clienti c ON o.cliente_id = c.id
@@ -154,7 +158,7 @@ router.post("/", (req, res) => {
 // PUT - Aggiorna ordine
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { cliente_id, data_movimento, modello_id, marca_id, note } = req.body;
+  const { cliente_id, data_movimento, modello_id, marca_id, note, contratto_finito } = req.body;
 
   if (!cliente_id) {
     return res.status(400).json({
@@ -164,7 +168,7 @@ router.put("/:id", (req, res) => {
 
   db.run(
     `UPDATE ordini 
-     SET cliente_id = ?, data_movimento = ?, modello_id = ?, marca_id = ?, note = ? 
+     SET cliente_id = ?, data_movimento = ?, modello_id = ?, marca_id = ?, note = ?, contratto_finito = ?
      WHERE id = ?`,
     [
       cliente_id,
@@ -172,6 +176,7 @@ router.put("/:id", (req, res) => {
       modello_id || null,
       marca_id || null,
       note || null,
+      contratto_finito ? 1 : 0,
       id,
     ],
     function (err) {

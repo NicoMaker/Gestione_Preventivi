@@ -4709,3 +4709,152 @@ tbody tr:hover {
 .piva-icon{
   color: #8b5cf6;
 }
+/* ==================== CONTRATTO FINITO TOGGLE ==================== */
+.contratto-toggle-wrapper {
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  user-select: none;
+}
+
+.contratto-toggle-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.contratto-toggle-wrapper:active {
+  transform: translateY(0);
+}
+
+.contratto-toggle-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #fca5a5;
+  border-radius: 14px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contratto-toggle-inner.is-finito {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: #6ee7b7;
+}
+
+.contratto-icon {
+  font-size: 22px;
+  line-height: 1;
+  transition: transform 0.35s ease;
+}
+
+.contratto-toggle-wrapper:hover .contratto-icon {
+  transform: scale(1.2) rotate(-5deg);
+}
+
+.contratto-label {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #991b1b;
+  transition: color 0.35s ease;
+  letter-spacing: 0.2px;
+}
+
+.contratto-toggle-inner.is-finito .contratto-label {
+  color: #065f46;
+}
+
+.contratto-arrow {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ef4444;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.contratto-toggle-inner.is-finito .contratto-arrow {
+  color: #10b981;
+}
+
+.contratto-toggle-wrapper:hover .contratto-arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* Badge nella tabella */
+.badge-contratto {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.badge-contratto:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.badge-contratto:active {
+  transform: scale(0.97);
+}
+
+.badge-contratto.no {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+  border: 1.5px solid #fca5a5;
+}
+
+.badge-contratto.si {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+  border: 1.5px solid #6ee7b7;
+}
+
+/* Badge ricontatto nella tabella preventivi */
+.badge-ricontatto {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.badge-ricontatto:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.badge-ricontatto:active {
+  transform: scale(0.97);
+}
+
+.badge-ricontatto.no {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
+}
+
+.badge-ricontatto.si {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #4c1d95;
+  border: 1.5px solid #c4b5fd;
+}

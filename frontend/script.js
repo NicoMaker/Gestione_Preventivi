@@ -715,13 +715,22 @@ function renderOrdini() {
         />
       </td>
       <td class="text-center">
-        <input 
-          type="checkbox" 
-          class="inline-checkbox" 
-          ${flagRicontatto ? "checked" : ""} 
-          onchange="updateClienteFlagRicontatto(${o.cliente_id}, this.checked)"
-          title="Ricontatto cliente"
-        />
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <button
+            class="badge-ricontatto ${flagRicontatto ? 'si' : 'no'}"
+            onclick="updateClienteFlagRicontatto(${o.cliente_id}, ${!flagRicontatto})"
+            title="Clicca per cambiare stato ricontatto"
+          >
+            ${flagRicontatto ? '📱 Ricontattato' : '⏳ Da ricontattare'}
+          </button>
+          <button
+            class="badge-contratto ${o.contratto_finito ? 'si' : 'no'}"
+            onclick="updateContrattoFinito(${o.id}, ${!o.contratto_finito})"
+            title="Clicca per cambiare stato contratto"
+          >
+            ${o.contratto_finito ? '✅ Contratto finito' : '🔴 Non finito'}
+          </button>
+        </div>
       </td>
       <td>${o.marca_nome || "-"}</td>
       <td>${o.modello_nome || "-"}</td>
@@ -778,15 +787,104 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
       throw new Error("Errore aggiornamento flag ricontatto");
     }
 
+    // Aggiorna dati locali
+    const o = allOrdini.find((x) => x.cliente_id === clienteId);
+    if (o) o.cliente_flag_ricontatto = checked ? 1 : 0;
+    const oF = ordini.find((x) => x.cliente_id === clienteId);
+    if (oF) oF.cliente_flag_ricontatto = checked ? 1 : 0;
+
     showNotification(
-      checked ? "Cliente da ricontattare" : "Flag ricontatto rimosso",
+      checked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
       "success",
     );
-    await loadOrdini();
+    renderOrdini();
   } catch (error) {
     console.error("Errore:", error);
     showNotification("Errore aggiornamento flag ricontatto", "error");
     await loadOrdini();
+  }
+}
+
+async function updateContrattoFinito(ordineId, newValue) {
+  try {
+    const ordine = allOrdini.find((o) => o.id === ordineId);
+    if (!ordine) {
+      showNotification("Preventivo non trovato", "error");
+      return;
+    }
+
+    const response = await fetch(`${API_URL}/ordini/${ordineId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cliente_id: ordine.cliente_id,
+        data_movimento: ordine.data_movimento,
+        marca_id: ordine.marca_id || null,
+        modello_id: ordine.modello_id || null,
+        note: ordine.note || null,
+        contratto_finito: newValue,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Errore aggiornamento contratto finito");
+
+    // Aggiorna dati locali senza ricaricare
+    const ordineAll = allOrdini.find((o) => o.id === ordineId);
+    if (ordineAll) ordineAll.contratto_finito = newValue ? 1 : 0;
+    const ordineFiltered = ordini.find((o) => o.id === ordineId);
+    if (ordineFiltered) ordineFiltered.contratto_finito = newValue ? 1 : 0;
+
+    showNotification(
+      newValue ? "✅ Contratto segnato come finito!" : "🔴 Contratto segnato come non finito",
+      "success",
+    );
+    renderOrdini();
+  } catch (error) {
+    console.error("Errore:", error);
+    showNotification("Errore aggiornamento contratto finito", "error");
+    await loadOrdini();
+  }
+}
+
+// Toggle visivo nel modal preventivo
+function toggleContrattoModal() {
+  const hidden = document.getElementById("ordineContrattoFinito");
+  const inner = document.getElementById("contrattoToggleInner");
+  const icon = document.getElementById("contrattoIcon");
+  const label = document.getElementById("contrattoLabel");
+
+  const isNowFinito = hidden.value !== "1";
+  hidden.value = isNowFinito ? "1" : "0";
+
+  if (isNowFinito) {
+    inner.classList.add("is-finito");
+    icon.textContent = "✅";
+    label.textContent = "Contratto Finito";
+  } else {
+    inner.classList.remove("is-finito");
+    icon.textContent = "🔴";
+    label.textContent = "Contratto Non Finito";
+  }
+}
+
+// Imposta stato visivo del toggle nel modal
+function setContrattoModalState(value) {
+  const hidden = document.getElementById("ordineContrattoFinito");
+  const inner = document.getElementById("contrattoToggleInner");
+  const icon = document.getElementById("contrattoIcon");
+  const label = document.getElementById("contrattoLabel");
+
+  if (!hidden || !inner) return;
+
+  hidden.value = value ? "1" : "0";
+  if (value) {
+    inner.classList.add("is-finito");
+    icon.textContent = "✅";
+    label.textContent = "Contratto Finito";
+  } else {
+    inner.classList.remove("is-finito");
+    icon.textContent = "🔴";
+    label.textContent = "Contratto Non Finito";
   }
 }
 
@@ -867,6 +965,8 @@ async function openOrdineModal(ordine = null) {
   const form = document.getElementById("formOrdine");
 
   form.reset();
+  // Reset stato toggle contratto
+  setContrattoModalState(false);
 
   if (ordine) {
     title.textContent = "Modifica Preventivo";
@@ -879,6 +979,7 @@ async function openOrdineModal(ordine = null) {
     document.getElementById("ordineMarca").value = ordine.marca_id || "";
     document.getElementById("ordineModello").value = ordine.modello_id || "";
     document.getElementById("ordineNote").value = ordine.note || "";
+    setContrattoModalState(ordine.contratto_finito == 1);
 
     setTimeout(() => {
       initSelectSearch(
@@ -1060,6 +1161,7 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   console.log("allModelli.length:", allModelli?.length);
 
   const note = document.getElementById("ordineNote").value.trim();
+  const contratto_finito = document.getElementById("ordineContrattoFinito").value === "1";
 
   // Validazione cliente
   if (!cliente_id) {
@@ -1101,6 +1203,7 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
         marca_id,
         modello_id,
         note,
+        contratto_finito,
       }),
     });
 
@@ -1780,7 +1883,8 @@ function generateClienteSection(cliente, ordiniCliente) {
           <tr style="background:#ecf0f1;border-bottom:2px solid #34495e;">
             <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Data Preventivo</th>
             <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Marca</th>
-            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Marca / Modello</th>
+            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Modello</th>
+            <th style="padding:10px;text-align:center;border:1px solid #bdc3c7;">Contratto</th>
             <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Note</th>
           </tr>
         </thead>
@@ -1792,6 +1896,11 @@ function generateClienteSection(cliente, ordiniCliente) {
               <td style="padding:10px;border:1px solid #ecf0f1;font-weight:bold;white-space:nowrap;">${formatDate(o.data_movimento)}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.marca_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.modello_nome || "-"}</td>
+              <td style="padding:10px;border:1px solid #ecf0f1;text-align:center;">
+                <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;${o.contratto_finito ? 'background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;' : 'background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;'}">
+                  ${o.contratto_finito ? "✅ Finito" : "🔴 Non finito"}
+                </span>
+              </td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.note || "-"}</td>
             </tr>
           `,
@@ -2398,6 +2507,8 @@ window.openOrdineModal = async function (ordine = null) {
   const form = document.getElementById("formOrdine");
 
   form.reset();
+  // Reset stato toggle contratto
+  setContrattoModalState(false);
 
   // Inizializza searchable selects se non già fatto
   if (!clienteSearchOrdine || !marcaSearchOrdine || !modelloSearchOrdine) {
@@ -2419,6 +2530,7 @@ window.openOrdineModal = async function (ordine = null) {
       ordine.data_movimento,
     );
     document.getElementById("ordineNote").value = ordine.note || "";
+    setContrattoModalState(ordine.contratto_finito == 1);
 
     // Imposta valori nei searchable selects
     if (ordine.cliente_id && clienteSearchOrdine) {
