@@ -257,13 +257,13 @@ function renderClienti() {
         />
       </td>
       <td style="text-align:center;">
-        <input 
-          type="checkbox" 
-          ${c.flag_ricontatto ? "checked" : ""} 
-          onchange="toggleRicontatto(${c.id}, this.checked)"
-          style="cursor: pointer; width: 18px; height: 18px;"
-          title="Ricontatto Cliente"
-        />
+        <button
+          class="badge-ricontatto ${c.flag_ricontatto ? 'si' : 'no'}"
+          onclick="toggleRicontatto(${c.id}, ${!c.flag_ricontatto})"
+          title="Clicca per cambiare stato ricontatto"
+        >
+          ${c.flag_ricontatto ? '📱 Ricontattato' : '⏳ Da ricontattare'}
+        </button>
       </td>
       <td style="text-align: center">
         <span class="prodotti-badge ${
@@ -371,16 +371,34 @@ function openClienteModal(cliente = null) {
     document.getElementById("clienteEmail").value = cliente.email || "";
     document.getElementById("clienteDataPassaggio").value =
       cliente.data_passaggio || "";
-    document.getElementById("clienteFlagRicontatto").checked =
-      cliente.flag_ricontatto == 1;
+    setRicontattoModalState(cliente.flag_ricontatto == 1);
   } else {
     title.textContent = "Nuovo Cliente";
     document.getElementById("clienteId").value = "";
     document.getElementById("clienteDataPassaggio").value = "";
-    document.getElementById("clienteFlagRicontatto").checked = false;
+    setRicontattoModalState(false);
   }
 
   modal.classList.add("active");
+}
+
+/** Imposta lo stato visivo del badge-toggle nel modal cliente */
+function setRicontattoModalState(isRicontattato) {
+  const hidden = document.getElementById("clienteFlagRicontatto");
+  const btn = document.getElementById("btnToggleRicontattoModal");
+  if (!hidden || !btn) return;
+
+  hidden.value = isRicontattato ? "1" : "0";
+  btn.className = `badge-ricontatto ${isRicontattato ? "si" : "no"}`;
+  btn.innerHTML = isRicontattato ? "📱 Ricontattato" : "⏳ Da ricontattare";
+  btn.style.cssText = "font-size:14px; padding: 10px 22px; border-radius: 12px;";
+}
+
+/** Toggle cliccato nel modal cliente */
+function toggleRicontattoModal() {
+  const hidden = document.getElementById("clienteFlagRicontatto");
+  const current = hidden.value === "1";
+  setRicontattoModalState(!current);
 }
 
 function closeClienteModal() {
@@ -415,11 +433,11 @@ async function toggleRicontatto(clienteId, isChecked) {
         clienteFiltered.flag_ricontatto = isChecked ? 1 : 0;
       }
       showNotification(
-        isChecked ? "Ricontatto attivato" : "Ricontatto disattivato",
+        isChecked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
         "success",
       );
+      renderClienti();
     } else {
-      // Ripristina il checkbox in caso di errore
       showNotification(data.error || "Errore durante l'aggiornamento", "error");
       renderClienti();
     }
@@ -592,9 +610,7 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
   const num_tel = document.getElementById("clienteTel").value.trim();
   const email = document.getElementById("clienteEmail").value.trim();
   const data_passaggio = document.getElementById("clienteDataPassaggio").value;
-  const flag_ricontatto = document.getElementById(
-    "clienteFlagRicontatto",
-  ).checked;
+  const flag_ricontatto = document.getElementById("clienteFlagRicontatto").value === "1";
 
   // Almeno uno tra cellulare e email obbligatorio
   if (!num_tel && !email) {
@@ -1872,7 +1888,10 @@ function generateClienteSection(cliente, ordiniCliente) {
   <strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "No"}
   </p>
   <p style="margin:4px 0;font-size:12px;color:#555;">
-  <strong>📞 Ricontattato:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
+  <strong>📞 Ricontattato:</strong>
+  <span style="display:inline-block;margin-left:6px;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;${cliente.flag_ricontatto == 1 ? 'background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;' : 'background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;'}">
+    ${cliente.flag_ricontatto == 1 ? '📱 Ricontattato' : '⏳ Da ricontattare'}
+  </span>
   </p>
   <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
   Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
