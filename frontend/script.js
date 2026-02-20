@@ -371,34 +371,16 @@ function openClienteModal(cliente = null) {
     document.getElementById("clienteEmail").value = cliente.email || "";
     document.getElementById("clienteDataPassaggio").value =
       cliente.data_passaggio || "";
-    setRicontattoModalState(cliente.flag_ricontatto == 1);
+    document.getElementById("clienteFlagRicontatto").checked =
+      cliente.flag_ricontatto == 1;
   } else {
     title.textContent = "Nuovo Cliente";
     document.getElementById("clienteId").value = "";
     document.getElementById("clienteDataPassaggio").value = "";
-    setRicontattoModalState(false);
+    document.getElementById("clienteFlagRicontatto").checked = false;
   }
 
   modal.classList.add("active");
-}
-
-/** Imposta lo stato visivo del badge-toggle nel modal cliente */
-function setRicontattoModalState(isRicontattato) {
-  const hidden = document.getElementById("clienteFlagRicontatto");
-  const btn = document.getElementById("btnToggleRicontattoModal");
-  if (!hidden || !btn) return;
-
-  hidden.value = isRicontattato ? "1" : "0";
-  btn.className = `badge-ricontatto ${isRicontattato ? "si" : "no"}`;
-  btn.innerHTML = isRicontattato ? "📱 Ricontattato" : "⏳ Da ricontattare";
-  btn.style.cssText = "font-size:14px; padding: 10px 22px; border-radius: 12px;";
-}
-
-/** Toggle cliccato nel modal cliente */
-function toggleRicontattoModal() {
-  const hidden = document.getElementById("clienteFlagRicontatto");
-  const current = hidden.value === "1";
-  setRicontattoModalState(!current);
 }
 
 function closeClienteModal() {
@@ -610,7 +592,9 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
   const num_tel = document.getElementById("clienteTel").value.trim();
   const email = document.getElementById("clienteEmail").value.trim();
   const data_passaggio = document.getElementById("clienteDataPassaggio").value;
-  const flag_ricontatto = document.getElementById("clienteFlagRicontatto").value === "1";
+  const flag_ricontatto = document.getElementById(
+    "clienteFlagRicontatto",
+  ).checked;
 
   // Almeno uno tra cellulare e email obbligatorio
   if (!num_tel && !email) {
@@ -744,7 +728,7 @@ function renderOrdini() {
             onclick="updateContrattoFinito(${o.id}, ${!o.contratto_finito})"
             title="Clicca per cambiare stato contratto"
           >
-            ${o.contratto_finito ? '✅ Contratto finito' : '🔴 Non finito'}
+            ${o.contratto_finito ? '✅ finito' : '🔴 Non finito'}
           </button>
         </div>
       </td>
@@ -1887,12 +1871,7 @@ function generateClienteSection(cliente, ordiniCliente) {
   <p style="margin:4px 0;font-size:12px;color:#555;">
   <strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "No"}
   </p>
-  <p style="margin:4px 0;font-size:12px;color:#555;">
-  <strong>📞 Ricontattato:</strong>
-  <span style="display:inline-block;margin-left:6px;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;${cliente.flag_ricontatto == 1 ? 'background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;' : 'background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;'}">
-    ${cliente.flag_ricontatto == 1 ? '📱 Ricontattato' : '⏳ Da ricontattare'}
-  </span>
-  </p>
+  <p style="margin:4px 0;"><span style="display:inline-block;padding:3px 12px;border-radius:99px;font-size:11px;font-weight:700;${cliente.flag_ricontatto == 1 ? 'background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;' : 'background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;'}">${cliente.flag_ricontatto == 1 ? '📱 Ricontattato' : '⏳ Da ricontattare'}</span></p>
   <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
   Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
   </p>
