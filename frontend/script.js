@@ -1769,7 +1769,7 @@ function generateClienteSection(cliente, ordiniCliente) {
   <strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "No"}
   </p>
   <p style="margin:4px 0;font-size:12px;color:#555;">
-  <strong>📞 Ricontattato:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
+  <strong>📞 Ricontattato/Contratto terminato:</strong> ${cliente.flag_ricontatto == 1 ? "Si" : "No"}
   </p>
   <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
   Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
