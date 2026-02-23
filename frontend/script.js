@@ -806,11 +806,13 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
       throw new Error("Errore aggiornamento flag ricontatto");
     }
 
-    // Aggiorna dati locali
-    const o = allOrdini.find((x) => x.cliente_id === clienteId);
-    if (o) o.cliente_flag_ricontatto = checked ? 1 : 0;
-    const oF = ordini.find((x) => x.cliente_id === clienteId);
-    if (oF) oF.cliente_flag_ricontatto = checked ? 1 : 0;
+    // Aggiorna dati locali — tutti i preventivi dello stesso cliente
+    allOrdini
+      .filter((x) => x.cliente_id === clienteId)
+      .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; });
+    ordini
+      .filter((x) => x.cliente_id === clienteId)
+      .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; });
 
     showNotification(
       checked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
