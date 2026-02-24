@@ -2,6 +2,7 @@
 // Script per popolare il database con dati di esempio completi
 // Eseguire con: node scripts/seed-database.js
 // ⚠️ IMPORTANTE: Ogni modello DEVE avere una marca associata (marche_id obbligatorio)
+// ⚠️ IMPORTANTE: Ogni preventivo DEVE avere marca_id E modello_id obbligatori (NOT NULL)
 
 const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcrypt");
@@ -99,13 +100,14 @@ async function initTables() {
         )`);
         console.log("  ✓ Tabella modelli OK (marca obbligatoria)");
 
-        // Tabella ordini (preventivi) - con contratto_finito
+        // Tabella ordini (preventivi)
+        // ⚠️ marca_id e modello_id sono entrambi NOT NULL (obbligatori)
         await runQuery(`CREATE TABLE IF NOT EXISTS ordini (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           data_movimento DATETIME DEFAULT CURRENT_TIMESTAMP,
-          modello_id INTEGER,
+          modello_id INTEGER NOT NULL,
           cliente_id INTEGER NOT NULL,
-          marca_id INTEGER,
+          marca_id INTEGER NOT NULL,
           note TEXT,
           contratto_finito INTEGER DEFAULT 0,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -113,7 +115,7 @@ async function initTables() {
           FOREIGN KEY (cliente_id) REFERENCES clienti(id),
           FOREIGN KEY (marca_id) REFERENCES marche(id)
         )`);
-        console.log("  ✓ Tabella ordini OK (con contratto_finito)");
+        console.log("  ✓ Tabella ordini OK (marca e modello obbligatori, con contratto_finito)");
 
         // ⚠️ MIGRAZIONE SICURA: aggiunge contratto_finito se il DB esiste già
         // Non perde nessun dato esistente - i record già presenti avranno valore 0
@@ -378,41 +380,37 @@ async function seedClienti() {
 
   const clienti = [
     // Solo CELLULARE
-    { nome: "Marco Neri", num_tel: "3478901234", email: null, data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Anna Verdi", num_tel: "3391234567", email: null, data_passaggio: "2024-01-25", flag_ricontatto: 1 },
-    { nome: "Francesca Moretti", num_tel: "3500228246", email: null, data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Roberto Colombo", num_tel: "3356998375", email: null, data_passaggio: "2024-03-01", flag_ricontatto: 1 },
-    { nome: "Andrea Santoro", num_tel: "3497654321", email: null, data_passaggio: "2024-12-28", flag_ricontatto: 1 },
-    { nome: "Matteo Romano", num_tel: "3489012345", email: null, data_passaggio: "2024-10-15", flag_ricontatto: 0 },
-    { nome: "Davide Costa", num_tel: "3338765432", email: null, data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Stefano Fontana", num_tel: "3345641621", email: null, data_passaggio: "2024-07-12", flag_ricontatto: 0 },
-    { nome: "Alessandro Greco", num_tel: "3384567890", email: null, data_passaggio: "2024-05-22", flag_ricontatto: 1 },
-    { nome: "Simone Caruso", num_tel: "3336789012", email: null, data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Claudio Battaglia", num_tel: "3447890123", email: null, data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Monica Martini", num_tel: "3356942968", email: null, data_passaggio: null, flag_ricontatto: 1 },
+    { nome: "Andrea Santoro",    num_tel: "3497654321", email: null,                          data_passaggio: "2024-12-28", flag_ricontatto: 1 },
+    { nome: "Matteo Romano",     num_tel: "3489012345", email: null,                          data_passaggio: "2024-10-15", flag_ricontatto: 0 },
+    { nome: "Davide Costa",      num_tel: "3338765432", email: null,                          data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Stefano Fontana",   num_tel: "3345641621", email: null,                          data_passaggio: "2024-07-12", flag_ricontatto: 0 },
+    { nome: "Alessandro Greco",  num_tel: "3384567890", email: null,                          data_passaggio: "2024-05-22", flag_ricontatto: 1 },
+    { nome: "Simone Caruso",     num_tel: "3336789012", email: null,                          data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Claudio Battaglia", num_tel: "3447890123", email: null,                          data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Monica Martini",    num_tel: "3356942968", email: null,                          data_passaggio: null,         flag_ricontatto: 1 },
     // Solo EMAIL
-    { nome: "Cristina Fabbri", num_tel: null, email: "cristina.fabbri@gmail.com", data_passaggio: "2024-02-10", flag_ricontatto: 0 },
-    { nome: "Emanuele Mancini", num_tel: null, email: "emanuele.mancini@libero.it", data_passaggio: null, flag_ricontatto: 1 },
-    { nome: "Serena Pellegrini", num_tel: null, email: "serena.pellegrini@outlook.com", data_passaggio: "2024-04-18", flag_ricontatto: 0 },
-    { nome: "Daniele Ferretti", num_tel: null, email: "daniele.ferretti@yahoo.it", data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Irene Marchetti", num_tel: null, email: "irene.marchetti@hotmail.it", data_passaggio: "2024-08-05", flag_ricontatto: 1 },
-    { nome: "Tommaso Serra", num_tel: null, email: "tommaso.serra@email.it", data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Beatrice Longo", num_tel: null, email: "beatrice.longo@gmail.com", data_passaggio: "2024-11-22", flag_ricontatto: 1 },
-    { nome: "Nicola Ferrara", num_tel: null, email: "nicola.ferrara@live.it", data_passaggio: null, flag_ricontatto: 0 },
+    { nome: "Cristina Fabbri",   num_tel: null,         email: "cristina.fabbri@gmail.com",   data_passaggio: "2024-02-10", flag_ricontatto: 0 },
+    { nome: "Emanuele Mancini",  num_tel: null,         email: "emanuele.mancini@libero.it",  data_passaggio: null,         flag_ricontatto: 1 },
+    { nome: "Serena Pellegrini", num_tel: null,         email: "serena.pellegrini@outlook.com",data_passaggio: "2024-04-18", flag_ricontatto: 0 },
+    { nome: "Daniele Ferretti",  num_tel: null,         email: "daniele.ferretti@yahoo.it",   data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Irene Marchetti",   num_tel: null,         email: "irene.marchetti@hotmail.it",  data_passaggio: "2024-08-05", flag_ricontatto: 1 },
+    { nome: "Tommaso Serra",     num_tel: null,         email: "tommaso.serra@email.it",      data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Beatrice Longo",    num_tel: null,         email: "beatrice.longo@gmail.com",    data_passaggio: "2024-11-22", flag_ricontatto: 1 },
+    { nome: "Nicola Ferrara",    num_tel: null,         email: "nicola.ferrara@live.it",      data_passaggio: null,         flag_ricontatto: 0 },
     // ENTRAMBI
-    { nome: "Giovanni Bianchi", num_tel: "3331234567", email: "giovanni.bianchi@email.it", data_passaggio: "2024-01-15", flag_ricontatto: 0 },
-    { nome: "Maria Rossi", num_tel: "3349876543", email: "maria.rossi@gmail.com", data_passaggio: "2024-02-20", flag_ricontatto: 1 },
-    { nome: "Luca Ferrari", num_tel: "3356789012", email: "luca.ferrari@yahoo.it", data_passaggio: "2024-03-10", flag_ricontatto: 0 },
-    { nome: "Silvia Conti", num_tel: "3486111039", email: "silvia.conti@libero.it", data_passaggio: "2024-02-05", flag_ricontatto: 1 },
-    { nome: "Paolo Ricci", num_tel: "3340772694", email: "paolo.ricci@outlook.com", data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Elena Gallo", num_tel: "3401234567", email: "elena.gallo@email.it", data_passaggio: "2024-12-20", flag_ricontatto: 1 },
-    { nome: "Chiara Esposito", num_tel: "3356781234", email: "chiara.espo@hotmail.it", data_passaggio: "2024-11-10", flag_ricontatto: 0 },
-    { nome: "Giulia Marino", num_tel: "3340823923", email: "giulia.marino@live.it", data_passaggio: "2024-09-05", flag_ricontatto: 1 },
-    { nome: "Valentina Bruno", num_tel: "3452345678", email: "valentina.bruno@yahoo.it", data_passaggio: "2024-08-20", flag_ricontatto: 1 },
-    { nome: "Laura De Luca", num_tel: "3473456789", email: "laura.deluca@gmail.com", data_passaggio: "2024-06-18", flag_ricontatto: 0 },
-    { nome: "Federica Piras", num_tel: "3495678901", email: "federica.piras@libero.it", data_passaggio: "2024-04-30", flag_ricontatto: 0 },
-    { nome: "Alessia Lombardi", num_tel: "3502544514", email: "alessia.lombardi@email.it", data_passaggio: null, flag_ricontatto: 0 },
-    { nome: "Riccardo Vitale", num_tel: "3358901234", email: "riccardo.vitale@gmail.com", data_passaggio: null, flag_ricontatto: 0 },
+    { nome: "Giovanni Bianchi",  num_tel: "3331234567", email: "giovanni.bianchi@email.it",   data_passaggio: "2024-01-15", flag_ricontatto: 0 },
+    { nome: "Maria Rossi",       num_tel: "3349876543", email: "maria.rossi@gmail.com",       data_passaggio: "2024-02-20", flag_ricontatto: 1 },
+    { nome: "Luca Ferrari",      num_tel: "3356789012", email: "luca.ferrari@yahoo.it",       data_passaggio: "2024-03-10", flag_ricontatto: 0 },
+    { nome: "Silvia Conti",      num_tel: "3486111039", email: "silvia.conti@libero.it",      data_passaggio: "2024-02-05", flag_ricontatto: 1 },
+    { nome: "Paolo Ricci",       num_tel: "3340772694", email: "paolo.ricci@outlook.com",     data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Elena Gallo",       num_tel: "3401234567", email: "elena.gallo@email.it",        data_passaggio: "2024-12-20", flag_ricontatto: 1 },
+    { nome: "Chiara Esposito",   num_tel: "3356781234", email: "chiara.espo@hotmail.it",      data_passaggio: "2024-11-10", flag_ricontatto: 0 },
+    { nome: "Giulia Marino",     num_tel: "3340823923", email: "giulia.marino@live.it",       data_passaggio: "2024-09-05", flag_ricontatto: 1 },
+    { nome: "Valentina Bruno",   num_tel: "3452345678", email: "valentina.bruno@yahoo.it",    data_passaggio: "2024-08-20", flag_ricontatto: 1 },
+    { nome: "Laura De Luca",     num_tel: "3473456789", email: "laura.deluca@gmail.com",      data_passaggio: "2024-06-18", flag_ricontatto: 0 },
+    { nome: "Federica Piras",    num_tel: "3495678901", email: "federica.piras@libero.it",    data_passaggio: "2024-04-30", flag_ricontatto: 0 },
+    { nome: "Alessia Lombardi",  num_tel: "3502544514", email: "alessia.lombardi@email.it",   data_passaggio: null,         flag_ricontatto: 0 },
+    { nome: "Riccardo Vitale",   num_tel: "3358901234", email: "riccardo.vitale@gmail.com",   data_passaggio: null,         flag_ricontatto: 0 },
   ];
 
   const clientiIds = [];
@@ -427,9 +425,9 @@ async function seedClienti() {
       clientiIds.push({ id, ...cliente });
 
       let caso;
-      if (cliente.num_tel && !cliente.email) { caso = "📱 solo cel"; countSoloCel++; }
+      if (cliente.num_tel && !cliente.email)  { caso = "📱 solo cel";  countSoloCel++; }
       else if (!cliente.num_tel && cliente.email) { caso = "📧 solo mail"; countSoloMail++; }
-      else { caso = "📱📧 entrambi"; countEntrambi++; }
+      else                                    { caso = "📱📧 entrambi"; countEntrambi++; }
 
       console.log(`  ✓ [${caso}] ${cliente.nome} (ID: ${id})`);
     } catch (err) {
@@ -452,12 +450,14 @@ async function seedClienti() {
 async function seedOrdini(clientiIds, modelliIds, marcheIds) {
   console.log("\n[ORDINI] Popolamento preventivi...");
   console.log("  Casi coperti: [✅ concluso] [🔴 non concluso]");
+  console.log("  ⚠️  IMPORTANTE: marca_id e modello_id sono entrambi obbligatori (NOT NULL)");
 
   // contratto_finito: 1 = finito ✅, 0 = non finito 🔴
+  // ⚠️ Tutti i preventivi DEVONO avere marca_id E modello_id valorizzati
   const ordini = [
     {
       cliente_id: clientiIds[0]?.id,
-      modello_id: modelliIds[0]?.id,
+      modello_id: modelliIds[0]?.id,       // Golf VIII 1.5 TSI Life
       marca_id: marcheIds["Volkswagen"],
       note: "Cliente interessato a finanziamento. Valutazione permuta auto usata.",
       data_movimento: "2024-01-16",
@@ -465,7 +465,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[1]?.id,
-      modello_id: modelliIds[8]?.id,
+      modello_id: modelliIds[8]?.id,       // Classe A 180d Automatic
       marca_id: marcheIds["Mercedes-Benz"],
       note: "Preventivo con optional: tetto apribile, sedili riscaldati, telecamera posteriore.",
       data_movimento: "2024-02-21",
@@ -473,7 +473,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[2]?.id,
-      modello_id: modelliIds[16]?.id,
+      modello_id: modelliIds[16]?.id,      // Yaris Hybrid Active
       marca_id: marcheIds["Toyota"],
       note: "Cliente cerca auto ibrida per risparmio carburante. Budget max 30.000 EUR.",
       data_movimento: "2024-03-11",
@@ -481,39 +481,39 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[3]?.id,
-      modello_id: null,
+      modello_id: modelliIds[5]?.id,       // Serie 1 118i M Sport — prima scelta
       marca_id: marcheIds["BMW"],
-      note: "Cliente indeciso tra Serie 1 e Serie 3. Richiesto confronto prezzi.",
+      note: "Cliente indeciso tra Serie 1 e Serie 3. Preventivo Serie 1 come prima proposta.",
       data_movimento: "2024-01-26",
       contratto_finito: 0, // 🔴 Cliente indeciso
     },
     {
       cliente_id: clientiIds[4]?.id,
-      modello_id: null,
+      modello_id: modelliIds[14]?.id,      // Q3 35 TFSI S line
       marca_id: marcheIds["Audi"],
-      note: "Interessato a gamma SUV Audi. Test drive da programmare.",
+      note: "Interessato a gamma SUV Audi. Test drive da programmare su Q3.",
       data_movimento: "2024-02-10",
       contratto_finito: 0, // 🔴 Da seguire
     },
     {
       cliente_id: clientiIds[5]?.id,
-      modello_id: null,
-      marca_id: null,
+      modello_id: modelliIds[24]?.id,      // 500 Hybrid Dolcevita — auto compatta benzina
+      marca_id: marcheIds["Fiat"],
       note: "Cliente cerca auto compatta benzina. Budget 15.000 EUR. Prima auto.",
       data_movimento: "2024-02-06",
-      contratto_finito: 0, // 🔴 Generico, in attesa
+      contratto_finito: 0, // 🔴 In attesa
     },
     {
       cliente_id: clientiIds[6]?.id,
-      modello_id: null,
-      marca_id: null,
-      note: "Richiesta preventivo generico per auto elettrica aziendale.",
+      modello_id: modelliIds[43]?.id,      // Model 3 Long Range — elettrica aziendale
+      marca_id: marcheIds["Tesla"],
+      note: "Richiesta preventivo auto elettrica aziendale. Ordine confermato.",
       data_movimento: "2024-03-05",
       contratto_finito: 1, // ✅ Ordine aziendale confermato
     },
     {
       cliente_id: clientiIds[7]?.id,
-      modello_id: modelliIds[24]?.id,
+      modello_id: modelliIds[24]?.id,      // 500 Hybrid Dolcevita
       marca_id: marcheIds["Fiat"],
       note: "Cliente ha chiesto: colore rosso, cerchi in lega 16\", sensori parcheggio, navigatore integrato, garanzia estesa 3 anni.",
       data_movimento: "2024-03-02",
@@ -521,7 +521,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[8]?.id,
-      modello_id: modelliIds[32]?.id,
+      modello_id: modelliIds[32]?.id,      // Clio 1.0 TCe Intens
       marca_id: marcheIds["Renault"],
       note: "URGENTE: Cliente necessita auto entro fine mese per lavoro. Disponibile subito?",
       data_movimento: "2024-12-15",
@@ -530,7 +530,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     // Più preventivi per lo stesso cliente (clientiIds[9])
     {
       cliente_id: clientiIds[9]?.id,
-      modello_id: modelliIds[4]?.id,
+      modello_id: modelliIds[4]?.id,       // Serie 3 320d xDrive
       marca_id: marcheIds["BMW"],
       note: "Prima proposta: BMW Serie 3 - Prezzo listino 48.000 EUR",
       data_movimento: "2024-12-20",
@@ -538,15 +538,15 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[9]?.id,
-      modello_id: modelliIds[12]?.id,
+      modello_id: modelliIds[12]?.id,      // A3 Sportback 35 TDI S tronic
       marca_id: marcheIds["Audi"],
-      note: "Seconda proposta: Audi A4 - Cliente preferisce questo modello",
+      note: "Seconda proposta: Audi A3 - Cliente preferisce questo modello",
       data_movimento: "2024-12-21",
       contratto_finito: 0, // 🔴 Alternativa
     },
     {
       cliente_id: clientiIds[9]?.id,
-      modello_id: modelliIds[9]?.id,
+      modello_id: modelliIds[9]?.id,       // Classe C 220d 4Matic
       marca_id: marcheIds["Mercedes-Benz"],
       note: "Terza proposta: Mercedes Classe C - Accettata! In attesa conferma finanziamento",
       data_movimento: "2024-12-22",
@@ -554,7 +554,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[10]?.id,
-      modello_id: modelliIds[40]?.id,
+      modello_id: modelliIds[43]?.id,      // Model 3 Long Range
       marca_id: marcheIds["Tesla"],
       note: "Cliente vuole passare all'elettrico. Interessato a wallbox domestica.",
       data_movimento: "2024-12-28",
@@ -562,7 +562,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[11]?.id,
-      modello_id: modelliIds[28]?.id,
+      modello_id: modelliIds[28]?.id,      // 2008 1.5 BlueHDi Allure
       marca_id: marcheIds["Peugeot"],
       note: "Cliente cerca SUV compatto. Budget flessibile.",
       data_movimento: "2024-11-12",
@@ -570,7 +570,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[12]?.id,
-      modello_id: modelliIds[20]?.id,
+      modello_id: modelliIds[20]?.id,      // Fiesta 1.0 EcoBoost Titanium
       marca_id: marcheIds["Ford"],
       note: "Permuta Ford Focus 2018 - Valutazione 12.000 EUR",
       data_movimento: "2024-10-16",
@@ -578,7 +578,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[13]?.id,
-      modello_id: modelliIds[36]?.id,
+      modello_id: modelliIds[36]?.id,      // Corsa 1.2 Elegance
       marca_id: marcheIds["Opel"],
       note: "Auto per neopatentato. Assicurazione inclusa nel preventivo.",
       data_movimento: "2024-09-06",
@@ -586,7 +586,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[14]?.id,
-      modello_id: modelliIds[48]?.id,
+      modello_id: modelliIds[50]?.id,      // Juke 1.0 DIG-T Tekna
       marca_id: marcheIds["Nissan"],
       note: "Cliente aziendale - Richiesto preventivo flotta 5 auto",
       data_movimento: "2024-08-25",
@@ -594,7 +594,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[15]?.id,
-      modello_id: modelliIds[56]?.id,
+      modello_id: modelliIds[62]?.id,      // i30 1.6 CRDi Business
       marca_id: marcheIds["Hyundai"],
       note: null,
       data_movimento: "2024-08-21",
@@ -602,7 +602,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[16]?.id,
-      modello_id: modelliIds[60]?.id,
+      modello_id: modelliIds[66]?.id,      // Sportage 1.6 CRDi Business
       marca_id: marcheIds["Kia"],
       note: null,
       data_movimento: "2024-07-13",
@@ -610,7 +610,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[17]?.id,
-      modello_id: modelliIds[68]?.id,
+      modello_id: modelliIds[69]?.id,      // Octavia 2.0 TDI Style
       marca_id: marcheIds["Skoda"],
       note: "Preventivo valido fino al 30/06/2024",
       data_movimento: "2024-06-19",
@@ -618,7 +618,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[18]?.id,
-      modello_id: modelliIds[72]?.id,
+      modello_id: modelliIds[72]?.id,      // Ibiza 1.0 TSI FR
       marca_id: marcheIds["Seat"],
       note: "Sconto promozionale -15% applicato",
       data_movimento: "2024-05-23",
@@ -626,7 +626,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[19]?.id,
-      modello_id: modelliIds[44]?.id,
+      modello_id: modelliIds[47]?.id,      // XC60 D4 AWD Momentum
       marca_id: marcheIds["Volvo"],
       note: "Cliente richiede preventivo aggiornato con nuovi incentivi statali",
       data_movimento: "2024-05-01",
@@ -634,7 +634,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[20]?.id,
-      modello_id: modelliIds[1]?.id,
+      modello_id: modelliIds[1]?.id,       // Polo 1.0 TSI Comfortline
       marca_id: marcheIds["Volkswagen"],
       note: "Ordine confermato e consegnato. Cliente soddisfatto.",
       data_movimento: "2024-01-10",
@@ -642,7 +642,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[21]?.id,
-      modello_id: modelliIds[24]?.id,
+      modello_id: modelliIds[25]?.id,      // Panda 1.0 Hybrid City Cross
       marca_id: marcheIds["Fiat"],
       note: "Preventivo annullato - Cliente ha acquistato altrove",
       data_movimento: "2024-02-14",
@@ -650,15 +650,15 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[22]?.id,
-      modello_id: null,
+      modello_id: modelliIds[17]?.id,      // Corolla Hybrid Executive
       marca_id: marcheIds["Toyota"],
-      note: "Richiesta informazioni generiche su gamma ibrida",
+      note: "Richiesta informazioni su gamma ibrida Toyota. Test drive prenotato.",
       data_movimento: "2024-03-20",
       contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[23]?.id,
-      modello_id: modelliIds[11]?.id,
+      modello_id: modelliIds[11]?.id,      // EQA 250 Electric
       marca_id: marcheIds["Mercedes-Benz"],
       note: "Auto elettrica con autonomia 400km. Incentivi disponibili: 6.000 EUR",
       data_movimento: "2024-11-05",
@@ -666,7 +666,7 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[24]?.id,
-      modello_id: modelliIds[33]?.id,
+      modello_id: modelliIds[35]?.id,      // ZOE Electric R135
       marca_id: marcheIds["Renault"],
       note: "Cliente chiede info su punti ricarica in città e costi energia",
       data_movimento: "2024-10-18",
@@ -675,10 +675,25 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
   ];
 
   const ordiniIds = [];
-  let countFiniti = 0, countNonFiniti = 0;
+  let countFiniti = 0, countNonFiniti = 0, countSaltati = 0;
 
   for (const ordine of ordini) {
-    if (!ordine.cliente_id) continue;
+    // ⚠️ Validazione: cliente_id, marca_id e modello_id sono obbligatori
+    if (!ordine.cliente_id) {
+      console.warn(`  ⚠️  Preventivo saltato: cliente_id mancante`);
+      countSaltati++;
+      continue;
+    }
+    if (!ordine.marca_id) {
+      console.error(`  ✗ Preventivo SALTATO: marca_id obbligatorio! (cliente_id: ${ordine.cliente_id})`);
+      countSaltati++;
+      continue;
+    }
+    if (!ordine.modello_id) {
+      console.error(`  ✗ Preventivo SALTATO: modello_id obbligatorio! (cliente_id: ${ordine.cliente_id})`);
+      countSaltati++;
+      continue;
+    }
 
     try {
       const id = await runQuery(
@@ -698,8 +713,9 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
       else countNonFiniti++;
 
       const clienteNome = clientiIds.find(c => c.id === ordine.cliente_id)?.nome || "N/A";
-      const modelloNome = modelliIds.find(m => m.id === ordine.modello_id)?.nome || "N/A";
-      const statoIcon = ordine.contratto_finito ? "✅" : "🔴";
+      const modelloObj  = modelliIds.find(m => m.id === ordine.modello_id);
+      const modelloNome = modelloObj?.nome || "N/A";
+      const statoIcon   = ordine.contratto_finito ? "✅" : "🔴";
 
       console.log(
         `  ${statoIcon} Preventivo ID ${id} | Cliente: ${clienteNome} | Modello: ${modelloNome}`
@@ -712,6 +728,9 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
   console.log(`✓ ${ordiniIds.length} preventivi inseriti:`);
   console.log(`  ✅ Contratto concluso:     ${countFiniti}`);
   console.log(`  🔴 Contratto non concluso: ${countNonFiniti}`);
+  if (countSaltati > 0) {
+    console.warn(`  ⚠️  Saltati (campo obbligatorio mancante): ${countSaltati}`);
+  }
   return ordiniIds;
 }
 
@@ -727,11 +746,11 @@ async function seedDatabase() {
     // Decommenta per partire da zero:
     // await pulisciDatabase();
 
-    const utentiIds = await seedUtenti();
-    const marcheIds = await seedMarche();
+    const utentiIds  = await seedUtenti();
+    const marcheIds  = await seedMarche();
     const modelliIds = await seedModelli(marcheIds);
     const clientiIds = await seedClienti();
-    const ordiniIds = await seedOrdini(clientiIds, modelliIds, marcheIds);
+    const ordiniIds  = await seedOrdini(clientiIds, modelliIds, marcheIds);
 
     console.log("\n" + "=".repeat(60));
     console.log("SEED COMPLETATO CON SUCCESSO!");
@@ -747,6 +766,7 @@ async function seedDatabase() {
     console.log(`  • Preventivi: ${ordiniIds.length}`);
     console.log("\n✓ Database pronto all'uso!");
     console.log("⚠️  Tutti i modelli hanno una marca associata (NOT NULL)");
+    console.log("⚠️  Tutti i preventivi hanno marca E modello obbligatori (NOT NULL)");
     console.log("✅  Il campo contratto_finito è presente in tutti i preventivi");
     console.log("=".repeat(60) + "\n");
   } catch (err) {
