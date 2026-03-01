@@ -1653,15 +1653,24 @@ function openUtenteModal(utente = null) {
 
   form.reset();
 
+  const passwordLabel = document.getElementById("utentePasswordLabel");
+  const passwordHelp = document.getElementById("passwordHelp");
+
   if (utente) {
     title.textContent = "Modifica Utente";
     document.getElementById("utenteId").value = utente.id;
     document.getElementById("utenteNome").value = utente.nome;
     passwordInput.removeAttribute("required");
+    passwordInput.placeholder = "Lascia vuoto per non cambiare";
+    if (passwordLabel) passwordLabel.textContent = "Password";
+    if (passwordHelp) passwordHelp.textContent = "Lascia vuoto per mantenere la password attuale";
   } else {
     title.textContent = "Nuovo Utente";
     document.getElementById("utenteId").value = "";
     passwordInput.setAttribute("required", "");
+    passwordInput.placeholder = "password";
+    if (passwordLabel) passwordLabel.textContent = "Password *";
+    if (passwordHelp) passwordHelp.textContent = "Minimo 8 caratteri, una maiuscola, una minuscola e un numero";
   }
 
   modal.classList.add("active");
