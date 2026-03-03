@@ -2361,9 +2361,7 @@ function createSearchableSelect(
 
 // Variabili globali per i searchable selects
 let clienteSearchOrdine = null;
-let marcaSearchOrdine = null;
-let _settingMarcaFromModello = false; // flag anti-loop
-let modelloSearchOrdine = null;
+let marcaModelloSearchOrdine = null; // campo unificato marca+modello
 let marcaSearchModello = null;
 
 // Inizializza SELECT searchable per il form Modello
@@ -2401,11 +2399,9 @@ async function initOrdineSearchableSelects() {
       const res = await fetch(`${API_URL}/clienti`);
       const clienti = await res.json();
       return clienti.map((c) => {
-        // Costruisci l'extra con telefono e email
         const extraParts = [];
         if (c.num_tel) extraParts.push(`📞 ${c.num_tel}`);
         if (c.email) extraParts.push(`✉️ ${c.email}`);
-
         return {
           id: c.id,
           nome: c.nome,
@@ -2421,34 +2417,16 @@ async function initOrdineSearchableSelects() {
     true, // required
   );
 
-  // SELECT MARCA nel form Ordine
-  marcaSearchOrdine = createSearchableSelect(
-    "ordineMarcaSearch_container",
-    "ordineMarca",
-    "Cerca marca...",
-    async () => {
-      const res = await fetch(`${API_URL}/marche`);
-      const marche = await res.json();
-      return marche.map((m) => ({ id: m.id, nome: m.nome }));
-    },
-    async (id, nome) => {
-      // Quando seleziono una marca, filtro i modelli (ma non resettare se impostata dal modello)
-      if (modelloSearchOrdine && !_settingMarcaFromModello) {
-        await updateModelloByMarca(id);
-      }
-    },
-    true, // required
-  );
-
-  // SELECT MODELLO nel form Ordine
-  modelloSearchOrdine = createSearchableSelect(
-    "ordineModelloSearch_container",
+  // SELECT UNIFICATO MARCA+MODELLO nel form Ordine
+  // Cerca per nome modello, mostra "Modello (Marca)" come extra
+  // Al click imposta entrambi gli hidden: ordineModello e ordineMarca
+  marcaModelloSearchOrdine = createSearchableSelect(
+    "ordineMarcaModelloSearch_container",
     "ordineModello",
-    "Cerca modello...",
+    "Cerca marca o modello...",
     async () => {
       const res = await fetch(`${API_URL}/modelli`);
       const modelli = await res.json();
-      // Aggiorna allModelli per coerenza col callback
       allModelli = modelli;
       return modelli.map((m) => ({
         id: m.id,
@@ -2458,20 +2436,13 @@ async function initOrdineSearchableSelects() {
       }));
     },
     (id, nome) => {
-      // Quando seleziono un modello, imposta SEMPRE la marca corrispondente
+      // Quando seleziono un modello, imposta anche la marca
       const modelloCompleto = allModelli.find(
         (m) => String(m.id) === String(id),
       );
       if (modelloCompleto && modelloCompleto.marche_id) {
-        // Imposta direttamente l'hidden input — funziona anche senza marcaSearchOrdine
         const marcaHidden = document.getElementById("ordineMarca");
         if (marcaHidden) marcaHidden.value = modelloCompleto.marche_id;
-
-        if (marcaSearchOrdine) {
-          _settingMarcaFromModello = true;
-          marcaSearchOrdine.setValue(modelloCompleto.marche_id);
-          _settingMarcaFromModello = false;
-        }
       }
     },
     true, // required
@@ -2479,32 +2450,7 @@ async function initOrdineSearchableSelects() {
 
   // Carica dati iniziali
   if (clienteSearchOrdine) await clienteSearchOrdine.loadData();
-  if (marcaSearchOrdine) await marcaSearchOrdine.loadData();
-  if (modelloSearchOrdine) await modelloSearchOrdine.loadData();
-}
-
-// Funzione per aggiornare modelli in base alla marca selezionata
-async function updateModelloByMarca(marcaId) {
-  if (!modelloSearchOrdine) return;
-
-  const res = await fetch(`${API_URL}/modelli`);
-  const modelli = await res.json();
-
-  const filtered = marcaId
-    ? modelli.filter((m) => String(m.marche_id) === String(marcaId))
-    : modelli;
-
-  modelloSearchOrdine.filterData(
-    filtered.map((m) => ({
-      id: m.id,
-      nome: m.nome,
-      extra: m.marca_nome || "",
-      marche_id: m.marche_id,
-    })),
-  );
-
-  // Reset selezione modello se cambia marca
-  modelloSearchOrdine.reset();
+  if (marcaModelloSearchOrdine) await marcaModelloSearchOrdine.loadData();
 }
 
 // Inizializza SELECT searchable per il form Modello
@@ -2541,16 +2487,14 @@ window.openOrdineModal = async function (ordine = null) {
   setContrattoModalState(false);
 
   // Inizializza searchable selects se non già fatto
-  if (!clienteSearchOrdine || !marcaSearchOrdine || !modelloSearchOrdine) {
+  if (!clienteSearchOrdine || !marcaModelloSearchOrdine) {
     await initOrdineSearchableSelects();
   } else {
     // Reset se già esistono
     clienteSearchOrdine.reset();
-    marcaSearchOrdine.reset();
-    modelloSearchOrdine.reset();
+    marcaModelloSearchOrdine.reset();
     await clienteSearchOrdine.loadData();
-    await marcaSearchOrdine.loadData();
-    await modelloSearchOrdine.loadData();
+    await marcaModelloSearchOrdine.loadData();
   }
 
   if (ordine) {
@@ -2567,18 +2511,15 @@ window.openOrdineModal = async function (ordine = null) {
       await clienteSearchOrdine.loadData();
       clienteSearchOrdine.setValue(ordine.cliente_id);
     }
-    // Imposta marca nell'hidden input direttamente (non dipende da marcaSearchOrdine)
-    if (ordine.marca_id) {
-      const marcaHidden = document.getElementById("ordineMarca");
-      if (marcaHidden) marcaHidden.value = ordine.marca_id;
-      if (marcaSearchOrdine) {
-        await marcaSearchOrdine.loadData();
-        marcaSearchOrdine.setValue(ordine.marca_id);
+    // Imposta marca+modello nel campo unificato
+    if (ordine.modello_id && marcaModelloSearchOrdine) {
+      await marcaModelloSearchOrdine.loadData();
+      marcaModelloSearchOrdine.setValue(ordine.modello_id);
+      // imposta anche marca hidden direttamente
+      if (ordine.marca_id) {
+        const marcaHidden = document.getElementById("ordineMarca");
+        if (marcaHidden) marcaHidden.value = ordine.marca_id;
       }
-    }
-    if (ordine.modello_id && modelloSearchOrdine) {
-      await modelloSearchOrdine.loadData();
-      modelloSearchOrdine.setValue(ordine.modello_id);
     }
   } else {
     title.textContent = "Nuovo Preventivo";
@@ -2635,21 +2576,15 @@ async function initOrdineSelects() {
     };
   }
 
-  // 2. Inizializza Ricerca MARCA
-  if (window.marcaSearchOrdine) {
-    window.marcaSearchOrdine.onSelect = (id) => {
-      document.getElementById("ordineMarca").value = id;
-      // Quando cambi marca, filtra i modelli
-      if (window.modelloSearchOrdine) {
-        window.modelloSearchOrdine.setFilter((m) => m.marche_id == id);
-      }
-    };
-  }
-
-  // 3. Inizializza Ricerca MODELLO
-  if (window.modelloSearchOrdine) {
-    window.modelloSearchOrdine.onSelect = (id) => {
+  // 2. Inizializza Ricerca MARCA+MODELLO unificato
+  if (window.marcaModelloSearchOrdine) {
+    window.marcaModelloSearchOrdine.onSelect = (id) => {
       document.getElementById("ordineModello").value = id;
+      const modelloCompleto = allModelli.find((m) => String(m.id) === String(id));
+      if (modelloCompleto && modelloCompleto.marche_id) {
+        const marcaHidden = document.getElementById("ordineMarca");
+        if (marcaHidden) marcaHidden.value = modelloCompleto.marche_id;
+      }
     };
   }
 }
