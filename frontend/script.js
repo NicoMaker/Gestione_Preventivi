@@ -203,8 +203,9 @@ function renderClienti() {
     <tr>
       <td><strong>${c.nome}</strong></td>
       <td>
-        ${c.num_tel
-          ? `
+        ${
+          c.num_tel
+            ? `
           <div class="contact-buttons">
             <a href="tel:${c.num_tel}" class="btn-contact btn-phone" title="Chiama ${formatPhoneNumber(c.num_tel)}">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -226,19 +227,20 @@ function renderClienti() {
             </a>
           </div>
         `
-          : "No Cell"
+            : "No Cell"
         }
       </td>
       <td>
-        ${c.email
-          ? `<a href="mailto:${c.email}" class="btn-contact btn-email" title="Invia email a ${c.email}">
+        ${
+          c.email
+            ? `<a href="mailto:${c.email}" class="btn-contact btn-email" title="Invia email a ${c.email}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
             ${c.email}
           </a>`
-          : "No Mail"
+            : "No Mail"
         }
       </td>
       <td style="position: relative;">
@@ -262,15 +264,16 @@ function renderClienti() {
       </td>
       <td style="text-align:center;">
         <button
-          class="badge-ricontatto ${c.flag_ricontatto ? 'si' : 'no'}"
+          class="badge-ricontatto ${c.flag_ricontatto ? "si" : "no"}"
           onclick="toggleRicontatto(${c.id}, ${!c.flag_ricontatto})"
           title="Clicca per cambiare stato ricontatto"
         >
-          ${c.flag_ricontatto ? '📱 Ricontattato' : '⏳ Da ricontattare'}
+          ${c.flag_ricontatto ? "📱 Ricontattato" : "⏳ Da ricontattare"}
         </button>
       </td>
       <td style="text-align: center">
-        <span class="prodotti-badge ${c.ordini_count > 0 ? "has-products" : "empty"
+        <span class="prodotti-badge ${
+          c.ordini_count > 0 ? "has-products" : "empty"
         }">
           ${c.ordini_count || 0}
         </span>
@@ -440,7 +443,9 @@ async function toggleRicontatto(clienteId, isChecked) {
         clienteFiltered.flag_ricontatto = isChecked ? 1 : 0;
       }
       showNotification(
-        isChecked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
+        isChecked
+          ? "📱 Cliente segnato come ricontattato"
+          : "⏳ Flag ricontatto rimosso",
         "success",
       );
       renderClienti();
@@ -617,9 +622,8 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
   const num_tel = document.getElementById("clienteTel").value.trim();
   const email = document.getElementById("clienteEmail").value.trim();
   const data_passaggio = document.getElementById("clienteDataPassaggio").value;
-  const flag_ricontatto = document.getElementById(
-    "clienteFlagRicontatto",
-  ).value === "1";
+  const flag_ricontatto =
+    document.getElementById("clienteFlagRicontatto").value === "1";
 
   // Almeno uno tra cellulare e email obbligatorio
   if (!num_tel && !email) {
@@ -696,8 +700,9 @@ function renderOrdini() {
       <td>${formatDate(o.data_movimento)}</td>
       <td><strong>${o.cliente_nome}</strong></td>
       <td>
-        ${telefono !== "No Cell"
-          ? `<div class="contact-buttons">
+        ${
+          telefono !== "No Cell"
+            ? `<div class="contact-buttons">
               <a href="tel:${telefono}" class="btn-contact btn-phone" title="Chiama ${formatPhoneNumber(telefono)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -717,19 +722,20 @@ function renderOrdini() {
                 Messaggio
               </a>
             </div>`
-          : "No Cell"
+            : "No Cell"
         }
       </td>
       <td>
-        ${email !== "No Mail"
-          ? `<a href="mailto:${email}" class="btn-contact btn-email" title="Invia email a ${email}">
+        ${
+          email !== "No Mail"
+            ? `<a href="mailto:${email}" class="btn-contact btn-email" title="Invia email a ${email}">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                 <polyline points="22,6 12,13 2,6"/>
               </svg>
               ${email}
             </a>`
-          : "No Mail"
+            : "No Mail"
         }
       </td>
       <td>
@@ -744,18 +750,18 @@ function renderOrdini() {
       <td class="text-center">
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
           <button
-            class="badge-ricontatto ${flagRicontatto ? 'si' : 'no'}"
+            class="badge-ricontatto ${flagRicontatto ? "si" : "no"}"
             onclick="updateClienteFlagRicontatto(${o.cliente_id}, ${!flagRicontatto})"
             title="Clicca per cambiare stato ricontatto"
           >
-            ${flagRicontatto ? '📱 Ricontattato' : '⏳ Da ricontattare'}
+            ${flagRicontatto ? "📱 Ricontattato" : "⏳ Da ricontattare"}
           </button>
           <button
-            class="badge-contratto ${o.contratto_finito ? 'si' : 'no'}"
+            class="badge-contratto ${o.contratto_finito ? "si" : "no"}"
             onclick="updateContrattoFinito(${o.id}, ${!o.contratto_finito})"
             title="Clicca per cambiare stato contratto"
           >
-            ${o.contratto_finito ? '✅ concluso' : '🔴 Non concluso'}
+            ${o.contratto_finito ? "✅ concluso" : "🔴 Non concluso"}
           </button>
         </div>
       </td>
@@ -817,13 +823,19 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
     // Aggiorna dati locali — tutti i preventivi dello stesso cliente
     allOrdini
       .filter((x) => x.cliente_id === clienteId)
-      .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; });
+      .forEach((x) => {
+        x.cliente_flag_ricontatto = checked ? 1 : 0;
+      });
     ordini
       .filter((x) => x.cliente_id === clienteId)
-      .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; });
+      .forEach((x) => {
+        x.cliente_flag_ricontatto = checked ? 1 : 0;
+      });
 
     showNotification(
-      checked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
+      checked
+        ? "📱 Cliente segnato come ricontattato"
+        : "⏳ Flag ricontatto rimosso",
       "success",
     );
     renderOrdini();
@@ -864,7 +876,9 @@ async function updateContrattoFinito(ordineId, newValue) {
     if (ordineFiltered) ordineFiltered.contratto_finito = newValue ? 1 : 0;
 
     showNotification(
-      newValue ? "✅ Contratto segnato come concluso!" : "🔴 Contratto segnato come non concluso",
+      newValue
+        ? "✅ Contratto segnato come concluso!"
+        : "🔴 Contratto segnato come non concluso",
       "success",
     );
     renderOrdini();
@@ -919,8 +933,10 @@ function setContrattoModalState(value) {
 
 function saveOrdiniFilter() {
   const searchTerm = document.getElementById("filterOrdini")?.value || "";
-  const dataPassaggio = document.getElementById("filterOrdiniDataPassaggio")?.value || "";
-  const dataPreventivo = document.getElementById("filterOrdiniDataPreventivo")?.value || "";
+  const dataPassaggio =
+    document.getElementById("filterOrdiniDataPassaggio")?.value || "";
+  const dataPreventivo =
+    document.getElementById("filterOrdiniDataPreventivo")?.value || "";
   localStorage.setItem("filter_ordini_search", searchTerm);
   localStorage.setItem("filter_ordini_data_passaggio", dataPassaggio);
   localStorage.setItem("filter_ordini_data_preventivo", dataPreventivo);
@@ -928,21 +944,35 @@ function saveOrdiniFilter() {
 
 function restoreOrdiniFilter() {
   const savedSearch = localStorage.getItem("filter_ordini_search") || "";
-  const savedDataPassaggio = localStorage.getItem("filter_ordini_data_passaggio") || "";
-  const savedDataPreventivo = localStorage.getItem("filter_ordini_data_preventivo") || "";
+  const savedDataPassaggio =
+    localStorage.getItem("filter_ordini_data_passaggio") || "";
+  const savedDataPreventivo =
+    localStorage.getItem("filter_ordini_data_preventivo") || "";
 
   const searchInput = document.getElementById("filterOrdini");
-  const dataPassaggioInput = document.getElementById("filterOrdiniDataPassaggio");
-  const dataPreventivoInput = document.getElementById("filterOrdiniDataPreventivo");
+  const dataPassaggioInput = document.getElementById(
+    "filterOrdiniDataPassaggio",
+  );
+  const dataPreventivoInput = document.getElementById(
+    "filterOrdiniDataPreventivo",
+  );
 
   if (searchInput) searchInput.value = savedSearch;
   if (dataPassaggioInput) dataPassaggioInput.value = savedDataPassaggio;
   if (dataPreventivoInput) dataPreventivoInput.value = savedDataPreventivo;
 
-  applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio, savedDataPreventivo);
+  applyOrdiniFilter(
+    savedSearch.toLowerCase(),
+    savedDataPassaggio,
+    savedDataPreventivo,
+  );
 }
 
-function applyOrdiniFilter(searchTerm = "", dataPassaggio = "", dataPreventivo = "") {
+function applyOrdiniFilter(
+  searchTerm = "",
+  dataPassaggio = "",
+  dataPreventivo = "",
+) {
   ordini = allOrdini.filter((o) => {
     const matchText =
       !searchTerm ||
@@ -969,9 +999,12 @@ function applyOrdiniFilter(searchTerm = "", dataPassaggio = "", dataPreventivo =
 
 function getOrdiniFilterValues() {
   return {
-    searchTerm: document.getElementById("filterOrdini")?.value.toLowerCase() || "",
-    dataPassaggio: document.getElementById("filterOrdiniDataPassaggio")?.value || "",
-    dataPreventivo: document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+    searchTerm:
+      document.getElementById("filterOrdini")?.value.toLowerCase() || "",
+    dataPassaggio:
+      document.getElementById("filterOrdiniDataPassaggio")?.value || "",
+    dataPreventivo:
+      document.getElementById("filterOrdiniDataPreventivo")?.value || "",
   };
 }
 
@@ -981,17 +1014,23 @@ document.getElementById("filterOrdini")?.addEventListener("input", () => {
   applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
 });
 
-document.getElementById("filterOrdiniDataPassaggio")?.addEventListener("change", () => {
-  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
-});
+document
+  .getElementById("filterOrdiniDataPassaggio")
+  ?.addEventListener("change", () => {
+    const { searchTerm, dataPassaggio, dataPreventivo } =
+      getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+  });
 
-document.getElementById("filterOrdiniDataPreventivo")?.addEventListener("change", () => {
-  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
-});
+document
+  .getElementById("filterOrdiniDataPreventivo")
+  ?.addEventListener("change", () => {
+    const { searchTerm, dataPassaggio, dataPreventivo } =
+      getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+  });
 
 async function openOrdineModal(ordine = null) {
   await loadClientiForSelect();
@@ -1138,8 +1177,8 @@ function populateOrdineModelliByMarca(marcaId) {
   const filtered =
     marcaId && marcaId !== ""
       ? source.filter(
-        (m) => m.marche_id && String(m.marche_id) === String(marcaId),
-      )
+          (m) => m.marche_id && String(m.marche_id) === String(marcaId),
+        )
       : source;
 
   select.innerHTML =
@@ -1147,7 +1186,8 @@ function populateOrdineModelliByMarca(marcaId) {
     filtered
       .map(
         (m) =>
-          `<option value="${m.id}">${m.nome}${m.marca_nome ? ` (${m.marca_nome})` : ""
+          `<option value="${m.id}">${m.nome}${
+            m.marca_nome ? ` (${m.marca_nome})` : ""
           }</option>`,
       )
       .join("");
@@ -1198,7 +1238,8 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   console.log("allModelli.length:", allModelli?.length);
 
   const note = document.getElementById("ordineNote").value.trim();
-  const contratto_finito = document.getElementById("ordineContrattoFinito").value === "1";
+  const contratto_finito =
+    document.getElementById("ordineContrattoFinito").value === "1";
 
   // Validazione cliente
   if (!cliente_id) {
@@ -1290,13 +1331,15 @@ function renderMarche() {
     <tr>
       <td><strong>${m.nome}</strong></td>
       <td class="text-center-badge">
-        <span class="prodotti-badge ${m.prodotti_count > 0 ? "has-products" : "empty"
+        <span class="prodotti-badge ${
+          m.prodotti_count > 0 ? "has-products" : "empty"
         }">
           ${m.prodotti_count || 0}
         </span>
       </td>
       <td class="text-center-badge">
-        <span class="prodotti-badge ${m.preventivi_count > 0 ? "has-products" : "empty"
+        <span class="prodotti-badge ${
+          m.preventivi_count > 0 ? "has-products" : "empty"
         }">
           ${m.preventivi_count || 0}
         </span>
@@ -1460,7 +1503,8 @@ function renderModelli() {
       <td><strong>${m.nome}</strong></td>
       <td>${m.marca_nome || "-"}</td>
       <td class="text-center-badge">
-        <span class="prodotti-badge ${m.ordini_count > 0 ? "has-products" : "empty"
+        <span class="prodotti-badge ${
+          m.ordini_count > 0 ? "has-products" : "empty"
         }">
           ${m.ordini_count || 0}
         </span>
@@ -1680,14 +1724,18 @@ function openUtenteModal(utente = null) {
     passwordInput.removeAttribute("required");
     passwordInput.placeholder = "Lascia vuoto per non cambiare";
     if (passwordLabel) passwordLabel.textContent = "Password";
-    if (passwordHelp) passwordHelp.textContent = "Lascia vuoto per mantenere la password attuale";
+    if (passwordHelp)
+      passwordHelp.textContent =
+        "Lascia vuoto per mantenere la password attuale";
   } else {
     title.textContent = "Nuovo Utente";
     document.getElementById("utenteId").value = "";
     passwordInput.setAttribute("required", "");
     passwordInput.placeholder = "password";
     if (passwordLabel) passwordLabel.textContent = "Password *";
-    if (passwordHelp) passwordHelp.textContent = "Minimo 8 caratteri, una maiuscola, una minuscola e un numero";
+    if (passwordHelp)
+      passwordHelp.textContent =
+        "Minimo 8 caratteri, una maiuscola, una minuscola e un numero";
   }
 
   modal.classList.add("active");
@@ -1914,7 +1962,7 @@ function generateClienteSection(cliente, ordiniCliente) {
   <p style="margin:4px 0;font-size:12px;color:#555;">
   <strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "No"}
   </p>
-  <p style="margin:4px 0;"><span style="display:inline-block;padding:3px 12px;border-radius:99px;font-size:11px;font-weight:700;${cliente.flag_ricontatto == 1 ? 'background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;' : 'background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;'}">${cliente.flag_ricontatto == 1 ? '📱 Ricontattato' : '⏳ Da ricontattare'}</span></p>
+  <p style="margin:4px 0;"><span style="display:inline-block;padding:3px 12px;border-radius:99px;font-size:11px;font-weight:700;${cliente.flag_ricontatto == 1 ? "background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;" : "background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;"}">${cliente.flag_ricontatto == 1 ? "📱 Ricontattato" : "⏳ Da ricontattare"}</span></p>
   <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">
   Totale preventivi: <strong>${ordiniOrdinati.length}</strong>
   </p>
@@ -1931,22 +1979,22 @@ function generateClienteSection(cliente, ordiniCliente) {
         </thead>
         <tbody>
           ${ordiniOrdinati
-      .map(
-        (o, i) => `
+            .map(
+              (o, i) => `
             <tr style="border-bottom:1px solid #ecf0f1;${i % 2 === 0 ? "background:#fafafa;" : ""}">
               <td style="padding:10px;border:1px solid #ecf0f1;font-weight:bold;white-space:nowrap;">${formatDate(o.data_movimento)}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.marca_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.modello_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;text-align:center;">
-                <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;${o.contratto_finito ? 'background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;' : 'background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;'}">
+                <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;${o.contratto_finito ? "background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;" : "background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;"}">
                   ${o.contratto_finito ? "✅ concluso" : "🔴 Non concluso"}
                 </span>
               </td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.note || "-"}</td>
             </tr>
           `,
-      )
-      .join("")}
+            )
+            .join("")}
         </tbody>
       </table>
     </div>
@@ -2222,7 +2270,9 @@ function createSearchableSelect(
     searchInput.style.display = "block";
     selectionDisplay.style.display = "none";
     selectedValueDisplay.textContent = "";
-    const extraDisplayReset = container.querySelector(".selected-extra-display");
+    const extraDisplayReset = container.querySelector(
+      ".selected-extra-display",
+    );
     if (extraDisplayReset) extraDisplayReset.textContent = "";
     clearBtn.style.display = "none";
     results.style.display = "none";
@@ -2281,19 +2331,19 @@ function createSearchableSelect(
       searchTerm === ""
         ? currentData
         : currentData.filter((item) => {
-          // Cerca nel nome
-          if (item.nome.toLowerCase().includes(searchTerm)) return true;
+            // Cerca nel nome
+            if (item.nome.toLowerCase().includes(searchTerm)) return true;
 
-          // Cerca nell'email se presente
-          if (item.email && item.email.toLowerCase().includes(searchTerm))
-            return true;
+            // Cerca nell'email se presente
+            if (item.email && item.email.toLowerCase().includes(searchTerm))
+              return true;
 
-          // Cerca nel numero di telefono se presente
-          if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm))
-            return true;
+            // Cerca nel numero di telefono se presente
+            if (item.num_tel && item.num_tel.toLowerCase().includes(searchTerm))
+              return true;
 
-          return false;
-        });
+            return false;
+          });
 
     showResults(filtered);
     searchInput.style.borderColor = "#6366f1";
@@ -2597,7 +2647,9 @@ async function initOrdineSelects() {
   if (window.marcaModelloSearchOrdine) {
     window.marcaModelloSearchOrdine.onSelect = (id) => {
       document.getElementById("ordineModello").value = id;
-      const modelloCompleto = allModelli.find((m) => String(m.id) === String(id));
+      const modelloCompleto = allModelli.find(
+        (m) => String(m.id) === String(id),
+      );
       if (modelloCompleto && modelloCompleto.marche_id) {
         const marcaHidden = document.getElementById("ordineMarca");
         if (marcaHidden) marcaHidden.value = modelloCompleto.marche_id;

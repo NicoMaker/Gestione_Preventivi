@@ -23,8 +23,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
   background: var(--bg-main);
   color: var(--text-primary);
   line-height: 1.6;
@@ -746,8 +747,10 @@ tbody tr:hover {
   display: flex;
   flex-direction: column;
   animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(99, 102, 241, 0.05);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(99, 102, 241, 0.05);
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
@@ -3513,7 +3516,7 @@ tbody tr:hover {
   }
 }
 
-.company-label{
+.company-label {
   color: black !important;
 }
 
@@ -3541,7 +3544,7 @@ tbody tr:hover {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filter-controls > * {
     flex: 1;
     min-width: 100%;
@@ -3553,20 +3556,20 @@ tbody tr:hover {
   body * {
     visibility: hidden;
   }
-  
+
   #printContainer,
   #printContainer *,
   body > div.print-container,
   body > div.print-container * {
     visibility: visible;
   }
-  
+
   body {
     margin: 0;
     padding: 0;
     background: white !important;
   }
-  
+
   .print-container {
     max-width: 210mm;
     margin: 0 auto;
@@ -3593,23 +3596,23 @@ tbody tr:hover {
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  
+
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
-  
+
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-tertiary: #94a3b8;
-  
+
   --border-color: #e2e8f0;
   --border-hover: #cbd5e1;
-  
+
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -3621,13 +3624,17 @@ tbody tr:hover {
   background: var(--bg-primary);
   border-radius: var(--radius-lg);
   padding: 0;
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 
 .modern-card:hover {
-  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(99, 102, 241, 0.1);
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px rgba(99, 102, 241, 0.1);
 }
 
 /* ========== SECTION HEADERS ========== */
@@ -3829,7 +3836,9 @@ tbody tr:hover {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ========== MODERN MODALS ========== */
@@ -3855,8 +3864,12 @@ tbody tr:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modern-modal-content {
@@ -3868,8 +3881,9 @@ tbody tr:hover {
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
-              0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
   animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -4019,7 +4033,11 @@ tbody tr:hover {
   min-width: 24px;
   height: 24px;
   padding: 0 8px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(139, 92, 246, 0.15) 100%
+  );
   color: #6366f1;
   font-size: 11px;
   font-weight: 800;
@@ -4064,7 +4082,7 @@ tbody tr:hover {
 }
 
 .nav-item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 50%;
@@ -4096,35 +4114,35 @@ tbody tr:hover {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .section-header-actions {
     width: 100%;
     flex-direction: column;
   }
-  
+
   .search-box {
     width: 100%;
   }
-  
+
   .search-input {
     width: 100%;
     min-width: auto;
   }
-  
+
   .btn-modern {
     width: 100%;
     justify-content: center;
   }
-  
+
   .modern-modal-content {
     width: 95%;
     max-height: 85vh;
   }
-  
+
   .modern-modal-footer {
     flex-direction: column-reverse;
   }
-  
+
   .modern-modal-footer .btn-modern {
     width: 100%;
   }
@@ -4134,15 +4152,15 @@ tbody tr:hover {
   .section-header-text h1 {
     font-size: 24px;
   }
-  
+
   .modern-modal-header {
     padding: 20px;
   }
-  
+
   .modern-modal-content form {
     padding: 20px;
   }
-  
+
   .modern-modal-footer {
     padding: 16px 20px;
   }
@@ -4150,14 +4168,19 @@ tbody tr:hover {
 
 /* ========== ANIMATIONS ========== */
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 .shimmer {
-  background: linear-gradient(90deg, 
-    var(--bg-secondary) 0%, 
-    var(--bg-tertiary) 50%, 
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0%,
+    var(--bg-tertiary) 50%,
     var(--bg-secondary) 100%
   );
   background-size: 200% 100%;
@@ -4296,12 +4319,12 @@ tbody tr:hover {
     padding: 10px 35px 10px 14px;
     font-size: 14px;
   }
-  
+
   .select-search-result-item {
     padding: 10px 14px;
     font-size: 13px;
   }
-  
+
   .select-search-results {
     max-height: 250px;
   }
@@ -4411,47 +4434,47 @@ tbody tr:hover {
     padding: 10px 35px 10px 14px;
     font-size: 14px;
   }
-  
+
   .searchable-select-results .result-item {
     padding: 10px 14px;
     font-size: 13px;
   }
-  
+
   .searchable-select-results {
     max-height: 250px;
   }
 }
 
 .searchable-select-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    z-index: 9999;
-    max-height: 250px;
-    overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .result-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 14px;
-    transition: background 0.2s;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  transition: background 0.2s;
 }
 
 .result-item:hover {
-    background-color: #f8fafc;
-    color: #6366f1;
+  background-color: #f8fafc;
+  color: #6366f1;
 }
 
 .has-selection {
-    border-color: #10b981 !important;
-    background-color: #f0fdf4 !important;
+  border-color: #10b981 !important;
+  background-color: #f0fdf4 !important;
 }
 /* ====================================
    📅 EDITING INLINE DATA PASSAGGIO
@@ -4527,32 +4550,32 @@ tbody tr:hover {
 }
 
 .contact-link.whatsapp {
-  background: #25D366;
+  background: #25d366;
   color: white;
 }
 
 .contact-link.whatsapp:hover {
-  background: #128C7E;
+  background: #128c7e;
   transform: scale(1.1);
 }
 
 .contact-link.email {
-  background: #EA4335;
+  background: #ea4335;
   color: white;
 }
 
 .contact-link.email:hover {
-  background: #C5221F;
+  background: #c5221f;
   transform: scale(1.1);
 }
 
 .contact-link.phone {
-  background: #4285F4;
+  background: #4285f4;
   color: white;
 }
 
 .contact-link.phone:hover {
-  background: #1967D2;
+  background: #1967d2;
   transform: scale(1.1);
 }
 
@@ -4605,7 +4628,7 @@ tbody tr:hover {
     align-items: flex-start;
     gap: 4px;
   }
-  
+
   .tel-number,
   .email-text {
     font-size: 12px;
@@ -4617,12 +4640,12 @@ tbody tr:hover {
     min-width: 120px;
     font-size: 12px;
   }
-  
+
   .contact-link {
     width: 28px;
     height: 28px;
   }
-  
+
   .inline-checkbox {
     width: 20px;
     height: 20px;
@@ -4659,32 +4682,32 @@ tbody tr:hover {
 }
 
 .contact-link.whatsapp {
-  background: #25D366;
+  background: #25d366;
   color: white;
 }
 
 .contact-link.whatsapp:hover {
-  background: #128C7E;
+  background: #128c7e;
   transform: scale(1.1);
 }
 
 .contact-link.email {
-  background: #EA4335;
+  background: #ea4335;
   color: white;
 }
 
 .contact-link.email:hover {
-  background: #C5221F;
+  background: #c5221f;
   transform: scale(1.1);
 }
 
 .contact-link.phone {
-  background: #4285F4;
+  background: #4285f4;
   color: white;
 }
 
 .contact-link.phone:hover {
-  background: #1967D2;
+  background: #1967d2;
   transform: scale(1.1);
 }
 
@@ -4738,7 +4761,7 @@ tbody tr:hover {
   .contact-cell {
     gap: 4px;
   }
-  
+
   .tel-number,
   .email-text {
     font-size: 12px;
@@ -4750,23 +4773,23 @@ tbody tr:hover {
     min-width: 120px;
     font-size: 12px;
   }
-  
+
   .contact-link {
     width: 28px;
     height: 28px;
   }
-  
+
   .inline-checkbox {
     width: 20px;
     height: 20px;
   }
 }
 
-.btn-close{
+.btn-close {
   display: none;
 }
 
-.piva-icon{
+.piva-icon {
   color: #8b5cf6;
 }
 /* ==================== CONTRATTO FINITO TOGGLE ==================== */
@@ -4775,13 +4798,13 @@ tbody tr:hover {
   border-radius: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   user-select: none;
 }
 
 .contratto-toggle-wrapper:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .contratto-toggle-wrapper:active {
@@ -4858,12 +4881,12 @@ tbody tr:hover {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.3px;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .badge-contratto:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
 .badge-contratto:active {
@@ -4895,12 +4918,12 @@ tbody tr:hover {
   border: none;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .badge-ricontatto:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
 .badge-ricontatto:active {
