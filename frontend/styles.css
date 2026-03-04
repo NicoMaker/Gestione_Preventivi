@@ -966,19 +966,18 @@ tbody tr:hover {
   padding-left: 2px;
   white-space: nowrap;
   height: 18px;
+  line-height: 18px;
 }
 
-/* Label invisibile usata come spaziatore per allineare elementi senza label */
 .filter-label-spacer {
   visibility: hidden;
   pointer-events: none;
   user-select: none;
 }
 
-/* Gruppo di bottoni inline */
 .filter-btns-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 
