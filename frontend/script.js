@@ -919,34 +919,30 @@ function setContrattoModalState(value) {
 
 function saveOrdiniFilter() {
   const searchTerm = document.getElementById("filterOrdini")?.value || "";
-  const dataPassaggio =
-    document.getElementById("filterOrdiniDataPassaggio")?.value || "";
+  const dataPassaggio = document.getElementById("filterOrdiniDataPassaggio")?.value || "";
+  const dataPreventivo = document.getElementById("filterOrdiniDataPreventivo")?.value || "";
   localStorage.setItem("filter_ordini_search", searchTerm);
   localStorage.setItem("filter_ordini_data_passaggio", dataPassaggio);
+  localStorage.setItem("filter_ordini_data_preventivo", dataPreventivo);
 }
 
 function restoreOrdiniFilter() {
   const savedSearch = localStorage.getItem("filter_ordini_search") || "";
-  const savedDataPassaggio =
-    localStorage.getItem("filter_ordini_data_passaggio") || "";
+  const savedDataPassaggio = localStorage.getItem("filter_ordini_data_passaggio") || "";
+  const savedDataPreventivo = localStorage.getItem("filter_ordini_data_preventivo") || "";
 
   const searchInput = document.getElementById("filterOrdini");
-  const dataPassaggioInput = document.getElementById(
-    "filterOrdiniDataPassaggio",
-  );
+  const dataPassaggioInput = document.getElementById("filterOrdiniDataPassaggio");
+  const dataPreventivoInput = document.getElementById("filterOrdiniDataPreventivo");
 
-  if (searchInput) {
-    searchInput.value = savedSearch;
-  }
+  if (searchInput) searchInput.value = savedSearch;
+  if (dataPassaggioInput) dataPassaggioInput.value = savedDataPassaggio;
+  if (dataPreventivoInput) dataPreventivoInput.value = savedDataPreventivo;
 
-  if (dataPassaggioInput) {
-    dataPassaggioInput.value = savedDataPassaggio;
-  }
-
-  applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio);
+  applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio, savedDataPreventivo);
 }
 
-function applyOrdiniFilter(searchTerm = "", dataPassaggio = "") {
+function applyOrdiniFilter(searchTerm = "", dataPassaggio = "", dataPreventivo = "") {
   ordini = allOrdini.filter((o) => {
     const matchText =
       !searchTerm ||
@@ -956,33 +952,46 @@ function applyOrdiniFilter(searchTerm = "", dataPassaggio = "") {
       (o.marca_nome && o.marca_nome.toLowerCase().includes(searchTerm)) ||
       (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm));
 
-    const matchData =
+    const matchDataPassaggio =
       !dataPassaggio ||
       (o.cliente_data_passaggio && o.cliente_data_passaggio === dataPassaggio);
 
-    return matchText && matchData;
+    const matchDataPreventivo =
+      !dataPreventivo ||
+      (o.data_movimento && o.data_movimento.startsWith(dataPreventivo));
+
+    // Se entrambe le date sono compilate → devono corrispondere entrambe (AND)
+    return matchText && matchDataPassaggio && matchDataPreventivo;
   });
 
   renderOrdini();
 }
 
-document.getElementById("filterOrdini")?.addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
-  const dataPassaggio =
-    document.getElementById("filterOrdiniDataPassaggio")?.value || "";
+function getOrdiniFilterValues() {
+  return {
+    searchTerm: document.getElementById("filterOrdini")?.value.toLowerCase() || "",
+    dataPassaggio: document.getElementById("filterOrdiniDataPassaggio")?.value || "",
+    dataPreventivo: document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+  };
+}
+
+document.getElementById("filterOrdini")?.addEventListener("input", () => {
+  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
   saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio);
+  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
 });
 
-document
-  .getElementById("filterOrdiniDataPassaggio")
-  ?.addEventListener("change", (e) => {
-    const searchTerm =
-      document.getElementById("filterOrdini")?.value.toLowerCase() || "";
-    const dataPassaggio = e.target.value;
-    saveOrdiniFilter();
-    applyOrdiniFilter(searchTerm, dataPassaggio);
-  });
+document.getElementById("filterOrdiniDataPassaggio")?.addEventListener("change", () => {
+  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
+  saveOrdiniFilter();
+  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+});
+
+document.getElementById("filterOrdiniDataPreventivo")?.addEventListener("change", () => {
+  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
+  saveOrdiniFilter();
+  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+});
 
 async function openOrdineModal(ordine = null) {
   await loadClientiForSelect();
