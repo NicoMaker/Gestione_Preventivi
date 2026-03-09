@@ -17,7 +17,18 @@ function renderModelli() {
   const tbody = document.getElementById("modelliTableBody");
 
   if (modelli.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" class="text-center">Nessun modello presente</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center">
+          <div style="padding:40px 20px;color:var(--text-secondary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            <p style="font-size:16px;font-weight:600;margin-bottom:8px;">Nessun modello presente</p>
+            <p style="font-size:14px;">Clicca su <strong>Nuovo Modello</strong> per iniziare</p>
+          </div>
+        </td></tr>`;
     return;
   }
 

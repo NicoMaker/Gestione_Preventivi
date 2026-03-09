@@ -17,7 +17,17 @@ function renderMarche() {
   const tbody = document.getElementById("marcheTableBody");
 
   if (marche.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" class="text-center">Nessuna marca presente</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center">
+          <div style="padding:40px 20px;color:var(--text-secondary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            <p style="font-size:16px;font-weight:600;margin-bottom:8px;">Nessuna marca presente</p>
+            <p style="font-size:14px;">Clicca su <strong>Nuova Marca</strong> per iniziare</p>
+          </div>
+        </td></tr>`;
     return;
   }
 

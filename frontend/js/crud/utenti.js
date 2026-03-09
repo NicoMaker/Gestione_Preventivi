@@ -2,21 +2,60 @@
 // File: js/utenti.js
 // Dipende da: config.js, ui.js
 
+let allUtenti = [];
+
 async function loadUtenti() {
   try {
     const res = await fetch(`${API_URL}/utenti`);
-    utenti = await res.json();
-    renderUtenti();
+    allUtenti = await res.json();
+    utenti    = allUtenti;
+    restoreUtentiFilter();
   } catch (error) {
     console.error("Errore caricamento utenti:", error);
   }
 }
 
+// ---- Filtri ----
+
+function saveUtentiFilter() {
+  localStorage.setItem("filter_utenti_search", document.getElementById("filterUtenti")?.value || "");
+}
+
+function restoreUtentiFilter() {
+  const saved = localStorage.getItem("filter_utenti_search") || "";
+  const input = document.getElementById("filterUtenti");
+  if (input) input.value = saved;
+  applyUtentiFilter(saved.toLowerCase());
+}
+
+function applyUtentiFilter(searchTerm) {
+  utenti = allUtenti.filter((u) => u.nome.toLowerCase().includes(searchTerm));
+  renderUtenti();
+}
+
+document.getElementById("filterUtenti")?.addEventListener("input", (e) => {
+  saveUtentiFilter();
+  applyUtentiFilter(e.target.value.toLowerCase());
+});
+
 function renderUtenti() {
   const tbody = document.getElementById("utentiTableBody");
+  const searchTerm = document.getElementById("filterUtenti")?.value || "";
 
   if (utenti.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="2" class="text-center">Nessun utente presente</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="2" class="text-center">
+          <div style="padding:40px 20px;color:var(--text-secondary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <p style="font-size:16px;font-weight:600;margin-bottom:8px;">${searchTerm ? "Nessun utente trovato" : "Nessun utente presente"}</p>
+            <p style="font-size:14px;">${searchTerm ? "Prova a modificare il termine di ricerca" : 'Clicca su <strong>Nuovo Utente</strong> per iniziare'}</p>
+          </div>
+        </td></tr>`;
     return;
   }
 

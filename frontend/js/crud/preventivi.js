@@ -22,7 +22,20 @@ function renderOrdini() {
   const tbody = document.getElementById("ordiniTableBody");
 
   if (ordini.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center">Nessun preventivo presente</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="10" class="text-center">
+          <div style="padding:40px 20px;color:var(--text-secondary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <p style="font-size:16px;font-weight:600;margin-bottom:8px;">Nessun preventivo presente</p>
+            <p style="font-size:14px;">Clicca su <strong>Nuovo Preventivo</strong> per iniziare</p>
+          </div>
+        </td></tr>`;
     return;
   }
 

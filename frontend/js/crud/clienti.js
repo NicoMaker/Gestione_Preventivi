@@ -22,7 +22,19 @@ function renderClienti() {
   const tbody = document.getElementById("clientiTableBody");
 
   if (clienti.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nessun cliente presente</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center">
+          <div style="padding:40px 20px;color:var(--text-secondary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <p style="font-size:16px;font-weight:600;margin-bottom:8px;">Nessun cliente presente</p>
+            <p style="font-size:14px;">Clicca su <strong>Nuovo Cliente</strong> per iniziare</p>
+          </div>
+        </td></tr>`;
     return;
   }
 

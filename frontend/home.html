@@ -574,22 +574,31 @@
               <h1>Gestione Utenti</h1>
               <p>Visualizza e gestisci gli utenti</p>
             </div>
-            <button
-              class="btn btn-primary"
-              onclick="openUtenteModal()"
-              title="Aggiungi un nuovo utente"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
+            <div class="filter-controls">
+              <div class="search-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  type="text"
+                  id="filterUtenti"
+                  class="filter-input"
+                  placeholder="Cerca utente per nome..."
+                />
+              </div>
+              <button
+                class="btn btn-primary"
+                onclick="openUtenteModal()"
+                title="Aggiungi un nuovo utente"
               >
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              <span>Nuovo Utente</span>
-            </button>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Nuovo Utente</span>
+              </button>
+            </div>
           </div>
 
           <div class="card">
@@ -1074,7 +1083,7 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/company-loader.js"></script>
-    <script src="realtime.js"></script>
+    <script src="js/realtime.js"></script>
     <script src="js/config.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/searchable-select.js"></script>
