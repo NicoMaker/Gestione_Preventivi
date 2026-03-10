@@ -1,5 +1,5 @@
 // ==================== PREVENTIVI ====================
-// File: js/preventivi.js
+// File: js/crud/preventivi.js
 // Dipende da: config.js, ui.js, searchable-select.js
 
 // ---- Caricamento ----

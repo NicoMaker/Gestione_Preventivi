@@ -1,5 +1,5 @@
 // ==================== STAMPA PREVENTIVI PER CLIENTE ====================
-// File: js/stampa.js
+// File: js/crud/stampa.js
 // Dipende da: config.js, ui.js
 
 let companyInfoPrintCache = null;

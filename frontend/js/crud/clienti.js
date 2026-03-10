@@ -1,5 +1,5 @@
 // ==================== CLIENTI ====================
-// File: js/clienti.js
+// File: js/crud/clienti.js
 // Dipende da: config.js, ui.js
 
 // ---- Caricamento ----

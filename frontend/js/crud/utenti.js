@@ -1,5 +1,5 @@
 // ==================== UTENTI ====================
-// File: js/utenti.js
+// File: js/crud/utenti.js
 // Dipende da: config.js, ui.js
 
 let allUtenti = [];

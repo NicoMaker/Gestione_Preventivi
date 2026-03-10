@@ -1,5 +1,5 @@
 // ==================== MODELLI ====================
-// File: js/modelli.js
+// File: js/crud/modelli.js
 // Dipende da: config.js, ui.js, searchable-select.js
 
 async function loadModelli() {
