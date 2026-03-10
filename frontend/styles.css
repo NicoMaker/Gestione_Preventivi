@@ -976,6 +976,9 @@ tbody tr:hover {
   visibility: hidden;
   pointer-events: none;
   user-select: none;
+  height: 18px;
+  line-height: 18px;
+  display: flex;
 }
 
 .filter-btns-row {
@@ -4944,7 +4947,7 @@ tbody tr:hover {
 
 .filter-controls-preventivi {
   flex-wrap: nowrap;
-  align-items: flex-end;
+  align-items: center;
 }
 .filter-controls-preventivi .filter-input-preventivi {
   min-width: 0;
@@ -4953,6 +4956,12 @@ tbody tr:hover {
 .filter-controls-preventivi .filter-date-wrapper .filter-input[type="date"] {
   min-width: 0;
   width: 170px;
+}
+.filter-controls-preventivi .filter-date-wrapper {
+  align-self: flex-end;
+}
+.filter-controls-preventivi .filter-date-wrapper:last-child {
+  align-self: center;
 }
 .filter-controls-preventivi .filter-btns-row .btn {
   height: 45px;
