@@ -59,18 +59,21 @@ function initDatabase() {
                 [defaultUser, hashedPassword],
                 (err) => {
                   if (err) {
-                    console.error("Errore creazione utente di default:", err.message);
+                    console.error(
+                      "Errore creazione utente di default:",
+                      err.message,
+                    );
                   } else {
                     console.log(
-                      `Utente di default creato: ${defaultUser} / ${defaultPassword}`
+                      `Utente di default creato: ${defaultUser} / ${defaultPassword}`,
                     );
                   }
-                }
+                },
               );
             }
           });
         }
-      }
+      },
     );
 
     // ==================== TABELLA MARCHE ====================
@@ -86,7 +89,7 @@ function initDatabase() {
         } else {
           console.log("Tabella marche OK");
         }
-      }
+      },
     );
 
     // ==================== TABELLA CLIENTI ====================
@@ -107,19 +110,25 @@ function initDatabase() {
           console.log("Tabella clienti OK");
 
           // Migrazione: aggiungi colonne se non esistono
-          db.run("ALTER TABLE clienti ADD COLUMN data_passaggio DATE", (err) => {
-            if (err && !err.message.includes("duplicate column")) {
-              console.error("Errore aggiunta data_passaggio:", err.message);
-            }
-          });
+          db.run(
+            "ALTER TABLE clienti ADD COLUMN data_passaggio DATE",
+            (err) => {
+              if (err && !err.message.includes("duplicate column")) {
+                console.error("Errore aggiunta data_passaggio:", err.message);
+              }
+            },
+          );
 
-          db.run("ALTER TABLE clienti ADD COLUMN flag_ricontatto INTEGER DEFAULT 0", (err) => {
-            if (err && !err.message.includes("duplicate column")) {
-              console.error("Errore aggiunta flag_ricontatto:", err.message);
-            }
-          });
+          db.run(
+            "ALTER TABLE clienti ADD COLUMN flag_ricontatto INTEGER DEFAULT 0",
+            (err) => {
+              if (err && !err.message.includes("duplicate column")) {
+                console.error("Errore aggiunta flag_ricontatto:", err.message);
+              }
+            },
+          );
         }
-      }
+      },
     );
 
     // ==================== TABELLA MODELLI ====================
@@ -137,7 +146,7 @@ function initDatabase() {
         } else {
           console.log("Tabella modelli OK");
         }
-      }
+      },
     );
 
     // ==================== TABELLA PREVENTIVI (EX ORDINI) ====================
@@ -171,15 +180,20 @@ function initDatabase() {
                   // Colonna già presente, tutto ok
                   console.log("Colonna contratto_finito già presente");
                 } else {
-                  console.error("Errore aggiunta contratto_finito:", err.message);
+                  console.error(
+                    "Errore aggiunta contratto_finito:",
+                    err.message,
+                  );
                 }
               } else {
-                console.log("Colonna contratto_finito aggiunta con successo (tutti i record esistenti impostati a 0 = No)");
+                console.log(
+                  "Colonna contratto_finito aggiunta con successo (tutti i record esistenti impostati a 0 = No)",
+                );
               }
-            }
+            },
           );
         }
-      }
+      },
     );
   });
 }

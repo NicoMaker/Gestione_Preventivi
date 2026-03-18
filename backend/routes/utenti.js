@@ -126,10 +126,10 @@ router.put("/:id", async (req, res) => {
         const io = req.app.get("io");
         if (io) {
           // Emetti evento con vecchio e nuovo nome
-          io.emit("utente_modificato", { 
-            id, 
-            oldNome, 
-            newNome 
+          io.emit("utente_modificato", {
+            id,
+            oldNome,
+            newNome,
           });
           io.emit("utenti_aggiornati");
         }
@@ -142,15 +142,15 @@ router.put("/:id", async (req, res) => {
 // DELETE /api/utenti/:id - elimina utente
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  
+
   // Prima ottieni il nome dell'utente
   db.get("SELECT nome FROM utenti WHERE id = ?", [id], (err, user) => {
     if (err || !user) {
       return res.status(404).json({ error: "Utente non trovato" });
     }
-    
+
     const nomeUtente = user.nome;
-    
+
     db.get("SELECT COUNT(*) AS total FROM utenti", [], (err, row) => {
       if (row.total <= 1)
         return res
@@ -161,13 +161,13 @@ router.delete("/:id", (req, res) => {
         if (err) {
           return res.status(500).json({ error: "Errore eliminazione utente" });
         }
-        
+
         const io = req.app.get("io");
         if (io) {
           // Emetti evento con nome utente eliminato
-          io.emit("utente_eliminato", { 
-            id, 
-            nomeUtente 
+          io.emit("utente_eliminato", {
+            id,
+            nomeUtente,
           });
           io.emit("utenti_aggiornati");
         }

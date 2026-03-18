@@ -8,7 +8,7 @@ async function loadClienti() {
   try {
     const res = await fetch(`${API_URL}/clienti`);
     allClienti = await res.json();
-    clienti    = allClienti;
+    clienti = allClienti;
     restoreClientiFilters();
   } catch (error) {
     console.error("Errore caricamento clienti:", error);
@@ -38,11 +38,15 @@ function renderClienti() {
     return;
   }
 
-  tbody.innerHTML = clienti.map((c) => `
+  tbody.innerHTML = clienti
+    .map(
+      (c) => `
     <tr>
       <td><strong>${c.nome}</strong></td>
       <td>
-        ${c.num_tel ? `
+        ${
+          c.num_tel
+            ? `
           <div class="contact-buttons">
             <a href="tel:${c.num_tel}" class="btn-contact btn-phone" title="Chiama ${formatPhoneNumber(c.num_tel)}">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -63,18 +67,21 @@ function renderClienti() {
               Messaggio
             </a>
           </div>
-        ` : "No Cell"}
+        `
+            : "No Cell"
+        }
       </td>
       <td>
-        ${c.email
-          ? `<a href="mailto:${c.email}" class="btn-contact btn-email" title="Email a ${c.email}">
+        ${
+          c.email
+            ? `<a href="mailto:${c.email}" class="btn-contact btn-email" title="Email a ${c.email}">
                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                  <polyline points="22,6 12,13 2,6" />
                </svg>
                ${c.email}
              </a>`
-          : "No Mail"
+            : "No Mail"
         }
       </td>
       <td style="position: relative;">
@@ -123,41 +130,53 @@ function renderClienti() {
         </button>
       </td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 // ---- Filtri ----
 
 function saveClientiFilters() {
-  localStorage.setItem("filter_clienti_search", document.getElementById("filterClienti")?.value || "");
-  localStorage.setItem("filter_clienti_data",   document.getElementById("filterDataPassaggio")?.value || "");
+  localStorage.setItem(
+    "filter_clienti_search",
+    document.getElementById("filterClienti")?.value || "",
+  );
+  localStorage.setItem(
+    "filter_clienti_data",
+    document.getElementById("filterDataPassaggio")?.value || "",
+  );
 }
 
 function restoreClientiFilters() {
   const savedSearch = localStorage.getItem("filter_clienti_search") || "";
-  const savedData   = localStorage.getItem("filter_clienti_data")   || "";
+  const savedData = localStorage.getItem("filter_clienti_data") || "";
 
   const searchInput = document.getElementById("filterClienti");
-  const dataInput   = document.getElementById("filterDataPassaggio");
+  const dataInput = document.getElementById("filterDataPassaggio");
 
   if (searchInput) searchInput.value = savedSearch;
-  if (dataInput)   dataInput.value   = savedData;
+  if (dataInput) dataInput.value = savedData;
 
   applyClientiFilters();
 }
 
 function applyClientiFilters() {
-  const searchTerm    = document.getElementById("filterClienti")?.value.toLowerCase() || "";
-  const dataPassaggio = document.getElementById("filterDataPassaggio")?.value || "";
+  const searchTerm =
+    document.getElementById("filterClienti")?.value.toLowerCase() || "";
+  const dataPassaggio =
+    document.getElementById("filterDataPassaggio")?.value || "";
 
   clienti = allClienti.filter((c) => {
-    const matchesText = !searchTerm ||
+    const matchesText =
+      !searchTerm ||
       c.nome.toLowerCase().includes(searchTerm) ||
       (c.num_tel && c.num_tel.toLowerCase().includes(searchTerm)) ||
-      (c.email   && c.email.toLowerCase().includes(searchTerm)) ||
+      (c.email && c.email.toLowerCase().includes(searchTerm)) ||
       (c.data_passaggio && c.data_passaggio.includes(searchTerm));
 
-    const matchesData = !dataPassaggio ||
+    const matchesData =
+      !dataPassaggio ||
       (c.data_passaggio && c.data_passaggio.startsWith(dataPassaggio));
 
     return matchesText && matchesData;
@@ -167,11 +186,15 @@ function applyClientiFilters() {
 }
 
 document.getElementById("filterClienti")?.addEventListener("input", () => {
-  saveClientiFilters(); applyClientiFilters();
+  saveClientiFilters();
+  applyClientiFilters();
 });
-document.getElementById("filterDataPassaggio")?.addEventListener("change", () => {
-  saveClientiFilters(); applyClientiFilters();
-});
+document
+  .getElementById("filterDataPassaggio")
+  ?.addEventListener("change", () => {
+    saveClientiFilters();
+    applyClientiFilters();
+  });
 
 // ---- Modal ----
 
@@ -180,17 +203,19 @@ function openClienteModal(cliente = null) {
   document.getElementById("formCliente").reset();
 
   if (cliente) {
-    document.getElementById("modalClienteTitle").textContent = "Modifica Cliente";
-    document.getElementById("clienteId").value           = cliente.id;
-    document.getElementById("clienteNome").value         = cliente.nome;
-    document.getElementById("clienteTel").value          = cliente.num_tel || "";
-    document.getElementById("clienteEmail").value        = cliente.email   || "";
-    document.getElementById("clienteDataPassaggio").value= cliente.data_passaggio || "";
+    document.getElementById("modalClienteTitle").textContent =
+      "Modifica Cliente";
+    document.getElementById("clienteId").value = cliente.id;
+    document.getElementById("clienteNome").value = cliente.nome;
+    document.getElementById("clienteTel").value = cliente.num_tel || "";
+    document.getElementById("clienteEmail").value = cliente.email || "";
+    document.getElementById("clienteDataPassaggio").value =
+      cliente.data_passaggio || "";
     setRicontattoModalState(cliente.flag_ricontatto == 1);
   } else {
     document.getElementById("modalClienteTitle").textContent = "Nuovo Cliente";
-    document.getElementById("clienteId").value           = "";
-    document.getElementById("clienteDataPassaggio").value= "";
+    document.getElementById("clienteId").value = "";
+    document.getElementById("clienteDataPassaggio").value = "";
     setRicontattoModalState(false);
   }
 
@@ -203,7 +228,7 @@ function closeClienteModal() {
 
 function setRicontattoModalState(isRicontattato) {
   const hiddenInput = document.getElementById("clienteFlagRicontatto");
-  const btn         = document.getElementById("btnToggleRicontattoModal");
+  const btn = document.getElementById("btnToggleRicontattoModal");
   if (!hiddenInput || !btn) return;
 
   hiddenInput.value = isRicontattato ? "1" : "0";
@@ -243,7 +268,12 @@ async function toggleRicontatto(clienteId, isChecked) {
         const c = arr.find((x) => x.id === clienteId);
         if (c) c.flag_ricontatto = isChecked ? 1 : 0;
       });
-      showNotification(isChecked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso", "success");
+      showNotification(
+        isChecked
+          ? "📱 Cliente segnato come ricontattato"
+          : "⏳ Flag ricontatto rimosso",
+        "success",
+      );
       renderClienti();
     } else {
       showNotification(data.error || "Errore durante l'aggiornamento", "error");
@@ -267,15 +297,19 @@ function toggleDateEdit(clienteId, currentDate, event) {
   });
 
   const dateInput = document.getElementById(`dateInput_${clienteId}`);
-  const dateCell  = dateInput?.previousElementSibling;
+  const dateCell = dateInput?.previousElementSibling;
 
   if (dateInput && dateCell) {
-    dateCell.style.display  = "none";
+    dateCell.style.display = "none";
     dateInput.style.display = "block";
     dateInput.setAttribute("data-original-value", dateInput.value);
     setTimeout(() => {
       dateInput.focus();
-      try { dateInput.showPicker(); } catch (e) { /* non supportato */ }
+      try {
+        dateInput.showPicker();
+      } catch (e) {
+        /* non supportato */
+      }
     }, 50);
   }
 }
@@ -295,17 +329,17 @@ function handleDateKeydown(event, clienteId) {
 
 function cancelDateEdit(clienteId) {
   const dateInput = document.getElementById(`dateInput_${clienteId}`);
-  const dateCell  = dateInput?.previousElementSibling;
+  const dateCell = dateInput?.previousElementSibling;
   if (dateInput && dateCell) {
     dateInput.style.display = "none";
-    dateCell.style.display  = "flex";
+    dateCell.style.display = "flex";
   }
 }
 
 function saveAndHideDateInput(clienteId) {
-  const dateInput    = document.getElementById(`dateInput_${clienteId}`);
-  const originalValue= dateInput?.getAttribute("data-original-value") || "";
-  const newValue     = dateInput?.value || "";
+  const dateInput = document.getElementById(`dateInput_${clienteId}`);
+  const originalValue = dateInput?.getAttribute("data-original-value") || "";
+  const newValue = dateInput?.value || "";
 
   if (newValue !== originalValue) {
     updateDataPassaggio(clienteId, newValue);
@@ -330,14 +364,17 @@ async function updateDataPassaggio(clienteId, newDate) {
       });
 
       const dateInput = document.getElementById(`dateInput_${clienteId}`);
-      const dateCell  = dateInput?.previousElementSibling;
+      const dateCell = dateInput?.previousElementSibling;
       if (dateCell) {
         const span = dateCell.querySelector(".date-display");
         if (span) span.textContent = newDate ? formatDate(newDate) : "-";
       }
 
       cancelDateEdit(clienteId);
-      showNotification(newDate ? "Data passaggio aggiornata" : "Data passaggio rimossa", "success");
+      showNotification(
+        newDate ? "Data passaggio aggiornata" : "Data passaggio rimossa",
+        "success",
+      );
     } else {
       showNotification(data.error || "Errore durante l'aggiornamento", "error");
       cancelDateEdit(clienteId);
@@ -351,11 +388,14 @@ async function updateDataPassaggio(clienteId, newDate) {
 }
 
 async function deleteCliente(id) {
-  const conferma = await showConfirmModal("Sei sicuro di voler eliminare questo cliente?", "Conferma Eliminazione");
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo cliente?",
+    "Conferma Eliminazione",
+  );
   if (!conferma) return;
 
   try {
-    const res  = await fetch(`${API_URL}/clienti/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_URL}/clienti/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (res.ok) {
       showNotification("Cliente eliminato con successo!", "success");
@@ -373,12 +413,13 @@ async function deleteCliente(id) {
 document.getElementById("formCliente").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const id              = document.getElementById("clienteId").value;
-  const nome            = document.getElementById("clienteNome").value.trim();
-  const num_tel         = document.getElementById("clienteTel").value.trim();
-  const email           = document.getElementById("clienteEmail").value.trim();
-  const data_passaggio  = document.getElementById("clienteDataPassaggio").value;
-  const flag_ricontatto = document.getElementById("clienteFlagRicontatto").value === "1";
+  const id = document.getElementById("clienteId").value;
+  const nome = document.getElementById("clienteNome").value.trim();
+  const num_tel = document.getElementById("clienteTel").value.trim();
+  const email = document.getElementById("clienteEmail").value.trim();
+  const data_passaggio = document.getElementById("clienteDataPassaggio").value;
+  const flag_ricontatto =
+    document.getElementById("clienteFlagRicontatto").value === "1";
 
   if (!num_tel && !email) {
     showNotification("Inserire almeno un contatto: cellulare o email", "error");
@@ -386,18 +427,27 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
   }
 
   const method = id ? "PUT" : "POST";
-  const url    = id ? `${API_URL}/clienti/${id}` : `${API_URL}/clienti`;
+  const url = id ? `${API_URL}/clienti/${id}` : `${API_URL}/clienti`;
 
   try {
-    const res  = await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto }),
+      body: JSON.stringify({
+        nome,
+        num_tel,
+        email,
+        data_passaggio,
+        flag_ricontatto,
+      }),
     });
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(id ? "Cliente aggiornato!" : "Cliente creato!", "success");
+      showNotification(
+        id ? "Cliente aggiornato!" : "Cliente creato!",
+        "success",
+      );
       closeClienteModal();
       loadClienti();
     } else {

@@ -3,9 +3,9 @@
 // Dipende da: config.js, ui.js
 
 // Istanze globali riutilizzate nei vari modal
-let clienteSearchOrdine      = null;
+let clienteSearchOrdine = null;
 let marcaModelloSearchOrdine = null;
-let marcaSearchModello       = null;
+let marcaSearchModello = null;
 
 /**
  * Crea un campo select con ricerca testuale in tempo reale.
@@ -18,7 +18,14 @@ let marcaSearchModello       = null;
  * @param {boolean}  required     - Abilita validazione obbligatoria
  * @returns {Object} API: { loadData, reset, setValue, getValue, getSelectedName, updateData, filterData }
  */
-function createSearchableSelect(containerId, inputId, placeholder, getData, onSelect, required = false) {
+function createSearchableSelect(
+  containerId,
+  inputId,
+  placeholder,
+  getData,
+  onSelect,
+  required = false,
+) {
   const container = document.getElementById(containerId);
   if (!container) {
     console.warn(`Container ${containerId} non trovato`);
@@ -61,17 +68,19 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
     </div>
   `;
 
-  const searchInput        = container.querySelector(`#${inputId}_search`);
-  const hiddenInput        = container.querySelector(`#${inputId}`);
-  const results            = container.querySelector(".searchable-select-results");
-  const clearBtn           = container.querySelector(".clear-selection-btn");
-  const selectionDisplay   = container.querySelector(".selection-display");
-  const selectedValueDisplay = container.querySelector(".selected-value-display");
+  const searchInput = container.querySelector(`#${inputId}_search`);
+  const hiddenInput = container.querySelector(`#${inputId}`);
+  const results = container.querySelector(".searchable-select-results");
+  const clearBtn = container.querySelector(".clear-selection-btn");
+  const selectionDisplay = container.querySelector(".selection-display");
+  const selectedValueDisplay = container.querySelector(
+    ".selected-value-display",
+  );
 
-  let allData      = [];
-  let currentData  = [];
+  let allData = [];
+  let currentData = [];
   let selectedValue = null;
-  let selectedName  = null;
+  let selectedName = null;
 
   // ---- Caricamento dati ----
   async function loadData() {
@@ -82,52 +91,71 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
   // ---- Evidenzia il testo cercato ----
   function highlightText(text, search) {
     if (!search) return text;
-    const regex = new RegExp(`(${search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
-    return text.replace(regex, '<mark style="background:#fef08a;color:#713f12;padding:2px 4px;border-radius:3px;font-weight:700;">$1</mark>');
+    const regex = new RegExp(
+      `(${search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi",
+    );
+    return text.replace(
+      regex,
+      '<mark style="background:#fef08a;color:#713f12;padding:2px 4px;border-radius:3px;font-weight:700;">$1</mark>',
+    );
   }
 
   // ---- Renderizza lista risultati ----
   function showResults(filteredData) {
     if (filteredData.length === 0) {
-      results.innerHTML = '<div style="padding:20px;text-align:center;color:#64748b;">Nessun risultato trovato</div>';
+      results.innerHTML =
+        '<div style="padding:20px;text-align:center;color:#64748b;">Nessun risultato trovato</div>';
       results.style.display = "block";
       return;
     }
 
-    results.innerHTML = filteredData.map((item) => `
+    results.innerHTML = filteredData
+      .map(
+        (item) => `
       <div class="result-item" data-id="${item.id}" data-nome="${item.nome}"
         style="padding:12px 18px;cursor:pointer;transition:all 0.2s ease;border-bottom:1px solid #f1f5f9;">
         <div style="font-weight:600;color:#334155;">${highlightText(item.nome, searchInput.value)}</div>
         ${item.extra ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">${highlightText(item.extra, searchInput.value)}</div>` : ""}
       </div>
-    `).join("");
+    `,
+      )
+      .join("");
 
     results.style.display = "block";
 
     results.querySelectorAll(".result-item").forEach((el) => {
-      el.addEventListener("mouseenter", () => { el.style.background = "#f8fafc"; el.style.paddingLeft = "22px"; });
-      el.addEventListener("mouseleave", () => { el.style.background = "white";   el.style.paddingLeft = "18px"; });
-      el.addEventListener("click",      () => selectItem(el.dataset.id, el.dataset.nome));
+      el.addEventListener("mouseenter", () => {
+        el.style.background = "#f8fafc";
+        el.style.paddingLeft = "22px";
+      });
+      el.addEventListener("mouseleave", () => {
+        el.style.background = "white";
+        el.style.paddingLeft = "18px";
+      });
+      el.addEventListener("click", () =>
+        selectItem(el.dataset.id, el.dataset.nome),
+      );
     });
   }
 
   // ---- Selezione di un elemento ----
   function selectItem(id, nome) {
     selectedValue = id;
-    selectedName  = nome;
+    selectedName = nome;
 
-    searchInput.value        = "";
-    hiddenInput.value        = id;
-    results.style.display    = "none";
-    searchInput.style.display   = "none";
+    searchInput.value = "";
+    hiddenInput.value = id;
+    results.style.display = "none";
+    searchInput.style.display = "none";
     selectionDisplay.style.display = "block";
     selectedValueDisplay.textContent = nome;
 
     const extraDisplay = container.querySelector(".selected-extra-display");
     if (extraDisplay) {
       const item = currentData.find((d) => String(d.id) === String(id));
-      extraDisplay.textContent = (item && item.extra) ? item.extra : "";
-      extraDisplay.style.display = (item && item.extra) ? "block" : "none";
+      extraDisplay.textContent = item && item.extra ? item.extra : "";
+      extraDisplay.style.display = item && item.extra ? "block" : "none";
     }
 
     clearBtn.style.display = "block";
@@ -137,16 +165,16 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
   // ---- Reset/Pulisci selezione ----
   function reset() {
     selectedValue = null;
-    selectedName  = null;
-    searchInput.value  = "";
-    hiddenInput.value  = "";
-    searchInput.style.display      = "block";
+    selectedName = null;
+    searchInput.value = "";
+    hiddenInput.value = "";
+    searchInput.style.display = "block";
     selectionDisplay.style.display = "none";
     selectedValueDisplay.textContent = "";
     const extraDisplay = container.querySelector(".selected-extra-display");
     if (extraDisplay) extraDisplay.textContent = "";
-    clearBtn.style.display    = "none";
-    results.style.display     = "none";
+    clearBtn.style.display = "none";
+    results.style.display = "none";
     searchInput.setCustomValidity("");
     hiddenInput.setCustomValidity("");
   }
@@ -155,16 +183,22 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
   function filterByText(term) {
     if (!term) return currentData;
     const t = term.toLowerCase();
-    return currentData.filter((item) =>
-      item.nome.toLowerCase().includes(t) ||
-      (item.email   && item.email.toLowerCase().includes(t)) ||
-      (item.num_tel && item.num_tel.toLowerCase().includes(t)) ||
-      (item.extra   && item.extra.toLowerCase().includes(t))
+    return currentData.filter(
+      (item) =>
+        item.nome.toLowerCase().includes(t) ||
+        (item.email && item.email.toLowerCase().includes(t)) ||
+        (item.num_tel && item.num_tel.toLowerCase().includes(t)) ||
+        (item.extra && item.extra.toLowerCase().includes(t)),
     );
   }
 
   // ---- Event listeners ----
-  clearBtn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); reset(); searchInput.focus(); });
+  clearBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    reset();
+    searchInput.focus();
+  });
 
   searchInput.addEventListener("input", async (e) => {
     if (allData.length === 0) await loadData();
@@ -175,14 +209,14 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
     if (allData.length === 0) await loadData();
     showResults(filterByText(searchInput.value.trim()));
     searchInput.style.borderColor = "#6366f1";
-    searchInput.style.boxShadow   = "0 0 0 4px rgba(99, 102, 241, 0.1)";
+    searchInput.style.boxShadow = "0 0 0 4px rgba(99, 102, 241, 0.1)";
   });
 
   searchInput.addEventListener("blur", () => {
     setTimeout(() => {
-      results.style.display     = "none";
+      results.style.display = "none";
       searchInput.style.borderColor = "#e2e8f0";
-      searchInput.style.boxShadow   = "none";
+      searchInput.style.boxShadow = "none";
     }, 200);
   });
 
@@ -194,22 +228,26 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
   if (required) {
     const form = container.closest("form");
     if (form) {
-      form.addEventListener("submit", (e) => {
-        if (!hiddenInput.value) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          searchInput.style.borderColor = "#ef4444";
-          searchInput.style.boxShadow   = "0 0 0 4px rgba(239, 68, 68, 0.1)";
-          searchInput.placeholder = "⚠️ Campo obbligatorio!";
-          searchInput.focus();
-          setTimeout(() => {
-            searchInput.style.borderColor = "#e2e8f0";
-            searchInput.style.boxShadow   = "none";
-            searchInput.placeholder = placeholder;
-          }, 3000);
-          return false;
-        }
-      }, true);
+      form.addEventListener(
+        "submit",
+        (e) => {
+          if (!hiddenInput.value) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            searchInput.style.borderColor = "#ef4444";
+            searchInput.style.boxShadow = "0 0 0 4px rgba(239, 68, 68, 0.1)";
+            searchInput.placeholder = "⚠️ Campo obbligatorio!";
+            searchInput.focus();
+            setTimeout(() => {
+              searchInput.style.borderColor = "#e2e8f0";
+              searchInput.style.boxShadow = "none";
+              searchInput.placeholder = placeholder;
+            }, 3000);
+            return false;
+          }
+        },
+        true,
+      );
     }
   }
 
@@ -221,10 +259,15 @@ function createSearchableSelect(containerId, inputId, placeholder, getData, onSe
       const item = allData.find((d) => String(d.id) === String(id));
       if (item) selectItem(item.id, item.nome);
     },
-    getValue:       () => selectedValue,
-    getSelectedName:() => selectedName,
-    updateData: (newData) => { allData = newData; currentData = newData; },
-    filterData: (newData) => { currentData = newData; },
+    getValue: () => selectedValue,
+    getSelectedName: () => selectedName,
+    updateData: (newData) => {
+      allData = newData;
+      currentData = newData;
+    },
+    filterData: (newData) => {
+      currentData = newData;
+    },
   };
 }
 
@@ -239,10 +282,16 @@ async function initOrdineSearchableSelects() {
       const res = await fetch(`${API_URL}/clienti`);
       const list = await res.json();
       return list.map((c) => ({
-        id: c.id, nome: c.nome,
-        extra:   [c.num_tel ? `📞 ${c.num_tel}` : "", c.email ? `✉️ ${c.email}` : ""].filter(Boolean).join(" • "),
+        id: c.id,
+        nome: c.nome,
+        extra: [
+          c.num_tel ? `📞 ${c.num_tel}` : "",
+          c.email ? `✉️ ${c.email}` : "",
+        ]
+          .filter(Boolean)
+          .join(" • "),
         num_tel: c.num_tel || "",
-        email:   c.email   || "",
+        email: c.email || "",
       }));
     },
     () => {},
@@ -257,7 +306,12 @@ async function initOrdineSearchableSelects() {
       const res = await fetch(`${API_URL}/modelli`);
       const list = await res.json();
       allModelli = list;
-      return list.map((m) => ({ id: m.id, nome: m.nome, extra: m.marca_nome || "", marche_id: m.marche_id }));
+      return list.map((m) => ({
+        id: m.id,
+        nome: m.nome,
+        extra: m.marca_nome || "",
+        marche_id: m.marche_id,
+      }));
     },
     (id) => {
       const mod = allModelli.find((m) => String(m.id) === String(id));
@@ -269,7 +323,7 @@ async function initOrdineSearchableSelects() {
     true,
   );
 
-  if (clienteSearchOrdine)      await clienteSearchOrdine.loadData();
+  if (clienteSearchOrdine) await clienteSearchOrdine.loadData();
   if (marcaModelloSearchOrdine) await marcaModelloSearchOrdine.loadData();
 }
 

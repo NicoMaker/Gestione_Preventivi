@@ -57,7 +57,7 @@ router.get("/:id", (req, res) => {
           ...cliente,
           ordini: ordini,
         });
-      }
+      },
     );
   });
 });
@@ -73,11 +73,11 @@ router.post("/", (req, res) => {
   db.run(
     "INSERT INTO clienti (nome, num_tel, email, data_passaggio, flag_ricontatto) VALUES (?, ?, ?, ?, ?)",
     [
-      nome.trim(), 
-      num_tel || null, 
-      email || null, 
+      nome.trim(),
+      num_tel || null,
+      email || null,
       data_passaggio || null,
-      flag_ricontatto ? 1 : 0
+      flag_ricontatto ? 1 : 0,
     ],
     function (err) {
       if (err) {
@@ -105,7 +105,7 @@ router.post("/", (req, res) => {
         flag_ricontatto: flag_ricontatto ? 1 : 0,
         ordini_count: 0,
       });
-    }
+    },
   );
 });
 
@@ -132,20 +132,29 @@ router.put("/:id", (req, res) => {
 
     // Usa i valori esistenti se non vengono passati nuovi valori
     const updatedNome = nome !== undefined ? nome.trim() : cliente.nome;
-    const updatedNumTel = num_tel !== undefined ? (num_tel || null) : cliente.num_tel;
-    const updatedEmail = email !== undefined ? (email || null) : cliente.email;
-    const updatedDataPassaggio = data_passaggio !== undefined ? (data_passaggio || null) : cliente.data_passaggio;
-    const updatedFlagRicontatto = flag_ricontatto !== undefined ? (flag_ricontatto ? 1 : 0) : cliente.flag_ricontatto;
+    const updatedNumTel =
+      num_tel !== undefined ? num_tel || null : cliente.num_tel;
+    const updatedEmail = email !== undefined ? email || null : cliente.email;
+    const updatedDataPassaggio =
+      data_passaggio !== undefined
+        ? data_passaggio || null
+        : cliente.data_passaggio;
+    const updatedFlagRicontatto =
+      flag_ricontatto !== undefined
+        ? flag_ricontatto
+          ? 1
+          : 0
+        : cliente.flag_ricontatto;
 
     db.run(
       "UPDATE clienti SET nome = ?, num_tel = ?, email = ?, data_passaggio = ?, flag_ricontatto = ? WHERE id = ?",
       [
-        updatedNome, 
-        updatedNumTel, 
-        updatedEmail, 
+        updatedNome,
+        updatedNumTel,
+        updatedEmail,
         updatedDataPassaggio,
         updatedFlagRicontatto,
-        id
+        id,
       ],
       function (err) {
         if (err) {
@@ -168,7 +177,7 @@ router.put("/:id", (req, res) => {
 
         console.log(`Cliente aggiornato: ID ${id} -> "${updatedNome}"`);
         res.json({ success: true, nome: updatedNome });
-      }
+      },
     );
   });
 });
@@ -191,12 +200,15 @@ router.delete("/:id", (req, res) => {
 
       // Blocca l'eliminazione se ci sono ordini
       if (ordiniCount > 0) {
-        console.log(`Tentativo di eliminare cliente ID ${id} con ${ordiniCount} ordini - BLOCCATO`);
-        
+        console.log(
+          `Tentativo di eliminare cliente ID ${id} con ${ordiniCount} ordini - BLOCCATO`,
+        );
+
         return res.status(400).json({
-          error: ordiniCount === 1
-            ? "Impossibile eliminare: c'è 1 preventivo collegato a questo cliente."
-            : `Impossibile eliminare: ci sono ${ordiniCount} preventivi collegati a questo cliente.`,
+          error:
+            ordiniCount === 1
+              ? "Impossibile eliminare: c'è 1 preventivo collegato a questo cliente."
+              : `Impossibile eliminare: ci sono ${ordiniCount} preventivi collegati a questo cliente.`,
           ordini_count: ordiniCount,
         });
       }
@@ -225,7 +237,7 @@ router.delete("/:id", (req, res) => {
           message: "Cliente eliminato con successo",
         });
       });
-    }
+    },
   );
 });
 

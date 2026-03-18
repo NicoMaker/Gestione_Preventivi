@@ -80,7 +80,14 @@ router.get("/cliente/:clienteId", (req, res) => {
 
 // POST - Crea nuovo ordine
 router.post("/", (req, res) => {
-  const { cliente_id, data_movimento, modello_id, marca_id, note, contratto_finito } = req.body;
+  const {
+    cliente_id,
+    data_movimento,
+    modello_id,
+    marca_id,
+    note,
+    contratto_finito,
+  } = req.body;
 
   if (!cliente_id) {
     return res.status(400).json({
@@ -158,7 +165,14 @@ router.post("/", (req, res) => {
 // PUT - Aggiorna ordine
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { cliente_id, data_movimento, modello_id, marca_id, note, contratto_finito } = req.body;
+  const {
+    cliente_id,
+    data_movimento,
+    modello_id,
+    marca_id,
+    note,
+    contratto_finito,
+  } = req.body;
 
   if (!cliente_id) {
     return res.status(400).json({

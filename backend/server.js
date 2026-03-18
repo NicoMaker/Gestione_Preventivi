@@ -43,7 +43,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
+  }),
 );
 
 app.use(express.json({ limit: "50mb" }));
@@ -56,7 +56,7 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
     console.log(
-      `${new Date().toISOString()} - ${req.method} ${req.path} da ${req.ip}`
+      `${new Date().toISOString()} - ${req.method} ${req.path} da ${req.ip}`,
     );
   }
   next();
@@ -88,9 +88,7 @@ app.get("/api/health", async (req, res) => {
 
 // GESTIONE CONNESSIONI SOCKET.IO
 io.on("connection", (socket) => {
-  console.log(
-    `Client connesso: ${socket.id} da ${socket.handshake.address}`
-  );
+  console.log(`Client connesso: ${socket.id} da ${socket.handshake.address}`);
 
   socket.emit("connected", {
     message: "Connesso al server",
@@ -177,7 +175,7 @@ process.on("unhandledRejection", (reason, promise) => {
 server.listen(PORT, "0.0.0.0", async () => {
   const localIP = getLocalIP();
   const publicIP = await getPublicIP();
-  
+
   console.log(`Backend avviato`);
   console.log(`IP Pubblico: http://${publicIP}:${PORT}`);
   console.log(`IP Locale: http://${localIP}:${PORT}`);

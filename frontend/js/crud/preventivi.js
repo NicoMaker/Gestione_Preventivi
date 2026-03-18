@@ -8,7 +8,7 @@ async function loadOrdini() {
   try {
     const res = await fetch(`${API_URL}/ordini`);
     allOrdini = await res.json();
-    ordini    = allOrdini;
+    ordini = allOrdini;
     restoreOrdiniFilter();
   } catch (error) {
     console.error("Errore caricamento preventivi:", error);
@@ -39,18 +39,21 @@ function renderOrdini() {
     return;
   }
 
-  tbody.innerHTML = ordini.map((o) => {
-    const telefono      = o.cliente_tel           || "No Cell";
-    const email         = o.cliente_email         || "No Mail";
-    const dataPassaggio = o.cliente_data_passaggio || "";
-    const flagRicontatto= o.cliente_flag_ricontatto || 0;
+  tbody.innerHTML = ordini
+    .map((o) => {
+      const telefono = o.cliente_tel || "No Cell";
+      const email = o.cliente_email || "No Mail";
+      const dataPassaggio = o.cliente_data_passaggio || "";
+      const flagRicontatto = o.cliente_flag_ricontatto || 0;
 
-    return `
+      return `
       <tr>
         <td>${formatDate(o.data_movimento)}</td>
         <td><strong>${o.cliente_nome}</strong></td>
         <td>
-          ${telefono !== "No Cell" ? `
+          ${
+            telefono !== "No Cell"
+              ? `
             <div class="contact-buttons">
               <a href="tel:${telefono}" class="btn-contact btn-phone" title="Chiama ${formatPhoneNumber(telefono)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,18 +74,21 @@ function renderOrdini() {
                 Messaggio
               </a>
             </div>
-          ` : "No Cell"}
+          `
+              : "No Cell"
+          }
         </td>
         <td>
-          ${email !== "No Mail"
-            ? `<a href="mailto:${email}" class="btn-contact btn-email" title="Email a ${email}">
+          ${
+            email !== "No Mail"
+              ? `<a href="mailto:${email}" class="btn-contact btn-email" title="Email a ${email}">
                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                    <polyline points="22,6 12,13 2,6"/>
                  </svg>
                  ${email}
                </a>`
-            : "No Mail"
+              : "No Mail"
           }
         </td>
         <td>
@@ -108,9 +114,9 @@ function renderOrdini() {
             </button>
           </div>
         </td>
-        <td>${o.marca_nome   || "-"}</td>
+        <td>${o.marca_nome || "-"}</td>
         <td>${o.modello_nome || "-"}</td>
-        <td>${o.note         || "-"}</td>
+        <td>${o.note || "-"}</td>
         <td class="text-right">
           <button class="btn-icon" onclick="editOrdine(${o.id})" title="Modifica preventivo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -126,7 +132,8 @@ function renderOrdini() {
         </td>
       </tr>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 // ---- Aggiornamenti inline ----
@@ -157,11 +164,19 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
     if (!response.ok) throw new Error("Errore aggiornamento flag ricontatto");
 
     [allOrdini, ordini].forEach((arr) =>
-      arr.filter((x) => x.cliente_id === clienteId)
-         .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; })
+      arr
+        .filter((x) => x.cliente_id === clienteId)
+        .forEach((x) => {
+          x.cliente_flag_ricontatto = checked ? 1 : 0;
+        }),
     );
 
-    showNotification(checked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso", "success");
+    showNotification(
+      checked
+        ? "📱 Cliente segnato come ricontattato"
+        : "⏳ Flag ricontatto rimosso",
+      "success",
+    );
     renderOrdini();
   } catch {
     showNotification("Errore aggiornamento flag ricontatto", "error");
@@ -172,17 +187,20 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
 async function updateContrattoFinito(ordineId, newValue) {
   try {
     const ordine = allOrdini.find((o) => o.id === ordineId);
-    if (!ordine) { showNotification("Preventivo non trovato", "error"); return; }
+    if (!ordine) {
+      showNotification("Preventivo non trovato", "error");
+      return;
+    }
 
     const response = await fetch(`${API_URL}/ordini/${ordineId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        cliente_id:     ordine.cliente_id,
+        cliente_id: ordine.cliente_id,
         data_movimento: ordine.data_movimento,
-        marca_id:       ordine.marca_id   || null,
-        modello_id:     ordine.modello_id || null,
-        note:           ordine.note       || null,
+        marca_id: ordine.marca_id || null,
+        modello_id: ordine.modello_id || null,
+        note: ordine.note || null,
         contratto_finito: newValue,
       }),
     });
@@ -193,7 +211,10 @@ async function updateContrattoFinito(ordineId, newValue) {
       if (o) o.contratto_finito = newValue ? 1 : 0;
     });
 
-    showNotification(newValue ? "✅ Contratto concluso!" : "🔴 Contratto non concluso", "success");
+    showNotification(
+      newValue ? "✅ Contratto concluso!" : "🔴 Contratto non concluso",
+      "success",
+    );
     renderOrdini();
   } catch {
     showNotification("Errore aggiornamento contratto finito", "error");
@@ -211,19 +232,19 @@ function toggleContrattoModal() {
 
 function setContrattoModalState(value) {
   const hidden = document.getElementById("ordineContrattoFinito");
-  const inner  = document.getElementById("contrattoToggleInner");
-  const icon   = document.getElementById("contrattoIcon");
-  const label  = document.getElementById("contrattoLabel");
+  const inner = document.getElementById("contrattoToggleInner");
+  const icon = document.getElementById("contrattoIcon");
+  const label = document.getElementById("contrattoLabel");
   if (!hidden || !inner) return;
 
   hidden.value = value ? "1" : "0";
   if (value) {
     inner.classList.add("is-finito");
-    icon.textContent  = "✅";
+    icon.textContent = "✅";
     label.textContent = "concluso";
   } else {
     inner.classList.remove("is-finito");
-    icon.textContent  = "🔴";
+    icon.textContent = "🔴";
     label.textContent = "Non concluso";
   }
 }
@@ -231,15 +252,26 @@ function setContrattoModalState(value) {
 // ---- Filtri ----
 
 function saveOrdiniFilter() {
-  localStorage.setItem("filter_ordini_search",          document.getElementById("filterOrdini")?.value || "");
-  localStorage.setItem("filter_ordini_data_passaggio",  document.getElementById("filterOrdiniDataPassaggio")?.value || "");
-  localStorage.setItem("filter_ordini_data_preventivo", document.getElementById("filterOrdiniDataPreventivo")?.value || "");
+  localStorage.setItem(
+    "filter_ordini_search",
+    document.getElementById("filterOrdini")?.value || "",
+  );
+  localStorage.setItem(
+    "filter_ordini_data_passaggio",
+    document.getElementById("filterOrdiniDataPassaggio")?.value || "",
+  );
+  localStorage.setItem(
+    "filter_ordini_data_preventivo",
+    document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+  );
 }
 
 function restoreOrdiniFilter() {
-  const savedSearch          = localStorage.getItem("filter_ordini_search")          || "";
-  const savedDataPassaggio   = localStorage.getItem("filter_ordini_data_passaggio")  || "";
-  const savedDataPreventivo  = localStorage.getItem("filter_ordini_data_preventivo") || "";
+  const savedSearch = localStorage.getItem("filter_ordini_search") || "";
+  const savedDataPassaggio =
+    localStorage.getItem("filter_ordini_data_passaggio") || "";
+  const savedDataPreventivo =
+    localStorage.getItem("filter_ordini_data_preventivo") || "";
 
   const si = document.getElementById("filterOrdini");
   const sp = document.getElementById("filterOrdiniDataPassaggio");
@@ -249,20 +281,33 @@ function restoreOrdiniFilter() {
   if (sp) sp.value = savedDataPassaggio;
   if (sd) sd.value = savedDataPreventivo;
 
-  applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio, savedDataPreventivo);
+  applyOrdiniFilter(
+    savedSearch.toLowerCase(),
+    savedDataPassaggio,
+    savedDataPreventivo,
+  );
 }
 
-function applyOrdiniFilter(searchTerm = "", dataPassaggio = "", dataPreventivo = "") {
+function applyOrdiniFilter(
+  searchTerm = "",
+  dataPassaggio = "",
+  dataPreventivo = "",
+) {
   ordini = allOrdini.filter((o) => {
-    const matchText = !searchTerm ||
+    const matchText =
+      !searchTerm ||
       o.cliente_nome.toLowerCase().includes(searchTerm) ||
-      (o.cliente_tel   && o.cliente_tel.toLowerCase().includes(searchTerm)) ||
+      (o.cliente_tel && o.cliente_tel.toLowerCase().includes(searchTerm)) ||
       (o.cliente_email && o.cliente_email.toLowerCase().includes(searchTerm)) ||
-      (o.marca_nome    && o.marca_nome.toLowerCase().includes(searchTerm))   ||
-      (o.modello_nome  && o.modello_nome.toLowerCase().includes(searchTerm));
+      (o.marca_nome && o.marca_nome.toLowerCase().includes(searchTerm)) ||
+      (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm));
 
-    const matchDataPassaggio  = !dataPassaggio  || (o.cliente_data_passaggio && o.cliente_data_passaggio === dataPassaggio);
-    const matchDataPreventivo = !dataPreventivo || (o.data_movimento && o.data_movimento.startsWith(dataPreventivo));
+    const matchDataPassaggio =
+      !dataPassaggio ||
+      (o.cliente_data_passaggio && o.cliente_data_passaggio === dataPassaggio);
+    const matchDataPreventivo =
+      !dataPreventivo ||
+      (o.data_movimento && o.data_movimento.startsWith(dataPreventivo));
 
     return matchText && matchDataPassaggio && matchDataPreventivo;
   });
@@ -271,9 +316,12 @@ function applyOrdiniFilter(searchTerm = "", dataPassaggio = "", dataPreventivo =
 
 function getOrdiniFilterValues() {
   return {
-    searchTerm:    document.getElementById("filterOrdini")?.value.toLowerCase() || "",
-    dataPassaggio: document.getElementById("filterOrdiniDataPassaggio")?.value  || "",
-    dataPreventivo:document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+    searchTerm:
+      document.getElementById("filterOrdini")?.value.toLowerCase() || "",
+    dataPassaggio:
+      document.getElementById("filterOrdiniDataPassaggio")?.value || "",
+    dataPreventivo:
+      document.getElementById("filterOrdiniDataPreventivo")?.value || "",
   };
 }
 
@@ -282,16 +330,22 @@ document.getElementById("filterOrdini")?.addEventListener("input", () => {
   saveOrdiniFilter();
   applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
 });
-document.getElementById("filterOrdiniDataPassaggio")?.addEventListener("change", () => {
-  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
-});
-document.getElementById("filterOrdiniDataPreventivo")?.addEventListener("change", () => {
-  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
-});
+document
+  .getElementById("filterOrdiniDataPassaggio")
+  ?.addEventListener("change", () => {
+    const { searchTerm, dataPassaggio, dataPreventivo } =
+      getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+  });
+document
+  .getElementById("filterOrdiniDataPreventivo")
+  ?.addEventListener("change", () => {
+    const { searchTerm, dataPassaggio, dataPreventivo } =
+      getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+  });
 
 // ---- Modal ----
 
@@ -312,9 +366,12 @@ window.openOrdineModal = async function (ordine = null) {
   }
 
   if (ordine) {
-    document.getElementById("modalOrdineTitle").textContent = "Modifica Preventivo";
-    document.getElementById("ordineId").value   = ordine.id;
-    document.getElementById("ordineData").value = formatDateForInput(ordine.data_movimento);
+    document.getElementById("modalOrdineTitle").textContent =
+      "Modifica Preventivo";
+    document.getElementById("ordineId").value = ordine.id;
+    document.getElementById("ordineData").value = formatDateForInput(
+      ordine.data_movimento,
+    );
     document.getElementById("ordineNote").value = ordine.note || "";
     setContrattoModalState(ordine.contratto_finito == 1);
 
@@ -331,9 +388,12 @@ window.openOrdineModal = async function (ordine = null) {
       }
     }
   } else {
-    document.getElementById("modalOrdineTitle").textContent = "Nuovo Preventivo";
-    document.getElementById("ordineId").value   = "";
-    document.getElementById("ordineData").value = new Date().toISOString().split("T")[0];
+    document.getElementById("modalOrdineTitle").textContent =
+      "Nuovo Preventivo";
+    document.getElementById("ordineId").value = "";
+    document.getElementById("ordineData").value = new Date()
+      .toISOString()
+      .split("T")[0];
   }
 
   modal.classList.add("active");
@@ -358,11 +418,14 @@ function editOrdine(id) {
 }
 
 async function deleteOrdine(id) {
-  const conferma = await showConfirmModal("Sei sicuro di voler eliminare questo preventivo?", "Conferma Eliminazione");
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo preventivo?",
+    "Conferma Eliminazione",
+  );
   if (!conferma) return;
 
   try {
-    const res  = await fetch(`${API_URL}/ordini/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_URL}/ordini/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (res.ok) {
       showNotification("Preventivo eliminato con successo!", "success");
@@ -380,13 +443,14 @@ async function deleteOrdine(id) {
 document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const id              = document.getElementById("ordineId").value;
-  const cliente_id      = document.getElementById("ordineCliente").value;
-  const data_movimento  = document.getElementById("ordineData").value;
-  const marca_id        = document.getElementById("ordineMarca").value   || null;
-  const modello_id      = document.getElementById("ordineModello").value || null;
-  const note            = document.getElementById("ordineNote").value.trim();
-  const contratto_finito= document.getElementById("ordineContrattoFinito").value === "1";
+  const id = document.getElementById("ordineId").value;
+  const cliente_id = document.getElementById("ordineCliente").value;
+  const data_movimento = document.getElementById("ordineData").value;
+  const marca_id = document.getElementById("ordineMarca").value || null;
+  const modello_id = document.getElementById("ordineModello").value || null;
+  const note = document.getElementById("ordineNote").value.trim();
+  const contratto_finito =
+    document.getElementById("ordineContrattoFinito").value === "1";
 
   if (!cliente_id) {
     showNotification("Seleziona un cliente dalla lista", "warning");
@@ -395,14 +459,22 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
 
   if (modello_id && Array.isArray(allModelli) && allModelli.length > 0) {
     const modello = allModelli.find((m) => String(m.id) === String(modello_id));
-    if (modello && marca_id && modello.marche_id && String(modello.marche_id) !== String(marca_id)) {
-      showNotification("Il modello selezionato non appartiene alla marca indicata.", "error");
+    if (
+      modello &&
+      marca_id &&
+      modello.marche_id &&
+      String(modello.marche_id) !== String(marca_id)
+    ) {
+      showNotification(
+        "Il modello selezionato non appartiene alla marca indicata.",
+        "error",
+      );
       return;
     }
   }
 
   const method = id ? "PUT" : "POST";
-  const url    = id ? `${API_URL}/ordini/${id}` : `${API_URL}/ordini`;
+  const url = id ? `${API_URL}/ordini/${id}` : `${API_URL}/ordini`;
 
   try {
     const res = await fetch(url, {
@@ -410,7 +482,9 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         cliente_id,
-        data_movimento: data_movimento ? new Date(data_movimento).toISOString() : new Date().toISOString(),
+        data_movimento: data_movimento
+          ? new Date(data_movimento).toISOString()
+          : new Date().toISOString(),
         marca_id,
         modello_id,
         note,
@@ -420,7 +494,10 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(id ? "Preventivo aggiornato!" : "Preventivo creato!", "success");
+      showNotification(
+        id ? "Preventivo aggiornato!" : "Preventivo creato!",
+        "success",
+      );
       closeOrdineModal();
       loadOrdini();
     } else {

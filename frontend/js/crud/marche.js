@@ -6,7 +6,7 @@ async function loadMarche() {
   try {
     const res = await fetch(`${API_URL}/marche`);
     allMarche = await res.json();
-    marche    = allMarche;
+    marche = allMarche;
     restoreMarcheFilter();
   } catch (error) {
     console.error("Errore caricamento marche:", error);
@@ -31,7 +31,9 @@ function renderMarche() {
     return;
   }
 
-  tbody.innerHTML = marche.map((m) => `
+  tbody.innerHTML = marche
+    .map(
+      (m) => `
     <tr>
       <td><strong>${m.nome}</strong></td>
       <td class="text-center-badge">
@@ -58,13 +60,18 @@ function renderMarche() {
         </button>
       </td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 // ---- Filtri ----
 
 function saveMarcheFilter() {
-  localStorage.setItem("filter_marche_search", document.getElementById("filterMarche")?.value || "");
+  localStorage.setItem(
+    "filter_marche_search",
+    document.getElementById("filterMarche")?.value || "",
+  );
 }
 
 function restoreMarcheFilter() {
@@ -92,11 +99,11 @@ function openMarcaModal(marca = null) {
 
   if (marca) {
     document.getElementById("modalMarcaTitle").textContent = "Modifica Marca";
-    document.getElementById("marcaId").value   = marca.id;
+    document.getElementById("marcaId").value = marca.id;
     document.getElementById("marcaNome").value = marca.nome;
   } else {
     document.getElementById("modalMarcaTitle").textContent = "Nuova Marca";
-    document.getElementById("marcaId").value   = "";
+    document.getElementById("marcaId").value = "";
   }
 
   document.getElementById("modalMarca").classList.add("active");
@@ -112,11 +119,14 @@ function editMarca(id) {
 }
 
 async function deleteMarca(id) {
-  const conferma = await showConfirmModal("Sei sicuro di voler eliminare questa marca?", "Conferma Eliminazione");
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questa marca?",
+    "Conferma Eliminazione",
+  );
   if (!conferma) return;
 
   try {
-    const res  = await fetch(`${API_URL}/marche/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_URL}/marche/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (res.ok) {
       showNotification("Marca eliminata con successo!", "success");
@@ -134,14 +144,14 @@ async function deleteMarca(id) {
 document.getElementById("formMarca").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const id   = document.getElementById("marcaId").value;
+  const id = document.getElementById("marcaId").value;
   const nome = document.getElementById("marcaNome").value.trim();
 
   const method = id ? "PUT" : "POST";
-  const url    = id ? `${API_URL}/marche/${id}` : `${API_URL}/marche`;
+  const url = id ? `${API_URL}/marche/${id}` : `${API_URL}/marche`;
 
   try {
-    const res  = await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome }),

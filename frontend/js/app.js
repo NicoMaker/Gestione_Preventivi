@@ -3,7 +3,6 @@
 // Dipende da: config.js, ui.js, clienti.js, preventivi.js, marche.js, modelli.js, utenti.js, stampa.js
 
 document.addEventListener("DOMContentLoaded", () => {
-
   // ---- Auth guard ----
   const nomeUtente = localStorage.getItem("nomeUtente");
   if (!nomeUtente) {
@@ -14,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Mobile menu ----
   const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-  const sidebar          = document.getElementById("sidebar");
+  const sidebar = document.getElementById("sidebar");
 
   if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener("click", () => {
@@ -23,9 +22,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("click", (e) => {
-      if (window.innerWidth <= 768 &&
-          !sidebar.contains(e.target) &&
-          !mobileMenuToggle.contains(e.target)) {
+      if (
+        window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
+        !mobileMenuToggle.contains(e.target)
+      ) {
         sidebar.classList.remove("mobile-open");
         mobileMenuToggle.classList.remove("active");
       }
@@ -38,8 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const section = item.dataset.section;
 
-      document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"));
-      document.querySelectorAll(".content-section").forEach((s) => s.classList.remove("active"));
+      document
+        .querySelectorAll(".nav-item")
+        .forEach((i) => i.classList.remove("active"));
+      document
+        .querySelectorAll(".content-section")
+        .forEach((s) => s.classList.remove("active"));
 
       item.classList.add("active");
       document.getElementById(`section-${section}`).classList.add("active");
@@ -53,10 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Carica dati della sezione attivata
       const loaders = {
         clienti: loadClienti,
-        ordini:  loadOrdini,
-        marche:  loadMarche,
+        ordini: loadOrdini,
+        marche: loadMarche,
         modelli: loadModelli,
-        utenti:  loadUtenti,
+        utenti: loadUtenti,
       };
       loaders[section]?.();
     });
@@ -64,7 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Ripristina la sezione salvata
   const savedSection = localStorage.getItem("activeSection") || "clienti";
-  const targetNav = document.querySelector(`.nav-item[data-section="${savedSection}"]`);
+  const targetNav = document.querySelector(
+    `.nav-item[data-section="${savedSection}"]`,
+  );
   if (targetNav) {
     targetNav.click();
   } else {
@@ -81,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Toggle password nel modal Utenti ----
   const togglePassword = document.getElementById("toggleUtentePassword");
-  const passwordInput  = document.getElementById("utentePassword");
+  const passwordInput = document.getElementById("utentePassword");
 
   if (togglePassword && passwordInput) {
     togglePassword.addEventListener("click", () => {
@@ -108,5 +115,4 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedSection === "ordini") {
     setTimeout(() => loadOrdini(), 500);
   }
-
 });

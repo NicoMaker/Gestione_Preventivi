@@ -8,7 +8,7 @@ async function loadUtenti() {
   try {
     const res = await fetch(`${API_URL}/utenti`);
     allUtenti = await res.json();
-    utenti    = allUtenti;
+    utenti = allUtenti;
     restoreUtentiFilter();
   } catch (error) {
     console.error("Errore caricamento utenti:", error);
@@ -18,7 +18,10 @@ async function loadUtenti() {
 // ---- Filtri ----
 
 function saveUtentiFilter() {
-  localStorage.setItem("filter_utenti_search", document.getElementById("filterUtenti")?.value || "");
+  localStorage.setItem(
+    "filter_utenti_search",
+    document.getElementById("filterUtenti")?.value || "",
+  );
 }
 
 function restoreUtentiFilter() {
@@ -53,13 +56,15 @@ function renderUtenti() {
               <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             <p style="font-size:16px;font-weight:600;margin-bottom:8px;">${searchTerm ? "Nessun utente trovato" : "Nessun utente presente"}</p>
-            <p style="font-size:14px;">${searchTerm ? "Prova a modificare il termine di ricerca" : 'Clicca su <strong>Nuovo Utente</strong> per iniziare'}</p>
+            <p style="font-size:14px;">${searchTerm ? "Prova a modificare il termine di ricerca" : "Clicca su <strong>Nuovo Utente</strong> per iniziare"}</p>
           </div>
         </td></tr>`;
     return;
   }
 
-  tbody.innerHTML = utenti.map((u) => `
+  tbody.innerHTML = utenti
+    .map(
+      (u) => `
     <tr>
       <td><strong>${u.nome}</strong></td>
       <td class="text-right">
@@ -76,32 +81,38 @@ function renderUtenti() {
         </button>
       </td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 function openUtenteModal(utente = null) {
-  const modal         = document.getElementById("modalUtente");
+  const modal = document.getElementById("modalUtente");
   const passwordInput = document.getElementById("utentePassword");
   const passwordLabel = document.getElementById("utentePasswordLabel");
-  const passwordHelp  = document.getElementById("passwordHelp");
+  const passwordHelp = document.getElementById("passwordHelp");
 
   document.getElementById("formUtente").reset();
 
   if (utente) {
     document.getElementById("modalUtenteTitle").textContent = "Modifica Utente";
-    document.getElementById("utenteId").value   = utente.id;
+    document.getElementById("utenteId").value = utente.id;
     document.getElementById("utenteNome").value = utente.nome;
     passwordInput.removeAttribute("required");
     passwordInput.placeholder = "Lascia vuoto per non cambiare";
     if (passwordLabel) passwordLabel.textContent = "Password";
-    if (passwordHelp)  passwordHelp.textContent  = "Lascia vuoto per mantenere la password attuale";
+    if (passwordHelp)
+      passwordHelp.textContent =
+        "Lascia vuoto per mantenere la password attuale";
   } else {
     document.getElementById("modalUtenteTitle").textContent = "Nuovo Utente";
     document.getElementById("utenteId").value = "";
     passwordInput.setAttribute("required", "");
     passwordInput.placeholder = "password";
     if (passwordLabel) passwordLabel.textContent = "Password *";
-    if (passwordHelp)  passwordHelp.textContent  = "Minimo 8 caratteri, una maiuscola, una minuscola e un numero";
+    if (passwordHelp)
+      passwordHelp.textContent =
+        "Minimo 8 caratteri, una maiuscola, una minuscola e un numero";
   }
 
   modal.classList.add("active");
@@ -117,11 +128,14 @@ function editUtente(id) {
 }
 
 async function deleteUtente(id) {
-  const conferma = await showConfirmModal("Sei sicuro di voler eliminare questo utente?", "Conferma Eliminazione");
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo utente?",
+    "Conferma Eliminazione",
+  );
   if (!conferma) return;
 
   try {
-    const res  = await fetch(`${API_URL}/utenti/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_URL}/utenti/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (res.ok) {
       showNotification("Utente eliminato con successo!", "success");
@@ -139,18 +153,18 @@ async function deleteUtente(id) {
 document.getElementById("formUtente").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const id       = document.getElementById("utenteId").value;
-  const nome     = document.getElementById("utenteNome").value.trim();
+  const id = document.getElementById("utenteId").value;
+  const nome = document.getElementById("utenteNome").value.trim();
   const password = document.getElementById("utentePassword").value;
 
   const method = id ? "PUT" : "POST";
-  const url    = id ? `${API_URL}/utenti/${id}` : `${API_URL}/utenti`;
+  const url = id ? `${API_URL}/utenti/${id}` : `${API_URL}/utenti`;
 
   const body = { nome };
   if (password) body.password = password;
 
   try {
-    const res  = await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

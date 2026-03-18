@@ -71,7 +71,10 @@ function showConfirmModal(message, title = "Conferma") {
       resolve(true);
     });
     modal.addEventListener("click", (e) => {
-      if (e.target === modal) { modal.remove(); resolve(false); }
+      if (e.target === modal) {
+        modal.remove();
+        resolve(false);
+      }
     });
   });
 }

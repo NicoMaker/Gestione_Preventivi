@@ -6,7 +6,7 @@ async function loadModelli() {
   try {
     const res = await fetch(`${API_URL}/modelli`);
     allModelli = await res.json();
-    modelli    = allModelli;
+    modelli = allModelli;
     restoreModelliFilter();
   } catch (error) {
     console.error("Errore caricamento modelli:", error);
@@ -32,7 +32,9 @@ function renderModelli() {
     return;
   }
 
-  tbody.innerHTML = modelli.map((m) => `
+  tbody.innerHTML = modelli
+    .map(
+      (m) => `
     <tr>
       <td><strong>${m.nome}</strong></td>
       <td>${m.marca_nome || "-"}</td>
@@ -55,13 +57,18 @@ function renderModelli() {
         </button>
       </td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 // ---- Filtri ----
 
 function saveModelliFilter() {
-  localStorage.setItem("filter_modelli_search", document.getElementById("filterModelli")?.value || "");
+  localStorage.setItem(
+    "filter_modelli_search",
+    document.getElementById("filterModelli")?.value || "",
+  );
 }
 
 function restoreModelliFilter() {
@@ -72,9 +79,10 @@ function restoreModelliFilter() {
 }
 
 function applyModelliFilter(searchTerm) {
-  modelli = allModelli.filter((m) =>
-    m.nome.toLowerCase().includes(searchTerm) ||
-    (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm))
+  modelli = allModelli.filter(
+    (m) =>
+      m.nome.toLowerCase().includes(searchTerm) ||
+      (m.marca_nome && m.marca_nome.toLowerCase().includes(searchTerm)),
   );
   renderModelli();
 }
@@ -98,8 +106,9 @@ window.openModelloModal = async function (modello = null) {
   }
 
   if (modello) {
-    document.getElementById("modalModelloTitle").textContent = "Modifica Modello";
-    document.getElementById("modelloId").value   = modello.id;
+    document.getElementById("modalModelloTitle").textContent =
+      "Modifica Modello";
+    document.getElementById("modelloId").value = modello.id;
     document.getElementById("modelloNome").value = modello.nome;
 
     if (modello.marche_id && marcaSearchModello) {
@@ -124,11 +133,14 @@ function editModello(id) {
 }
 
 async function deleteModello(id) {
-  const conferma = await showConfirmModal("Sei sicuro di voler eliminare questo modello?", "Conferma Eliminazione");
+  const conferma = await showConfirmModal(
+    "Sei sicuro di voler eliminare questo modello?",
+    "Conferma Eliminazione",
+  );
   if (!conferma) return;
 
   try {
-    const res  = await fetch(`${API_URL}/modelli/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_URL}/modelli/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (res.ok) {
       showNotification("Modello eliminato con successo!", "success");
@@ -146,9 +158,9 @@ async function deleteModello(id) {
 document.getElementById("formModello").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const id       = document.getElementById("modelloId").value;
-  const nome     = document.getElementById("modelloNome").value.trim();
-  const marche_id= document.getElementById("modelloMarca").value;
+  const id = document.getElementById("modelloId").value;
+  const nome = document.getElementById("modelloNome").value.trim();
+  const marche_id = document.getElementById("modelloMarca").value;
 
   if (!marche_id || marche_id === "" || marche_id === "null") {
     showNotification("Seleziona una marca per il modello", "error");
@@ -156,10 +168,10 @@ document.getElementById("formModello").addEventListener("submit", async (e) => {
   }
 
   const method = id ? "PUT" : "POST";
-  const url    = id ? `${API_URL}/modelli/${id}` : `${API_URL}/modelli`;
+  const url = id ? `${API_URL}/modelli/${id}` : `${API_URL}/modelli`;
 
   try {
-    const res  = await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, marche_id }),
@@ -167,7 +179,10 @@ document.getElementById("formModello").addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(id ? "Modello aggiornato!" : "Modello creato!", "success");
+      showNotification(
+        id ? "Modello aggiornato!" : "Modello creato!",
+        "success",
+      );
       closeModelloModal();
       loadModelli();
     } else {

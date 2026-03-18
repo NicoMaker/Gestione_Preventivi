@@ -32,7 +32,9 @@ function groupOrdiniByCliente(list) {
 }
 
 function sortOrdiniByDateDesc(list) {
-  return [...list].sort((a, b) => new Date(b.data_movimento) - new Date(a.data_movimento));
+  return [...list].sort(
+    (a, b) => new Date(b.data_movimento) - new Date(a.data_movimento),
+  );
 }
 
 function generatePrintHeader(company) {
@@ -78,10 +80,12 @@ function generateClienteSection(cliente, ordiniCliente) {
           </tr>
         </thead>
         <tbody>
-          ${sorted.map((o, i) => `
+          ${sorted
+            .map(
+              (o, i) => `
             <tr style="border-bottom:1px solid #ecf0f1;${i % 2 === 0 ? "background:#fafafa;" : ""}">
               <td style="padding:10px;border:1px solid #ecf0f1;font-weight:bold;white-space:nowrap;">${formatDate(o.data_movimento)}</td>
-              <td style="padding:10px;border:1px solid #ecf0f1;">${o.marca_nome   || "-"}</td>
+              <td style="padding:10px;border:1px solid #ecf0f1;">${o.marca_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.modello_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;text-align:center;">
                 <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;${o.contratto_finito ? "background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;" : "background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}"}">
@@ -90,7 +94,9 @@ function generateClienteSection(cliente, ordiniCliente) {
               </td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.note || "-"}</td>
             </tr>
-          `).join("")}
+          `,
+            )
+            .join("")}
         </tbody>
       </table>
     </div>
@@ -98,18 +104,29 @@ function generateClienteSection(cliente, ordiniCliente) {
 }
 
 function generatePrintDocumentOrdiniPerCliente(list, companyWrapper) {
-  const company     = companyWrapper.company || companyWrapper;
-  const gruppi      = groupOrdiniByCliente(list);
+  const company = companyWrapper.company || companyWrapper;
+  const gruppi = groupOrdiniByCliente(list);
   const clientiUnici = Array.from(
-    new Set(list.map((o) => JSON.stringify({
-      id: o.cliente_id, nome: o.cliente_nome, num_tel: o.cliente_tel,
-      email: o.cliente_email, data_passaggio: o.cliente_data_passaggio,
-      flag_ricontatto: o.cliente_flag_ricontatto,
-    })))
-  ).map((s) => JSON.parse(s)).sort((a, b) => a.nome.localeCompare(b.nome, "it"));
+    new Set(
+      list.map((o) =>
+        JSON.stringify({
+          id: o.cliente_id,
+          nome: o.cliente_nome,
+          num_tel: o.cliente_tel,
+          email: o.cliente_email,
+          data_passaggio: o.cliente_data_passaggio,
+          flag_ricontatto: o.cliente_flag_ricontatto,
+        }),
+      ),
+    ),
+  )
+    .map((s) => JSON.parse(s))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
 
-  const header      = generatePrintHeader(company);
-  const bodyClienti = clientiUnici.map((c) => generateClienteSection(c, gruppi[c.id] || [])).join("");
+  const header = generatePrintHeader(company);
+  const bodyClienti = clientiUnici
+    .map((c) => generateClienteSection(c, gruppi[c.id] || []))
+    .join("");
 
   return `
     <!DOCTYPE html>
@@ -143,15 +160,22 @@ function generatePrintDocumentOrdiniPerCliente(list, companyWrapper) {
 async function printOrdiniDiretta() {
   try {
     if (!ordini || !ordini.length) {
-      showNotification("Nessun preventivo da stampare. Controlla i filtri applicati.", "warning");
+      showNotification(
+        "Nessun preventivo da stampare. Controlla i filtri applicati.",
+        "warning",
+      );
       return;
     }
 
     companyInfo = await loadCompanyInfoForPrint();
-    const htmlPrint = generatePrintDocumentOrdiniPerCliente(ordini, companyInfo);
+    const htmlPrint = generatePrintDocumentOrdiniPerCliente(
+      ordini,
+      companyInfo,
+    );
 
     const printFrame = document.createElement("iframe");
-    printFrame.style.cssText = "position:absolute;left:-9999px;width:0;height:0;border:0;";
+    printFrame.style.cssText =
+      "position:absolute;left:-9999px;width:0;height:0;border:0;";
     document.body.appendChild(printFrame);
 
     printFrame.contentDocument.open();
