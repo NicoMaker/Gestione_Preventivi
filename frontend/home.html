@@ -253,7 +253,23 @@
                   aria-hidden="true"
                   >&nbsp;</label
                 >
-                <button
+                <div class="filter-btns-row">
+                  <button
+                    class="btn btn-reset-filtri"
+                    title="Cancella filtro data"
+                    onclick="
+                      document.getElementById('filterDataPassaggio').value = '';
+                      localStorage.removeItem('filter_clienti_data');
+                      applyClientiFilters();
+                    "
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="1 4 1 10 7 10"/>
+                      <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+                    </svg>
+                    <span>Reset Data</span>
+                  </button>
+                  <button
                   class="btn btn-primary"
                   onclick="openClienteModal()"
                   title="Aggiungi un nuovo cliente"
@@ -269,6 +285,7 @@
                   </svg>
                   <span>Nuovo Cliente</span>
                 </button>
+                </div>
               </div>
             </div>
           </div>
@@ -380,6 +397,23 @@
                   >&nbsp;</label
                 >
                 <div class="filter-btns-row">
+                  <button
+                    class="btn btn-reset-filtri"
+                    title="Cancella filtri data"
+                    onclick="
+                      document.getElementById('filterOrdiniDataPreventivo').value = '';
+                      document.getElementById('filterOrdiniDataPassaggio').value = '';
+                      localStorage.removeItem('filter_ordini_data_preventivo');
+                      localStorage.removeItem('filter_ordini_data_passaggio');
+                      applyOrdiniFilter(document.getElementById('filterOrdini').value.toLowerCase(), '', '');
+                    "
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="1 4 1 10 7 10"/>
+                      <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+                    </svg>
+                    <span>Reset Date</span>
+                  </button>
                   <button
                     class="btn btn-primary"
                     onclick="openOrdineModal()"
