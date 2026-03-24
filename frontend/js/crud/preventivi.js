@@ -166,15 +166,11 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
     [allOrdini, ordini].forEach((arr) =>
       arr
         .filter((x) => x.cliente_id === clienteId)
-        .forEach((x) => {
-          x.cliente_flag_ricontatto = checked ? 1 : 0;
-        }),
+        .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; }),
     );
 
     showNotification(
-      checked
-        ? "📱 Cliente segnato come ricontattato"
-        : "⏳ Flag ricontatto rimosso",
+      checked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
       "success",
     );
     renderOrdini();
@@ -264,34 +260,44 @@ function saveOrdiniFilter() {
     "filter_ordini_data_preventivo",
     document.getElementById("filterOrdiniDataPreventivo")?.value || "",
   );
+  localStorage.setItem(
+    "filter_ordini_ricontattato",
+    document.getElementById("filterOrdiniRicontattato")?.value || "tutti",
+  );
+  localStorage.setItem(
+    "filter_ordini_contratto",
+    document.getElementById("filterOrdiniContratto")?.value || "tutti",
+  );
 }
 
 function restoreOrdiniFilter() {
   const savedSearch = localStorage.getItem("filter_ordini_search") || "";
-  const savedDataPassaggio =
-    localStorage.getItem("filter_ordini_data_passaggio") || "";
-  const savedDataPreventivo =
-    localStorage.getItem("filter_ordini_data_preventivo") || "";
+  const savedDataPassaggio = localStorage.getItem("filter_ordini_data_passaggio") || "";
+  const savedDataPreventivo = localStorage.getItem("filter_ordini_data_preventivo") || "";
+  const savedRicontattato = localStorage.getItem("filter_ordini_ricontattato") || "tutti";
+  const savedContratto = localStorage.getItem("filter_ordini_contratto") || "tutti";
 
   const si = document.getElementById("filterOrdini");
   const sp = document.getElementById("filterOrdiniDataPassaggio");
   const sd = document.getElementById("filterOrdiniDataPreventivo");
+  const sr = document.getElementById("filterOrdiniRicontattato");
+  const sc = document.getElementById("filterOrdiniContratto");
 
   if (si) si.value = savedSearch;
   if (sp) sp.value = savedDataPassaggio;
   if (sd) sd.value = savedDataPreventivo;
+  if (sr) sr.value = savedRicontattato;
+  if (sc) sc.value = savedContratto;
 
-  applyOrdiniFilter(
-    savedSearch.toLowerCase(),
-    savedDataPassaggio,
-    savedDataPreventivo,
-  );
+  applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio, savedDataPreventivo, savedRicontattato, savedContratto);
 }
 
 function applyOrdiniFilter(
   searchTerm = "",
   dataPassaggio = "",
   dataPreventivo = "",
+  ricontattoVal = "tutti",
+  contrattoVal = "tutti",
 ) {
   ordini = allOrdini.filter((o) => {
     const matchText =
@@ -305,47 +311,61 @@ function applyOrdiniFilter(
     const matchDataPassaggio =
       !dataPassaggio ||
       (o.cliente_data_passaggio && o.cliente_data_passaggio === dataPassaggio);
+
     const matchDataPreventivo =
       !dataPreventivo ||
       (o.data_movimento && o.data_movimento.startsWith(dataPreventivo));
 
-    return matchText && matchDataPassaggio && matchDataPreventivo;
+    const matchRicontattato =
+      ricontattoVal === "tutti" ||
+      (ricontattoVal === "si" && o.cliente_flag_ricontatto == 1) ||
+      (ricontattoVal === "no" && !o.cliente_flag_ricontatto);
+
+    const matchContratto =
+      contrattoVal === "tutti" ||
+      (contrattoVal === "si" && o.contratto_finito == 1) ||
+      (contrattoVal === "no" && !o.contratto_finito);
+
+    return matchText && matchDataPassaggio && matchDataPreventivo && matchRicontattato && matchContratto;
   });
   renderOrdini();
 }
 
 function getOrdiniFilterValues() {
   return {
-    searchTerm:
-      document.getElementById("filterOrdini")?.value.toLowerCase() || "",
-    dataPassaggio:
-      document.getElementById("filterOrdiniDataPassaggio")?.value || "",
-    dataPreventivo:
-      document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+    searchTerm: document.getElementById("filterOrdini")?.value.toLowerCase() || "",
+    dataPassaggio: document.getElementById("filterOrdiniDataPassaggio")?.value || "",
+    dataPreventivo: document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+    ricontattoVal: document.getElementById("filterOrdiniRicontattato")?.value || "tutti",
+    contrattoVal: document.getElementById("filterOrdiniContratto")?.value || "tutti",
   };
 }
 
 document.getElementById("filterOrdini")?.addEventListener("input", () => {
-  const { searchTerm, dataPassaggio, dataPreventivo } = getOrdiniFilterValues();
+  const v = getOrdiniFilterValues();
   saveOrdiniFilter();
-  applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
+  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
 });
-document
-  .getElementById("filterOrdiniDataPassaggio")
-  ?.addEventListener("change", () => {
-    const { searchTerm, dataPassaggio, dataPreventivo } =
-      getOrdiniFilterValues();
-    saveOrdiniFilter();
-    applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
-  });
-document
-  .getElementById("filterOrdiniDataPreventivo")
-  ?.addEventListener("change", () => {
-    const { searchTerm, dataPassaggio, dataPreventivo } =
-      getOrdiniFilterValues();
-    saveOrdiniFilter();
-    applyOrdiniFilter(searchTerm, dataPassaggio, dataPreventivo);
-  });
+document.getElementById("filterOrdiniDataPassaggio")?.addEventListener("change", () => {
+  const v = getOrdiniFilterValues();
+  saveOrdiniFilter();
+  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
+});
+document.getElementById("filterOrdiniDataPreventivo")?.addEventListener("change", () => {
+  const v = getOrdiniFilterValues();
+  saveOrdiniFilter();
+  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
+});
+document.getElementById("filterOrdiniRicontattato")?.addEventListener("change", () => {
+  const v = getOrdiniFilterValues();
+  saveOrdiniFilter();
+  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
+});
+document.getElementById("filterOrdiniContratto")?.addEventListener("change", () => {
+  const v = getOrdiniFilterValues();
+  saveOrdiniFilter();
+  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
+});
 
 // ---- Modal ----
 
@@ -366,12 +386,9 @@ window.openOrdineModal = async function (ordine = null) {
   }
 
   if (ordine) {
-    document.getElementById("modalOrdineTitle").textContent =
-      "Modifica Preventivo";
+    document.getElementById("modalOrdineTitle").textContent = "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
-    document.getElementById("ordineData").value = formatDateForInput(
-      ordine.data_movimento,
-    );
+    document.getElementById("ordineData").value = formatDateForInput(ordine.data_movimento);
     document.getElementById("ordineNote").value = ordine.note || "";
     setContrattoModalState(ordine.contratto_finito == 1);
 
@@ -388,12 +405,9 @@ window.openOrdineModal = async function (ordine = null) {
       }
     }
   } else {
-    document.getElementById("modalOrdineTitle").textContent =
-      "Nuovo Preventivo";
+    document.getElementById("modalOrdineTitle").textContent = "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
-    document.getElementById("ordineData").value = new Date()
-      .toISOString()
-      .split("T")[0];
+    document.getElementById("ordineData").value = new Date().toISOString().split("T")[0];
   }
 
   modal.classList.add("active");
@@ -460,15 +474,10 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   if (modello_id && Array.isArray(allModelli) && allModelli.length > 0) {
     const modello = allModelli.find((m) => String(m.id) === String(modello_id));
     if (
-      modello &&
-      marca_id &&
-      modello.marche_id &&
+      modello && marca_id && modello.marche_id &&
       String(modello.marche_id) !== String(marca_id)
     ) {
-      showNotification(
-        "Il modello selezionato non appartiene alla marca indicata.",
-        "error",
-      );
+      showNotification("Il modello selezionato non appartiene alla marca indicata.", "error");
       return;
     }
   }
@@ -494,10 +503,7 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(
-        id ? "Preventivo aggiornato!" : "Preventivo creato!",
-        "success",
-      );
+      showNotification(id ? "Preventivo aggiornato!" : "Preventivo creato!", "success");
       closeOrdineModal();
       loadOrdini();
     } else {

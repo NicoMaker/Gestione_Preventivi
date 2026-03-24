@@ -146,17 +146,24 @@ function saveClientiFilters() {
     "filter_clienti_data",
     document.getElementById("filterDataPassaggio")?.value || "",
   );
+  localStorage.setItem(
+    "filter_clienti_ricontattato",
+    document.getElementById("filterClientiRicontattato")?.value || "tutti",
+  );
 }
 
 function restoreClientiFilters() {
   const savedSearch = localStorage.getItem("filter_clienti_search") || "";
   const savedData = localStorage.getItem("filter_clienti_data") || "";
+  const savedRicontattato = localStorage.getItem("filter_clienti_ricontattato") || "tutti";
 
   const searchInput = document.getElementById("filterClienti");
   const dataInput = document.getElementById("filterDataPassaggio");
+  const ricontattoSelect = document.getElementById("filterClientiRicontattato");
 
   if (searchInput) searchInput.value = savedSearch;
   if (dataInput) dataInput.value = savedData;
+  if (ricontattoSelect) ricontattoSelect.value = savedRicontattato;
 
   applyClientiFilters();
 }
@@ -166,6 +173,8 @@ function applyClientiFilters() {
     document.getElementById("filterClienti")?.value.toLowerCase() || "";
   const dataPassaggio =
     document.getElementById("filterDataPassaggio")?.value || "";
+  const ricontattoVal =
+    document.getElementById("filterClientiRicontattato")?.value || "tutti";
 
   clienti = allClienti.filter((c) => {
     const matchesText =
@@ -179,7 +188,12 @@ function applyClientiFilters() {
       !dataPassaggio ||
       (c.data_passaggio && c.data_passaggio.startsWith(dataPassaggio));
 
-    return matchesText && matchesData;
+    const matchesRicontattato =
+      ricontattoVal === "tutti" ||
+      (ricontattoVal === "si" && c.flag_ricontatto == 1) ||
+      (ricontattoVal === "no" && !c.flag_ricontatto);
+
+    return matchesText && matchesData && matchesRicontattato;
   });
 
   renderClienti();
@@ -189,12 +203,27 @@ document.getElementById("filterClienti")?.addEventListener("input", () => {
   saveClientiFilters();
   applyClientiFilters();
 });
-document
-  .getElementById("filterDataPassaggio")
-  ?.addEventListener("change", () => {
-    saveClientiFilters();
-    applyClientiFilters();
-  });
+document.getElementById("filterDataPassaggio")?.addEventListener("change", () => {
+  saveClientiFilters();
+  applyClientiFilters();
+});
+document.getElementById("filterClientiRicontattato")?.addEventListener("change", () => {
+  saveClientiFilters();
+  applyClientiFilters();
+});
+
+// ---- Reset Filtri ----
+
+function resetClientiFilters() {
+  // Cancella SOLO le date e i select, NON la ricerca testo
+  document.getElementById("filterDataPassaggio").value = "";
+  document.getElementById("filterClientiRicontattato").value = "tutti";
+  
+  localStorage.removeItem("filter_clienti_data");
+  localStorage.removeItem("filter_clienti_ricontattato");
+  
+  applyClientiFilters();
+}
 
 // ---- Modal ----
 
@@ -203,14 +232,12 @@ function openClienteModal(cliente = null) {
   document.getElementById("formCliente").reset();
 
   if (cliente) {
-    document.getElementById("modalClienteTitle").textContent =
-      "Modifica Cliente";
+    document.getElementById("modalClienteTitle").textContent = "Modifica Cliente";
     document.getElementById("clienteId").value = cliente.id;
     document.getElementById("clienteNome").value = cliente.nome;
     document.getElementById("clienteTel").value = cliente.num_tel || "";
     document.getElementById("clienteEmail").value = cliente.email || "";
-    document.getElementById("clienteDataPassaggio").value =
-      cliente.data_passaggio || "";
+    document.getElementById("clienteDataPassaggio").value = cliente.data_passaggio || "";
     setRicontattoModalState(cliente.flag_ricontatto == 1);
   } else {
     document.getElementById("modalClienteTitle").textContent = "Nuovo Cliente";
@@ -269,9 +296,7 @@ async function toggleRicontatto(clienteId, isChecked) {
         if (c) c.flag_ricontatto = isChecked ? 1 : 0;
       });
       showNotification(
-        isChecked
-          ? "📱 Cliente segnato come ricontattato"
-          : "⏳ Flag ricontatto rimosso",
+        isChecked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
         "success",
       );
       renderClienti();
@@ -305,11 +330,7 @@ function toggleDateEdit(clienteId, currentDate, event) {
     dateInput.setAttribute("data-original-value", dateInput.value);
     setTimeout(() => {
       dateInput.focus();
-      try {
-        dateInput.showPicker();
-      } catch (e) {
-        /* non supportato */
-      }
+      try { dateInput.showPicker(); } catch (e) { /* non supportato */ }
     }, 50);
   }
 }
@@ -433,21 +454,12 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nome,
-        num_tel,
-        email,
-        data_passaggio,
-        flag_ricontatto,
-      }),
+      body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto }),
     });
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(
-        id ? "Cliente aggiornato!" : "Cliente creato!",
-        "success",
-      );
+      showNotification(id ? "Cliente aggiornato!" : "Cliente creato!", "success");
       closeClienteModal();
       loadClienti();
     } else {
