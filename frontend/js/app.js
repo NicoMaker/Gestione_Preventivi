@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---- Navigazione sezioni ----
-  document.querySelectorAll(".nav-item").forEach((item) => {
+  document.querySelectorAll(".nav-item[data-section]").forEach((item) => {
     item.addEventListener("click", (e) => {
       e.preventDefault();
       const section = item.dataset.section;
