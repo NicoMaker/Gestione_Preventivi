@@ -146,6 +146,48 @@ async function getPublicIP() {
   }
 }
 
+// ========================================
+// 💾 DOWNLOAD DATABASE
+// Endpoint: GET /api/admin/download-db
+// ========================================
+const fs = require("fs");
+app.get("/api/admin/download-db", (req, res) => {
+  const dbPath = path.join(__dirname, "db", "Preventivi.db");
+
+  if (!fs.existsSync(dbPath)) {
+    console.error("❌ File database non trovato:", dbPath);
+    return res.status(404).json({
+      error: "File database non trovato",
+      path: dbPath,
+    });
+  }
+
+  const now = new Date();
+  const timestamp = now
+    .toISOString()
+    .replace(/[:.]/g, "-")
+    .replace("T", "_")
+    .slice(0, 19);
+  const downloadFilename = `preventivi_backup_${timestamp}.db`;
+
+  console.log(`📥 Download DB richiesto - File: ${downloadFilename}`);
+
+  res.setHeader("Content-Type", "application/octet-stream");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${downloadFilename}"`,
+  );
+
+  const fileStream = fs.createReadStream(dbPath);
+  fileStream.on("error", (err) => {
+    console.error("❌ Errore lettura DB:", err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Errore durante la lettura del database" });
+    }
+  });
+  fileStream.pipe(res);
+});
+
 // SERVE INDEX.HTML PER TUTTE LE ROUTE NON-API (SPA)
 app.get("*", (req, res) => {
   if (req.path.startsWith("/api")) {

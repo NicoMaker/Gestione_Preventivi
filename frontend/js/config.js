@@ -3,7 +3,25 @@
 
 const API_URL = "/api";
 
-// Array dati principali (visibili = filtrati)
+// ==================== DOWNLOAD DATABASE ====================
+function downloadDatabase(event) {
+  event.preventDefault();
+
+  const downloadUrl = "/api/admin/download-db";
+
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  if (typeof showNotification === "function") {
+    showNotification("📥 Download database avviato...", "info");
+  }
+}
+
+// ==================== STATO GLOBALE ====================
 let clienti = [];
 let ordini = [];
 let marche = [];
