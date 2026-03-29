@@ -1,4 +1,5 @@
 // backend/server.js
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -14,6 +15,7 @@ const utentiRoutes = require("./routes/utenti");
 const marcheRoutes = require("./routes/marche");
 const modelliRoutes = require("./routes/modelli");
 const downloadRoutes = require("./routes/download");
+const avvioHtmlRoutes = require("./routes/avvioHtml");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -63,19 +65,17 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/admin", downloadRoutes);
-
 // INIZIALIZZA DATABASE
 initDatabase();
 
 // API ROUTES
+app.use("/api/admin", downloadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/clienti", clientiRoutes);
 app.use("/api/ordini", ordiniRoutes);
 app.use("/api/utenti", utentiRoutes);
 app.use("/api/marche", marcheRoutes);
 app.use("/api/modelli", modelliRoutes);
-app.use("/api/admin", require("./routes/download"));
 
 // HEALTH CHECK
 app.get("/api/health", async (req, res) => {
@@ -150,14 +150,13 @@ async function getPublicIP() {
   }
 }
 
-
-// SERVE INDEX.HTML PER TUTTE LE ROUTE NON-API (SPA)
-app.get("*", (req, res) => {
+// AVVIO PAGINA INIZIALE (SPA FALLBACK) — deve stare DOPO tutte le API
+app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
     return res.status(404).json({ error: "Endpoint API non trovato" });
   }
-  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
-});
+  next();
+}, avvioHtmlRoutes);
 
 // GESTIONE ERRORI
 app.use((err, req, res, next) => {
