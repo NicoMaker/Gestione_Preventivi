@@ -5246,3 +5246,7 @@ textarea{
     font-size: 13px;
   }
 }
+
+.textarea{
+    border: 2px solid #1e293b !important; /* nero di default */
+}
