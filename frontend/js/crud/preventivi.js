@@ -53,7 +53,7 @@ function renderOrdini() {
         <td style="min-width:180px;max-width:280px;">
           <strong>${o.cliente_nome}</strong>
           ${noteCliente
-            ? `<div title="${noteCliente.replace(/"/g, '&quot;')}" style="margin-top:5px;font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #6366f1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;cursor:help;min-width:180px;">📝 ${noteCliente}</div>`
+            ? `<div title="${noteCliente.replace(/"/g, '&quot;')}" style="margin-top:5px;font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #6366f1;display:block;white-space:pre-wrap;line-height:1.45;min-width:180px;">📝 ${noteCliente}</div>`
             : ""}
         </td>
         <td>
@@ -123,11 +123,11 @@ function renderOrdini() {
         <td>${o.marca_nome || "-"}</td>
         <td>${o.modello_nome || "-"}</td>
         <td style="min-width:200px;max-width:300px;">
-          <span style="font-size:13px;color:#334155;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;cursor:help;" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note || "-"}</span>
+          <span style="font-size:13px;color:#334155;display:block;white-space:pre-wrap;line-height:1.5;cursor:help;" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note || "-"}</span>
         </td>
         <td style="min-width:220px;max-width:320px;">
           ${noteCliente
-            ? `<span title="${noteCliente.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;cursor:help;">${noteCliente}</span>`
+            ? `<span title="${noteCliente.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${noteCliente}</span>`
             : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
         </td>
         <td class="text-right">
