@@ -139,78 +139,86 @@
         </div>
 
         <!-- ==================== Sezione CLIENTI ==================== -->
-        <section id="section-clienti" class="content-section active">
-          <div class="section-header">
-            <div>
-              <h1>Gestione Clienti</h1>
-              <p>Visualizza e gestisci i clienti</p>
-            </div>
-            <div class="filter-controls">
-              <div class="filter-date-wrapper">
-                <label class="filter-date-label filter-label-spacer" aria-hidden="true">&nbsp;</label>
-                <input type="text" id="filterClienti" class="filter-input" placeholder="Cerca cliente, tel, email, note..." title="Cerca per nome, telefono, email, note" />
-              </div>
-              <div class="filter-date-wrapper">
-                <label class="filter-date-label" for="filterDataPassaggio">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  Data ricontatto
-                </label>
-                <input type="date" id="filterDataPassaggio" class="filter-input" title="Filtra per data passaggio / ricontatto" />
-              </div>
-              <div class="filter-date-wrapper">
-                <label class="filter-date-label" for="filterClientiRicontattato">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  Ricontattato
-                </label>
-                <select id="filterClientiRicontattato" class="filter-select" title="Filtra per stato ricontatto">
-                  <option value="tutti">📋 Tutti</option>
-                  <option value="si">📱 Ricontattato</option>
-                  <option value="no">⏳ Da ricontattare</option>
-                </select>
-              </div>
-              <div class="filter-date-wrapper">
-                <label class="filter-date-label filter-label-spacer" aria-hidden="true">&nbsp;</label>
-                <div class="filter-btns-row">
-                  <button class="btn btn-reset-filtri" title="Cancella tutti i filtri" onclick="
-                    document.getElementById('filterDataPassaggio').value = '';
-                    document.getElementById('filterClientiRicontattato').value = 'tutti';
-                    localStorage.removeItem('filter_clienti_data');
-                    localStorage.removeItem('filter_clienti_ricontattato');
-                    applyClientiFilters();
-                  ">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-                    <span>Reset Data</span>
-                  </button>
-                  <button class="btn btn-primary" onclick="openClienteModal()" title="Aggiungi un nuovo cliente">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span>Nuovo Cliente</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Telefono</th>
-                    <th>Email</th>
-                    <th>Data Passaggio/Ricontatto</th>
-                    <th>Ricontattato</th>
-                    <th>Note Cliente</th>
-                    <th class="text-center">N° Preventivi</th>
-                    <th class="text-right">Azioni</th>
-                  </tr>
-                </thead>
-                <tbody id="clientiTableBody">
-                  <tr><td colspan="8" class="text-center"><span>Caricamento...</span></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+<!-- ==================== Sezione CLIENTI ==================== -->
+<section id="section-clienti" class="content-section active">
+  <div class="section-header">
+    <div>
+      <h1>Gestione Clienti</h1>
+      <p>Visualizza e gestisci i clienti</p>
+    </div>
+    <div class="filter-controls">
+      <div class="filter-date-wrapper">
+        <label class="filter-date-label filter-label-spacer" aria-hidden="true">&nbsp;</label>
+        <input type="text" id="filterClienti" class="filter-input" placeholder="Cerca cliente, tel, email, note..." title="Cerca per nome, telefono, email, note" />
+      </div>
+      <div class="filter-date-wrapper">
+        <label class="filter-date-label" for="filterDataPassaggio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Data ricontatto
+        </label>
+        <input type="date" id="filterDataPassaggio" class="filter-input" title="Filtra per data passaggio / ricontatto" />
+      </div>
+      <div class="filter-date-wrapper">
+        <label class="filter-date-label" for="filterClientiRicontattato">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Ricontattato
+        </label>
+        <select id="filterClientiRicontattato" class="filter-select" title="Filtra per stato ricontatto">
+          <option value="tutti">📋 Tutti</option>
+          <option value="si">📱 Ricontattato</option>
+          <option value="no">⏳ Da ricontattare</option>
+        </select>
+      </div>
+      <div class="filter-date-wrapper">
+        <label class="filter-date-label filter-label-spacer" aria-hidden="true">&nbsp;</label>
+        <div class="filter-btns-row">
+          <button class="btn btn-reset-filtri" title="Cancella tutti i filtri" onclick="
+            document.getElementById('filterDataPassaggio').value = '';
+            document.getElementById('filterClientiRicontattato').value = 'tutti';
+            localStorage.removeItem('filter_clienti_data');
+            localStorage.removeItem('filter_clienti_ricontattato');
+            applyClientiFilters();
+          ">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+            <span>Reset Data</span>
+          </button>
+          <button class="btn btn-primary" onclick="openClienteModal()" title="Aggiungi un nuovo cliente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Nuovo Cliente</span>
+          </button>
+          <button class="btn btn-secondary" onclick="printClientiDiretta()" title="Stampa elenco clienti con filtri attivi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            <span>Stampa Clienti</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Contatti</th>
+            <th>Data Passaggio/Ricontatto</th>
+            <th>Stato Ricontatto</th>
+            <th>Note Cliente</th>
+            <th class="text-center">N° Preventivi</th>
+            <th class="text-right">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="clientiTableBody">
+          <tr><td colspan="7" class="text-center"><span>Caricamento...</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
         <!-- ==================== Sezione PREVENTIVI ==================== -->
         <section id="section-ordini" class="content-section">
@@ -666,5 +674,6 @@
     <script src="js/crud/utenti.js"></script>
     <script src="js/crud/stampa.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/crud/stampa-clienti.js"></script>
   </body>
 </html>
