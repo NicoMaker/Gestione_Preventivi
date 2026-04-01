@@ -111,9 +111,9 @@ function renderClienti() {
           ${c.flag_ricontatto ? "📱 Ricontattato" : "⏳ Da ricontattare"}
         </button>
       </td>
-      <td>
+      <td style="min-width:220px;max-width:320px;">
         ${c.note
-          ? `<span style="font-size:14px;color:#334155;font-weight:500;display:block;white-space:normal;line-height:1.5;word-break:break-word;">${c.note}</span>`
+          ? `<span title="${c.note.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;cursor:help;">${c.note}</span>`
           : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
       </td>
       <td style="text-align:center;">
