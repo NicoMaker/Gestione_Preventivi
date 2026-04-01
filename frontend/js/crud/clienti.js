@@ -113,7 +113,7 @@ function renderClienti() {
       </td>
       <td>
         ${c.note
-          ? `<span style="font-size:13px;color:#475569;max-width:180px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.note.replace(/"/g, '&quot;')}">${c.note}</span>`
+          ? `<span style="font-size:14px;color:#334155;font-weight:500;display:block;white-space:normal;line-height:1.5;word-break:break-word;">${c.note}</span>`
           : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
       </td>
       <td style="text-align:center;">

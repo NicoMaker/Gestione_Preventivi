@@ -53,7 +53,7 @@ function renderOrdini() {
         <td>
           <strong>${o.cliente_nome}</strong>
           ${noteCliente
-            ? `<div style="margin-top:4px;font-size:11px;color:#64748b;background:#f1f5f9;padding:3px 7px;border-radius:6px;border-left:3px solid #6366f1;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${noteCliente.replace(/"/g, '&quot;')}">📝 ${noteCliente}</div>`
+            ? `<div style="margin-top:4px;font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #6366f1;white-space:normal;word-break:break-word;line-height:1.45;">📝 ${noteCliente}</div>`
             : ""}
         </td>
         <td>
@@ -125,7 +125,7 @@ function renderOrdini() {
         <td>${o.note || "-"}</td>
         <td>
           ${noteCliente
-            ? `<span style="font-size:13px;color:#475569;max-width:160px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${noteCliente.replace(/"/g, '&quot;')}">${noteCliente}</span>`
+            ? `<span style="font-size:14px;color:#334155;font-weight:500;display:block;white-space:normal;line-height:1.5;word-break:break-word;">${noteCliente}</span>`
             : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
         </td>
         <td class="text-right">
