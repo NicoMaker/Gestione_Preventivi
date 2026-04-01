@@ -13,11 +13,12 @@ router.get("/", (req, res) => {
       c.email,
       c.data_passaggio,
       c.flag_ricontatto,
+      c.note,
       c.created_at,
       COUNT(o.id) as ordini_count
     FROM clienti c
     LEFT JOIN ordini o ON c.id = o.cliente_id
-    GROUP BY c.id, c.nome, c.num_tel, c.email, c.data_passaggio, c.flag_ricontatto, c.created_at
+    GROUP BY c.id, c.nome, c.num_tel, c.email, c.data_passaggio, c.flag_ricontatto, c.note, c.created_at
     ORDER BY c.nome COLLATE NOCASE, c.nome
   `;
 
@@ -64,20 +65,21 @@ router.get("/:id", (req, res) => {
 
 // POST - Crea nuovo cliente
 router.post("/", (req, res) => {
-  const { nome, num_tel, email, data_passaggio, flag_ricontatto } = req.body;
+  const { nome, num_tel, email, data_passaggio, flag_ricontatto, note } = req.body;
 
   if (!nome || !nome.trim()) {
     return res.status(400).json({ error: "Nome cliente obbligatorio" });
   }
 
   db.run(
-    "INSERT INTO clienti (nome, num_tel, email, data_passaggio, flag_ricontatto) VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO clienti (nome, num_tel, email, data_passaggio, flag_ricontatto, note) VALUES (?, ?, ?, ?, ?, ?)",
     [
       nome.trim(),
       num_tel || null,
       email || null,
       data_passaggio || null,
       flag_ricontatto ? 1 : 0,
+      note || null,
     ],
     function (err) {
       if (err) {
@@ -103,6 +105,7 @@ router.post("/", (req, res) => {
         email: email || null,
         data_passaggio: data_passaggio || null,
         flag_ricontatto: flag_ricontatto ? 1 : 0,
+        note: note || null,
         ordini_count: 0,
       });
     },
@@ -112,7 +115,7 @@ router.post("/", (req, res) => {
 // PUT - Aggiorna cliente
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { nome, num_tel, email, data_passaggio, flag_ricontatto } = req.body;
+  const { nome, num_tel, email, data_passaggio, flag_ricontatto, note } = req.body;
 
   // Recupera prima il cliente esistente
   db.get("SELECT * FROM clienti WHERE id = ?", [id], (err, cliente) => {
@@ -145,15 +148,17 @@ router.put("/:id", (req, res) => {
           ? 1
           : 0
         : cliente.flag_ricontatto;
+    const updatedNote = note !== undefined ? note || null : cliente.note;
 
     db.run(
-      "UPDATE clienti SET nome = ?, num_tel = ?, email = ?, data_passaggio = ?, flag_ricontatto = ? WHERE id = ?",
+      "UPDATE clienti SET nome = ?, num_tel = ?, email = ?, data_passaggio = ?, flag_ricontatto = ?, note = ? WHERE id = ?",
       [
         updatedNome,
         updatedNumTel,
         updatedEmail,
         updatedDataPassaggio,
         updatedFlagRicontatto,
+        updatedNote,
         id,
       ],
       function (err) {

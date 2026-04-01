@@ -22,7 +22,7 @@ function renderOrdini() {
   const tbody = document.getElementById("ordiniTableBody");
 
   if (ordini.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -45,11 +45,17 @@ function renderOrdini() {
       const email = o.cliente_email || "No Mail";
       const dataPassaggio = o.cliente_data_passaggio || "";
       const flagRicontatto = o.cliente_flag_ricontatto || 0;
+      const noteCliente = o.cliente_note || "";
 
       return `
       <tr>
         <td>${formatDate(o.data_movimento)}</td>
-        <td><strong>${o.cliente_nome}</strong></td>
+        <td>
+          <strong>${o.cliente_nome}</strong>
+          ${noteCliente
+            ? `<div style="margin-top:4px;font-size:11px;color:#64748b;background:#f1f5f9;padding:3px 7px;border-radius:6px;border-left:3px solid #6366f1;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${noteCliente.replace(/"/g, '&quot;')}">📝 ${noteCliente}</div>`
+            : ""}
+        </td>
         <td>
           ${
             telefono !== "No Cell"
@@ -117,6 +123,11 @@ function renderOrdini() {
         <td>${o.marca_nome || "-"}</td>
         <td>${o.modello_nome || "-"}</td>
         <td>${o.note || "-"}</td>
+        <td>
+          ${noteCliente
+            ? `<span style="font-size:13px;color:#475569;max-width:160px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${noteCliente.replace(/"/g, '&quot;')}">${noteCliente}</span>`
+            : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
+        </td>
         <td class="text-right">
           <button class="btn-icon" onclick="editOrdine(${o.id})" title="Modifica preventivo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -306,7 +317,9 @@ function applyOrdiniFilter(
       (o.cliente_tel && o.cliente_tel.toLowerCase().includes(searchTerm)) ||
       (o.cliente_email && o.cliente_email.toLowerCase().includes(searchTerm)) ||
       (o.marca_nome && o.marca_nome.toLowerCase().includes(searchTerm)) ||
-      (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm));
+      (o.modello_nome && o.modello_nome.toLowerCase().includes(searchTerm)) ||
+      (o.note && o.note.toLowerCase().includes(searchTerm)) ||
+      (o.cliente_note && o.cliente_note.toLowerCase().includes(searchTerm));
 
     const matchDataPassaggio =
       !dataPassaggio ||

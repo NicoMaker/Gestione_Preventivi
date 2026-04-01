@@ -7,7 +7,6 @@ let companyInfoPrintCache = null;
 async function loadCompanyInfoForPrint() {
   try {
     if (companyInfoPrintCache) return companyInfoPrintCache;
-    // Riusa il dato già caricato da company-loader.js se disponibile
     if (typeof companyInfo !== "undefined" && companyInfo) {
       companyInfoPrintCache = companyInfo;
       return companyInfoPrintCache;
@@ -55,6 +54,10 @@ function generatePrintHeader(company) {
 
 function generateClienteSection(cliente, ordiniCliente) {
   const sorted = sortOrdiniByDateDesc(ordiniCliente);
+
+  // Prendi le note cliente dal primo ordine (sono le stesse per tutti)
+  const noteCliente = sorted.length > 0 ? (sorted[0].cliente_note || "") : (cliente.note || "");
+
   return `
     <div class="cliente-section" style="margin-bottom:30px;page-break-inside:avoid;">
       <div style="background:#f5f5f5;padding:15px;border-radius:6px;margin-bottom:15px;border-left:5px solid #2980b9;">
@@ -67,6 +70,9 @@ function generateClienteSection(cliente, ordiniCliente) {
             ${cliente.flag_ricontatto == 1 ? "📱 Ricontattato" : "⏳ Da ricontattare"}
           </span>
         </p>
+        <p style="margin:6px 0 0 0;font-size:12px;color:#555;">
+          <strong>📝 Note cliente:</strong> ${noteCliente ? noteCliente : "No"}
+        </p>
         <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">Totale preventivi: <strong>${sorted.length}</strong></p>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
@@ -76,7 +82,7 @@ function generateClienteSection(cliente, ordiniCliente) {
             <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Marca</th>
             <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Modello</th>
             <th style="padding:10px;text-align:center;border:1px solid #bdc3c7;">Contratto</th>
-            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Note</th>
+            <th style="padding:10px;text-align:left;border:1px solid #bdc3c7;">Note preventivo</th>
           </tr>
         </thead>
         <tbody>
@@ -88,7 +94,7 @@ function generateClienteSection(cliente, ordiniCliente) {
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.marca_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;">${o.modello_nome || "-"}</td>
               <td style="padding:10px;border:1px solid #ecf0f1;text-align:center;">
-                <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;${o.contratto_finito ? "background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;" : "background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}"}">
+                <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;${o.contratto_finito ? "background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;" : "background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;"}">
                   ${o.contratto_finito ? "✅ concluso" : "🔴 Non concluso"}
                 </span>
               </td>
@@ -116,6 +122,7 @@ function generatePrintDocumentOrdiniPerCliente(list, companyWrapper) {
           email: o.cliente_email,
           data_passaggio: o.cliente_data_passaggio,
           flag_ricontatto: o.cliente_flag_ricontatto,
+          note: o.cliente_note || "",
         }),
       ),
     ),

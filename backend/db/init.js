@@ -101,6 +101,7 @@ function initDatabase() {
         email TEXT,
         data_passaggio DATE,
         flag_ricontatto INTEGER DEFAULT 0,
+        note TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       (err) => {
@@ -124,6 +125,22 @@ function initDatabase() {
             (err) => {
               if (err && !err.message.includes("duplicate column")) {
                 console.error("Errore aggiunta flag_ricontatto:", err.message);
+              }
+            },
+          );
+
+          // ⚠️ MIGRAZIONE SICURA: aggiunge note se il DB esiste già
+          db.run(
+            "ALTER TABLE clienti ADD COLUMN note TEXT",
+            (err) => {
+              if (err) {
+                if (err.message.includes("duplicate column")) {
+                  console.log("Colonna note clienti già presente");
+                } else {
+                  console.error("Errore aggiunta note clienti:", err.message);
+                }
+              } else {
+                console.log("Colonna note aggiunta a clienti con successo");
               }
             },
           );
@@ -171,13 +188,11 @@ function initDatabase() {
           console.log("Tabella ordini OK");
 
           // ⚠️ MIGRAZIONE SICURA: aggiunge contratto_finito se il DB esiste già
-          // Non perde nessun dato esistente - i record già presenti avranno valore 0 (No)
           db.run(
             "ALTER TABLE ordini ADD COLUMN contratto_finito INTEGER DEFAULT 0",
             (err) => {
               if (err) {
                 if (err.message.includes("duplicate column")) {
-                  // Colonna già presente, tutto ok
                   console.log("Colonna contratto_finito già presente");
                 } else {
                   console.error(

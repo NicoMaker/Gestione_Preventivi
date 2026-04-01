@@ -22,7 +22,7 @@ function renderClienti() {
   const tbody = document.getElementById("clientiTableBody");
 
   if (clienti.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -111,6 +111,11 @@ function renderClienti() {
           ${c.flag_ricontatto ? "📱 Ricontattato" : "⏳ Da ricontattare"}
         </button>
       </td>
+      <td>
+        ${c.note
+          ? `<span style="font-size:13px;color:#475569;max-width:180px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.note.replace(/"/g, '&quot;')}">${c.note}</span>`
+          : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
+      </td>
       <td style="text-align:center;">
         <span class="prodotti-badge ${c.ordini_count > 0 ? "has-products" : "empty"}">
           ${c.ordini_count || 0}
@@ -182,7 +187,8 @@ function applyClientiFilters() {
       c.nome.toLowerCase().includes(searchTerm) ||
       (c.num_tel && c.num_tel.toLowerCase().includes(searchTerm)) ||
       (c.email && c.email.toLowerCase().includes(searchTerm)) ||
-      (c.data_passaggio && c.data_passaggio.includes(searchTerm));
+      (c.data_passaggio && c.data_passaggio.includes(searchTerm)) ||
+      (c.note && c.note.toLowerCase().includes(searchTerm));
 
     const matchesData =
       !dataPassaggio ||
@@ -215,13 +221,10 @@ document.getElementById("filterClientiRicontattato")?.addEventListener("change",
 // ---- Reset Filtri ----
 
 function resetClientiFilters() {
-  // Cancella SOLO le date e i select, NON la ricerca testo
   document.getElementById("filterDataPassaggio").value = "";
   document.getElementById("filterClientiRicontattato").value = "tutti";
-  
   localStorage.removeItem("filter_clienti_data");
   localStorage.removeItem("filter_clienti_ricontattato");
-  
   applyClientiFilters();
 }
 
@@ -238,11 +241,13 @@ function openClienteModal(cliente = null) {
     document.getElementById("clienteTel").value = cliente.num_tel || "";
     document.getElementById("clienteEmail").value = cliente.email || "";
     document.getElementById("clienteDataPassaggio").value = cliente.data_passaggio || "";
+    document.getElementById("clienteNote").value = cliente.note || "";
     setRicontattoModalState(cliente.flag_ricontatto == 1);
   } else {
     document.getElementById("modalClienteTitle").textContent = "Nuovo Cliente";
     document.getElementById("clienteId").value = "";
     document.getElementById("clienteDataPassaggio").value = "";
+    document.getElementById("clienteNote").value = "";
     setRicontattoModalState(false);
   }
 
@@ -441,6 +446,7 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
   const data_passaggio = document.getElementById("clienteDataPassaggio").value;
   const flag_ricontatto =
     document.getElementById("clienteFlagRicontatto").value === "1";
+  const note = document.getElementById("clienteNote").value.trim();
 
   if (!num_tel && !email) {
     showNotification("Inserire almeno un contatto: cellulare o email", "error");
@@ -454,7 +460,7 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto }),
+      body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto, note }),
     });
     const data = await res.json();
 
