@@ -58,6 +58,11 @@ function generatePrintHeaderClienti(company) {
       <img src="${logoPath}" alt="Logo Azienda" style="max-width:200px;height:auto;margin-bottom:15px;display:block;margin-left:auto;margin-right:auto;" />
       <h1 style="margin:10px 0 5px 0;font-size:26px;font-weight:bold;color:#2c3e50;">${company.name || "Elenco Clienti"}</h1>
       <p style="margin:3px 0;font-size:13px;color:#555;">${company.address || ""}, ${company.cap || ""} ${company.city || ""} (${company.province || ""})</p>
+      <p style="margin:3px 0;font-size:12px;color:#555;">${company.country || "Italia"}</p>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #ddd;">
+        <p style="margin:3px 0;font-size:11px;color:#666;"><strong>P.IVA:</strong> ${company.piva || ""}</p>
+        <p style="margin:3px 0;font-size:11px;color:#666;"><strong>Tel:</strong> ${company.phone || ""} | <strong>Email:</strong> ${company.email || ""}</p>
+      </div>
     </div>
   `;
 }
