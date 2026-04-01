@@ -130,20 +130,17 @@ function initDatabase() {
           );
 
           // ⚠️ MIGRAZIONE SICURA: aggiunge note se il DB esiste già
-          db.run(
-            "ALTER TABLE clienti ADD COLUMN note TEXT",
-            (err) => {
-              if (err) {
-                if (err.message.includes("duplicate column")) {
-                  console.log("Colonna note clienti già presente");
-                } else {
-                  console.error("Errore aggiunta note clienti:", err.message);
-                }
+          db.run("ALTER TABLE clienti ADD COLUMN note TEXT", (err) => {
+            if (err) {
+              if (err.message.includes("duplicate column")) {
+                console.log("Colonna note clienti già presente");
               } else {
-                console.log("Colonna note aggiunta a clienti con successo");
+                console.error("Errore aggiunta note clienti:", err.message);
               }
-            },
-          );
+            } else {
+              console.log("Colonna note aggiunta a clienti con successo");
+            }
+          });
         }
       },
     );

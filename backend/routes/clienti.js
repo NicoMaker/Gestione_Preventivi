@@ -65,7 +65,8 @@ router.get("/:id", (req, res) => {
 
 // POST - Crea nuovo cliente
 router.post("/", (req, res) => {
-  const { nome, num_tel, email, data_passaggio, flag_ricontatto, note } = req.body;
+  const { nome, num_tel, email, data_passaggio, flag_ricontatto, note } =
+    req.body;
 
   if (!nome || !nome.trim()) {
     return res.status(400).json({ error: "Nome cliente obbligatorio" });
@@ -115,7 +116,8 @@ router.post("/", (req, res) => {
 // PUT - Aggiorna cliente
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { nome, num_tel, email, data_passaggio, flag_ricontatto, note } = req.body;
+  const { nome, num_tel, email, data_passaggio, flag_ricontatto, note } =
+    req.body;
 
   // Recupera prima il cliente esistente
   db.get("SELECT * FROM clienti WHERE id = ?", [id], (err, cliente) => {

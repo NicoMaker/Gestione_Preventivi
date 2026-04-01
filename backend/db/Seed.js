@@ -473,9 +473,7 @@ async function seedClienti() {
   console.log(
     "  Casi coperti: [📱 solo cellulare] [📧 solo email] [📱📧 entrambi]",
   );
-  console.log(
-    "  Note: generate casualmente (~65% dei clienti avrà una nota)",
-  );
+  console.log("  Note: generate casualmente (~65% dei clienti avrà una nota)");
 
   const clienti = [
     // Solo CELLULARE
@@ -723,7 +721,9 @@ async function seedClienti() {
         countEntrambi++;
       }
 
-      const notaLabel = nota ? `📝 "${nota.substring(0, 40)}..."` : "🔇 nessuna nota";
+      const notaLabel = nota
+        ? `📝 "${nota.substring(0, 40)}..."`
+        : "🔇 nessuna nota";
       console.log(`  ✓ [${caso}] ${cliente.nome} (ID: ${id}) | ${notaLabel}`);
 
       if (nota) countConNote++;
