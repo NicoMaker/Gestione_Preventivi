@@ -54,7 +54,52 @@ function getQuery(sql, params = []) {
   });
 }
 
-// Funzione per inizializzare le tabelle
+// ==================== GENERATORE NOTE CLIENTI ====================
+// Pool di note realistiche per un concessionario auto
+const NOTE_POOL = [
+  "Cliente molto preciso, preferisce comunicazioni via email. Valutare offerta personalizzata.",
+  "Conosce bene il settore, ha già confrontato prezzi online. Trattare con attenzione.",
+  "Interessato principalmente a modelli ibridi o elettrici per ridurre i costi carburante.",
+  "Ha una permuta da valutare: auto attuale in buone condizioni.",
+  "Viene da un'esperienza negativa con altro concessionario. Richiede massima trasparenza.",
+  "Cliente fedele da anni, ha già acquistato 2 auto in precedenza. Trattamento preferenziale.",
+  "Cerca auto aziendale, richiede fattura intestata alla ditta.",
+  "Budget limitato, molto sensibile al prezzo. Valutare promozioni e finanziamenti.",
+  "Preferisce appuntamenti nel tardo pomeriggio, difficile da raggiungere di mattina.",
+  "Ha il figlio neopatentato, cerca auto sicura e economica da gestire.",
+  "Molto interessato agli optional: tetto apribile, sedili in pelle, sistema audio premium.",
+  "Cliente straniero residente in Italia, richiede supporto per pratiche burocratiche.",
+  "Lavora come agente di commercio, percorre molti km annui. Valutare garanzia estesa.",
+  "Richiede consegna entro fine mese per motivi fiscali (deduzione anno in corso).",
+  "Preferisce colori scuri (nero, grigio antracite, blu). Non gradisce varianti chiare.",
+  "Ha già finanziamento pre-approvato da banca esterna, non interessato a offerte finanziarie.",
+  "Cliente anziano, ha bisogno di assistenza per pratiche digitali e firma contratti.",
+  "Moglie molto coinvolta nella decisione, preferisce appuntamenti con entrambi i coniugi.",
+  "Lavora in ospedale, necessita auto affidabile. Apprezza molto l'assistenza stradale.",
+  "Si è iscritto alla newsletter, segue le promozioni stagionali.",
+  "Contattato tramite passaparola da cliente soddisfatto (Luca Ferrari).",
+  "Ha richiesto preventivo anche ad altri concessionari. Da monitorare.",
+  "Chiesto espressamente modello con cambio automatico per problemi al ginocchio.",
+  "Risiede in zona montagna, ha chiesto info su trazione integrale e pneumatici invernali.",
+  "Interessato a noleggio lungo termine (NLT) come alternativa all'acquisto.",
+  "Ha bambini piccoli, priorità a spazio interno, sistemi ISOFIX e telecamera posteriore.",
+  "Preferisce versioni diesel per lunghi percorsi autostradali frequenti.",
+  "Ex cliente, era passato alla concorrenza. Tornato dopo esperienza deludente altrove.",
+  "Chiesto preventivo come regalo di laurea per figlio/figlia.",
+  "Molto attento ai consumi dichiarati, ha fatto domande tecniche sul ciclo WLTP.",
+];
+
+/**
+ * Restituisce una nota casuale o null.
+ * Circa il 65% dei clienti avrà una nota, il 35% no.
+ */
+function getNotaRandom() {
+  if (Math.random() > 0.65) return null;
+  const idx = Math.floor(Math.random() * NOTE_POOL.length);
+  return NOTE_POOL[idx];
+}
+
+// ==================== FUNZIONE INIZIALIZZAZIONE TABELLE ====================
 async function initTables() {
   console.log("\n[INIT] Creazione tabelle...");
 
@@ -78,7 +123,7 @@ async function initTables() {
         )`);
         console.log("  ✓ Tabella marche OK");
 
-        // Tabella clienti
+        // Tabella clienti (con colonna note)
         await runQuery(`CREATE TABLE IF NOT EXISTS clienti (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           nome TEXT NOT NULL UNIQUE,
@@ -86,6 +131,7 @@ async function initTables() {
           email TEXT,
           data_passaggio DATE,
           flag_ricontatto INTEGER DEFAULT 0,
+          note TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
         console.log("  ✓ Tabella clienti OK");
@@ -120,7 +166,6 @@ async function initTables() {
         );
 
         // ⚠️ MIGRAZIONE SICURA: aggiunge contratto_finito se il DB esiste già
-        // Non perde nessun dato esistente - i record già presenti avranno valore 0
         db.run(
           "ALTER TABLE ordini ADD COLUMN contratto_finito INTEGER DEFAULT 0",
           (err) => {
@@ -140,6 +185,19 @@ async function initTables() {
             }
           },
         );
+
+        // ⚠️ MIGRAZIONE SICURA: aggiunge note a clienti se il DB esiste già
+        db.run("ALTER TABLE clienti ADD COLUMN note TEXT", (err) => {
+          if (err) {
+            if (err.message.includes("duplicate column")) {
+              console.log("  ✓ Colonna note clienti già presente");
+            } else {
+              console.error("  ✗ Errore migrazione note clienti:", err.message);
+            }
+          } else {
+            console.log("  ✓ Colonna note aggiunta a clienti");
+          }
+        });
 
         console.log("✓ Tutte le tabelle sono pronte");
         resolve();
@@ -415,6 +473,9 @@ async function seedClienti() {
   console.log(
     "  Casi coperti: [📱 solo cellulare] [📧 solo email] [📱📧 entrambi]",
   );
+  console.log(
+    "  Note: generate casualmente (~65% dei clienti avrà una nota)",
+  );
 
   const clienti = [
     // Solo CELLULARE
@@ -628,21 +689,27 @@ async function seedClienti() {
   const clientiIds = [];
   let countSoloCel = 0,
     countSoloMail = 0,
-    countEntrambi = 0;
+    countEntrambi = 0,
+    countConNote = 0,
+    countSenzaNote = 0;
 
   for (const cliente of clienti) {
+    // Genera nota casuale: ~65% dei clienti avrà una nota
+    const nota = getNotaRandom();
+
     try {
       const id = await runQuery(
-        "INSERT INTO clienti (nome, num_tel, email, data_passaggio, flag_ricontatto) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO clienti (nome, num_tel, email, data_passaggio, flag_ricontatto, note) VALUES (?, ?, ?, ?, ?, ?)",
         [
           cliente.nome,
           cliente.num_tel,
           cliente.email,
           cliente.data_passaggio,
           cliente.flag_ricontatto,
+          nota,
         ],
       );
-      clientiIds.push({ id, ...cliente });
+      clientiIds.push({ id, ...cliente, note: nota });
 
       let caso;
       if (cliente.num_tel && !cliente.email) {
@@ -656,7 +723,11 @@ async function seedClienti() {
         countEntrambi++;
       }
 
-      console.log(`  ✓ [${caso}] ${cliente.nome} (ID: ${id})`);
+      const notaLabel = nota ? `📝 "${nota.substring(0, 40)}..."` : "🔇 nessuna nota";
+      console.log(`  ✓ [${caso}] ${cliente.nome} (ID: ${id}) | ${notaLabel}`);
+
+      if (nota) countConNote++;
+      else countSenzaNote++;
     } catch (err) {
       if (err.message.includes("UNIQUE")) {
         console.log(`  → Cliente ${cliente.nome} già esistente, skip`);
@@ -670,6 +741,8 @@ async function seedClienti() {
   console.log(`  📱 Solo cellulare: ${countSoloCel}`);
   console.log(`  📧 Solo email:     ${countSoloMail}`);
   console.log(`  📱📧 Entrambi:     ${countEntrambi}`);
+  console.log(`  📝 Con nota:       ${countConNote}`);
+  console.log(`  🔇 Senza nota:     ${countSenzaNote}`);
   return clientiIds;
 }
 
@@ -682,148 +755,146 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
   );
 
   // contratto_finito: 1 = finito ✅, 0 = non finito 🔴
-  // ⚠️ Tutti i preventivi DEVONO avere marca_id E modello_id valorizzati
   const ordini = [
     {
       cliente_id: clientiIds[0]?.id,
-      modello_id: modelliIds[0]?.id, // Golf VIII 1.5 TSI Life
+      modello_id: modelliIds[0]?.id,
       marca_id: marcheIds["Volkswagen"],
       note: "Cliente interessato a finanziamento. Valutazione permuta auto usata.",
       data_movimento: "2024-01-16",
-      contratto_finito: 1, // ✅ Contratto chiuso
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[1]?.id,
-      modello_id: modelliIds[8]?.id, // Classe A 180d Automatic
+      modello_id: modelliIds[8]?.id,
       marca_id: marcheIds["Mercedes-Benz"],
       note: "Preventivo con optional: tetto apribile, sedili riscaldati, telecamera posteriore.",
       data_movimento: "2024-02-21",
-      contratto_finito: 0, // 🔴 In trattativa
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[2]?.id,
-      modello_id: modelliIds[16]?.id, // Yaris Hybrid Active
+      modello_id: modelliIds[16]?.id,
       marca_id: marcheIds["Toyota"],
       note: "Cliente cerca auto ibrida per risparmio carburante. Budget max 30.000 EUR.",
       data_movimento: "2024-03-11",
-      contratto_finito: 1, // ✅ Venduto
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[3]?.id,
-      modello_id: modelliIds[5]?.id, // Serie 1 118i M Sport — prima scelta
+      modello_id: modelliIds[5]?.id,
       marca_id: marcheIds["BMW"],
       note: "Cliente indeciso tra Serie 1 e Serie 3. Preventivo Serie 1 come prima proposta.",
       data_movimento: "2024-01-26",
-      contratto_finito: 0, // 🔴 Cliente indeciso
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[4]?.id,
-      modello_id: modelliIds[14]?.id, // Q3 35 TFSI S line
+      modello_id: modelliIds[14]?.id,
       marca_id: marcheIds["Audi"],
       note: "Interessato a gamma SUV Audi. Test drive da programmare su Q3.",
       data_movimento: "2024-02-10",
-      contratto_finito: 0, // 🔴 Da seguire
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[5]?.id,
-      modello_id: modelliIds[24]?.id, // 500 Hybrid Dolcevita — auto compatta benzina
+      modello_id: modelliIds[24]?.id,
       marca_id: marcheIds["Fiat"],
       note: "Cliente cerca auto compatta benzina. Budget 15.000 EUR. Prima auto.",
       data_movimento: "2024-02-06",
-      contratto_finito: 0, // 🔴 In attesa
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[6]?.id,
-      modello_id: modelliIds[43]?.id, // Model 3 Long Range — elettrica aziendale
+      modello_id: modelliIds[43]?.id,
       marca_id: marcheIds["Tesla"],
       note: "Richiesta preventivo auto elettrica aziendale. Ordine confermato.",
       data_movimento: "2024-03-05",
-      contratto_finito: 1, // ✅ Ordine aziendale confermato
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[7]?.id,
-      modello_id: modelliIds[24]?.id, // 500 Hybrid Dolcevita
+      modello_id: modelliIds[24]?.id,
       marca_id: marcheIds["Fiat"],
       note: 'Cliente ha chiesto: colore rosso, cerchi in lega 16", sensori parcheggio, navigatore integrato, garanzia estesa 3 anni.',
       data_movimento: "2024-03-02",
-      contratto_finito: 1, // ✅ Consegnata
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[8]?.id,
-      modello_id: modelliIds[32]?.id, // Clio 1.0 TCe Intens
+      modello_id: modelliIds[32]?.id,
       marca_id: marcheIds["Renault"],
       note: "URGENTE: Cliente necessita auto entro fine mese per lavoro. Disponibile subito?",
       data_movimento: "2024-12-15",
-      contratto_finito: 0, // 🔴 Urgente, da chiudere
+      contratto_finito: 0,
     },
-    // Più preventivi per lo stesso cliente (clientiIds[9])
     {
       cliente_id: clientiIds[9]?.id,
-      modello_id: modelliIds[4]?.id, // Serie 3 320d xDrive
+      modello_id: modelliIds[4]?.id,
       marca_id: marcheIds["BMW"],
       note: "Prima proposta: BMW Serie 3 - Prezzo listino 48.000 EUR",
       data_movimento: "2024-12-20",
-      contratto_finito: 0, // 🔴 Scartata
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[9]?.id,
-      modello_id: modelliIds[12]?.id, // A3 Sportback 35 TDI S tronic
+      modello_id: modelliIds[12]?.id,
       marca_id: marcheIds["Audi"],
       note: "Seconda proposta: Audi A3 - Cliente preferisce questo modello",
       data_movimento: "2024-12-21",
-      contratto_finito: 0, // 🔴 Alternativa
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[9]?.id,
-      modello_id: modelliIds[9]?.id, // Classe C 220d 4Matic
+      modello_id: modelliIds[9]?.id,
       marca_id: marcheIds["Mercedes-Benz"],
       note: "Terza proposta: Mercedes Classe C - Accettata! In attesa conferma finanziamento",
       data_movimento: "2024-12-22",
-      contratto_finito: 1, // ✅ Scelta finale confermata
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[10]?.id,
-      modello_id: modelliIds[43]?.id, // Model 3 Long Range
+      modello_id: modelliIds[43]?.id,
       marca_id: marcheIds["Tesla"],
       note: "Cliente vuole passare all'elettrico. Interessato a wallbox domestica.",
       data_movimento: "2024-12-28",
-      contratto_finito: 0, // 🔴 In valutazione
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[11]?.id,
-      modello_id: modelliIds[28]?.id, // 2008 1.5 BlueHDi Allure
+      modello_id: modelliIds[28]?.id,
       marca_id: marcheIds["Peugeot"],
       note: "Cliente cerca SUV compatto. Budget flessibile.",
       data_movimento: "2024-11-12",
-      contratto_finito: 1, // ✅ Acquistato
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[12]?.id,
-      modello_id: modelliIds[20]?.id, // Fiesta 1.0 EcoBoost Titanium
+      modello_id: modelliIds[20]?.id,
       marca_id: marcheIds["Ford"],
       note: "Permuta Ford Focus 2018 - Valutazione 12.000 EUR",
       data_movimento: "2024-10-16",
-      contratto_finito: 1, // ✅ Permuta + acquisto conclusi
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[13]?.id,
-      modello_id: modelliIds[36]?.id, // Corsa 1.2 Elegance
+      modello_id: modelliIds[36]?.id,
       marca_id: marcheIds["Opel"],
       note: "Auto per neopatentato. Assicurazione inclusa nel preventivo.",
       data_movimento: "2024-09-06",
-      contratto_finito: 0, // 🔴 In attesa approvazione genitori
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[14]?.id,
-      modello_id: modelliIds[50]?.id, // Juke 1.0 DIG-T Tekna
+      modello_id: modelliIds[50]?.id,
       marca_id: marcheIds["Nissan"],
       note: "Cliente aziendale - Richiesto preventivo flotta 5 auto",
       data_movimento: "2024-08-25",
-      contratto_finito: 1, // ✅ Flotta consegnata
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[15]?.id,
-      modello_id: modelliIds[62]?.id, // i30 1.6 CRDi Business
+      modello_id: modelliIds[62]?.id,
       marca_id: marcheIds["Hyundai"],
       note: null,
       data_movimento: "2024-08-21",
@@ -831,31 +902,31 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[16]?.id,
-      modello_id: modelliIds[66]?.id, // Sportage 1.6 CRDi Business
+      modello_id: modelliIds[66]?.id,
       marca_id: marcheIds["Kia"],
       note: null,
       data_movimento: "2024-07-13",
-      contratto_finito: 1, // ✅
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[17]?.id,
-      modello_id: modelliIds[69]?.id, // Octavia 2.0 TDI Style
+      modello_id: modelliIds[69]?.id,
       marca_id: marcheIds["Skoda"],
       note: "Preventivo valido fino al 30/06/2024",
       data_movimento: "2024-06-19",
-      contratto_finito: 0, // 🔴 Scaduto, da aggiornare
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[18]?.id,
-      modello_id: modelliIds[72]?.id, // Ibiza 1.0 TSI FR
+      modello_id: modelliIds[72]?.id,
       marca_id: marcheIds["Seat"],
       note: "Sconto promozionale -15% applicato",
       data_movimento: "2024-05-23",
-      contratto_finito: 1, // ✅ Chiuso con sconto
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[19]?.id,
-      modello_id: modelliIds[47]?.id, // XC60 D4 AWD Momentum
+      modello_id: modelliIds[47]?.id,
       marca_id: marcheIds["Volvo"],
       note: "Cliente richiede preventivo aggiornato con nuovi incentivi statali",
       data_movimento: "2024-05-01",
@@ -863,23 +934,23 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[20]?.id,
-      modello_id: modelliIds[1]?.id, // Polo 1.0 TSI Comfortline
+      modello_id: modelliIds[1]?.id,
       marca_id: marcheIds["Volkswagen"],
       note: "Ordine confermato e consegnato. Cliente soddisfatto.",
       data_movimento: "2024-01-10",
-      contratto_finito: 1, // ✅
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[21]?.id,
-      modello_id: modelliIds[25]?.id, // Panda 1.0 Hybrid City Cross
+      modello_id: modelliIds[25]?.id,
       marca_id: marcheIds["Fiat"],
       note: "Preventivo annullato - Cliente ha acquistato altrove",
       data_movimento: "2024-02-14",
-      contratto_finito: 0, // 🔴 Perso
+      contratto_finito: 0,
     },
     {
       cliente_id: clientiIds[22]?.id,
-      modello_id: modelliIds[17]?.id, // Corolla Hybrid Executive
+      modello_id: modelliIds[17]?.id,
       marca_id: marcheIds["Toyota"],
       note: "Richiesta informazioni su gamma ibrida Toyota. Test drive prenotato.",
       data_movimento: "2024-03-20",
@@ -887,15 +958,15 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     },
     {
       cliente_id: clientiIds[23]?.id,
-      modello_id: modelliIds[11]?.id, // EQA 250 Electric
+      modello_id: modelliIds[11]?.id,
       marca_id: marcheIds["Mercedes-Benz"],
       note: "Auto elettrica con autonomia 400km. Incentivi disponibili: 6.000 EUR",
       data_movimento: "2024-11-05",
-      contratto_finito: 1, // ✅ Incentivo ottenuto, venduta
+      contratto_finito: 1,
     },
     {
       cliente_id: clientiIds[24]?.id,
-      modello_id: modelliIds[35]?.id, // ZOE Electric R135
+      modello_id: modelliIds[35]?.id,
       marca_id: marcheIds["Renault"],
       note: "Cliente chiede info su punti ricarica in città e costi energia",
       data_movimento: "2024-10-18",
@@ -909,7 +980,6 @@ async function seedOrdini(clientiIds, modelliIds, marcheIds) {
     countSaltati = 0;
 
   for (const ordine of ordini) {
-    // ⚠️ Validazione: cliente_id, marca_id e modello_id sono obbligatori
     if (!ordine.cliente_id) {
       console.warn(`  ⚠️  Preventivo saltato: cliente_id mancante`);
       countSaltati++;
@@ -1009,6 +1079,12 @@ async function seedDatabase() {
     console.log(
       `      📱📧 Entrambi:     ${clientiIds.filter((c) => c.num_tel && c.email).length}`,
     );
+    console.log(
+      `      📝 Con nota:       ${clientiIds.filter((c) => c.note).length}`,
+    );
+    console.log(
+      `      🔇 Senza nota:     ${clientiIds.filter((c) => !c.note).length}`,
+    );
     console.log(`  • Preventivi: ${ordiniIds.length}`);
     console.log("\n✓ Database pronto all'uso!");
     console.log("⚠️  Tutti i modelli hanno una marca associata (NOT NULL)");
@@ -1017,6 +1093,9 @@ async function seedDatabase() {
     );
     console.log(
       "✅  Il campo contratto_finito è presente in tutti i preventivi",
+    );
+    console.log(
+      "📝  Le note dei clienti sono generate casualmente (~65% con nota)",
     );
     console.log("=".repeat(60) + "\n");
   } catch (err) {
