@@ -34,16 +34,16 @@ function renderClienti() {
             <p style="font-size:16px;font-weight:600;margin-bottom:8px;">Nessun cliente presente</p>
             <p style="font-size:14px;">Clicca su <strong>Nuovo Cliente</strong> per iniziare</p>
           </div>
-        </td></tr>`;
+         </td></tr>`;
     return;
   }
 
   tbody.innerHTML = clienti
     .map(
       (c) => `
-    <tr>
-      <td><strong>${c.nome}</strong></td>
-      <td>
+     <tr>
+       <td><strong>${c.nome}</strong></td>
+       <td>
         ${
           c.num_tel
             ? `
@@ -70,8 +70,8 @@ function renderClienti() {
         `
             : "No Cell"
         }
-      </td>
-      <td>
+       </td>
+       <td>
         ${
           c.email
             ? `<a href="mailto:${c.email}" class="btn-contact btn-email" title="Email a ${c.email}">
@@ -83,7 +83,7 @@ function renderClienti() {
              </a>`
             : "No Mail"
         }
-      </td>
+       </td>
       <td style="position: relative;">
         <div class="editable-date-cell" onclick="toggleDateEdit(${c.id}, '${c.data_passaggio || ""}', event)">
           <span class="date-display">${c.data_passaggio ? formatDate(c.data_passaggio) : "No"}</span>
@@ -103,24 +103,24 @@ function renderClienti() {
           onkeydown="handleDateKeydown(event, ${c.id})"
           style="display:none;width:100%;padding:4px;border:2px solid #6366f1;border-radius:4px;"
         />
-      </td>
+       </td>
       <td style="text-align:center;">
         <button class="badge-ricontatto ${c.flag_ricontatto ? "si" : "no"}"
           onclick="toggleRicontatto(${c.id}, ${!c.flag_ricontatto})"
           title="Cambia stato ricontatto">
           ${c.flag_ricontatto ? "📱 Ricontattato" : "⏳ Da ricontattare"}
         </button>
-      </td>
+       </td>
       <td style="min-width:220px;max-width:320px;">
         ${c.note
           ? `<span title="${c.note.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${c.note}</span>`
-          : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
-      </td>
+          : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`}
+       </td>
       <td style="text-align:center;">
         <span class="prodotti-badge ${c.ordini_count > 0 ? "has-products" : "empty"}">
           ${c.ordini_count || 0}
         </span>
-      </td>
+       </td>
       <td class="text-right">
         <button class="btn-icon" onclick="editCliente(${c.id})" title="Modifica cliente">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -133,8 +133,8 @@ function renderClienti() {
             <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
           </svg>
         </button>
-      </td>
-    </tr>
+       </td>
+     </tr>
   `,
     )
     .join("");

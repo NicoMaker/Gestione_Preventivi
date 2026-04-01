@@ -32,10 +32,10 @@ function renderOrdini() {
               <line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10 9 9 9 8 9"/>
             </svg>
-            <p style="font-size:16px;font-weight:600;margin-bottom:8px;">Nessun preventivo presente</p>
+            <p style="font-size:16px;font-weight:600;margin-bottom:8px;"> Nessun preventivo presente</p>
             <p style="font-size:14px;">Clicca su <strong>Nuovo Preventivo</strong> per iniziare</p>
           </div>
-        </td></tr>`;
+         </td></tr>`;
     return;
   }
 
@@ -48,13 +48,13 @@ function renderOrdini() {
       const noteCliente = o.cliente_note || "";
 
       return `
-      <tr>
+       <tr>
         <td>${formatDate(o.data_movimento)}</td>
         <td style="min-width:180px;max-width:280px;">
           <strong>${o.cliente_nome}</strong>
           ${noteCliente
             ? `<div title="${noteCliente.replace(/"/g, '&quot;')}" style="margin-top:5px;font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #6366f1;display:block;white-space:pre-wrap;line-height:1.45;min-width:180px;">📝 ${noteCliente}</div>`
-            : ""}
+            : `<div style="margin-top:5px;font-size:12px;color:#94a3b8;font-style:italic;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #94a3b8;display:block;">Nessuna nota</div>`}
         </td>
         <td>
           ${
@@ -119,17 +119,19 @@ function renderOrdini() {
               ${o.contratto_finito ? "✅ concluso" : "🔴 Non concluso"}
             </button>
           </div>
-        </td>
+         </td>
         <td>${o.marca_nome || "-"}</td>
         <td>${o.modello_nome || "-"}</td>
         <td style="min-width:200px;max-width:300px;">
-          <span style="font-size:13px;color:#334155;display:block;white-space:pre-wrap;line-height:1.5;cursor:help;" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note || "-"}</span>
-        </td>
+          ${o.note 
+            ? `<span style="font-size:13px;color:#334155;display:block;white-space:pre-wrap;line-height:1.5;cursor:help;" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note}</span>` 
+            : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`}
+         </td>
         <td style="min-width:220px;max-width:320px;">
           ${noteCliente
             ? `<span title="${noteCliente.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${noteCliente}</span>`
-            : `<span style="font-size:13px;color:#94a3b8;">-</span>`}
-        </td>
+            : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`}
+         </td>
         <td class="text-right">
           <button class="btn-icon" onclick="editOrdine(${o.id})" title="Modifica preventivo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -142,8 +144,8 @@ function renderOrdini() {
               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
             </svg>
           </button>
-        </td>
-      </tr>
+         </td>
+       </tr>
     `;
     })
     .join("");
