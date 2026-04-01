@@ -52,9 +52,6 @@ function renderOrdini() {
         <td>${formatDate(o.data_movimento)}</td>
         <td style="min-width:180px;max-width:280px;">
           <strong>${o.cliente_nome}</strong>
-          ${noteCliente
-            ? `<div title="${noteCliente.replace(/"/g, '&quot;')}" style="margin-top:5px;font-size:12px;color:#64748b;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #6366f1;display:block;white-space:pre-wrap;line-height:1.45;min-width:180px;">📝 ${noteCliente}</div>`
-            : `<div style="margin-top:5px;font-size:12px;color:#94a3b8;font-style:italic;background:#f1f5f9;padding:4px 8px;border-radius:6px;border-left:3px solid #94a3b8;display:block;">Nessuna nota</div>`}
         </td>
         <td>
           ${
