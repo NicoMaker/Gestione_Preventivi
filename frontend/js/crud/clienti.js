@@ -42,7 +42,7 @@ function renderClienti() {
     .map(
       (c) => `
      <tr>
-       <td><strong>${c.nome}</strong></td>
+       <td style="min-width:180px;max-width:280px;white-space:nowrap;"><strong>${c.nome}</strong></td>
        <td>
         ${
           c.num_tel
@@ -84,26 +84,15 @@ function renderClienti() {
             : "No Mail"
         }
        </td>
-      <td style="position: relative;">
-        <div class="editable-date-cell" onclick="toggleDateEdit(${c.id}, '${c.data_passaggio || ""}', event)">
-          <span class="date-display">${c.data_passaggio ? formatDate(c.data_passaggio) : "No"}</span>
-          <svg class="edit-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            style="width:14px;height:14px;margin-left:6px;opacity:0.5;">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-        </div>
+      <td>
         <input
           type="date"
           class="inline-date-input"
-          id="dateInput_${c.id}"
           value="${c.data_passaggio || ""}"
-          data-original-value="${c.data_passaggio || ""}"
-          onblur="saveAndHideDateInput(${c.id})"
-          onkeydown="handleDateKeydown(event, ${c.id})"
-          style="display:none;width:100%;padding:4px;border:2px solid #6366f1;border-radius:4px;"
+          onchange="updateDataPassaggio(${c.id}, this.value)"
+          title="Modifica data passaggio"
         />
-       </td>
+      </td>
       <td style="text-align:center;">
         <button class="badge-ricontatto ${c.flag_ricontatto ? "si" : "no"}"
           onclick="toggleRicontatto(${c.id}, ${!c.flag_ricontatto})"
@@ -315,64 +304,7 @@ async function toggleRicontatto(clienteId, isChecked) {
   }
 }
 
-// ---- Editing inline data passaggio ----
-
-function toggleDateEdit(clienteId, currentDate, event) {
-  event.stopPropagation();
-
-  document.querySelectorAll(".inline-date-input").forEach((input) => {
-    input.style.display = "none";
-    const cell = input.closest("td")?.querySelector(".editable-date-cell");
-    if (cell) cell.style.display = "flex";
-  });
-
-  const dateInput = document.getElementById(`dateInput_${clienteId}`);
-  const dateCell = dateInput?.previousElementSibling;
-
-  if (dateInput && dateCell) {
-    dateCell.style.display = "none";
-    dateInput.style.display = "block";
-    dateInput.setAttribute("data-original-value", dateInput.value);
-    setTimeout(() => {
-      dateInput.focus();
-      try { dateInput.showPicker(); } catch (e) { /* non supportato */ }
-    }, 50);
-  }
-}
-
-function handleDateKeydown(event, clienteId) {
-  if (event.key === "Escape") {
-    const dateInput = document.getElementById(`dateInput_${clienteId}`);
-    if (dateInput) {
-      dateInput.value = dateInput.getAttribute("data-original-value") || "";
-      cancelDateEdit(clienteId);
-    }
-  } else if (event.key === "Enter") {
-    event.preventDefault();
-    document.getElementById(`dateInput_${clienteId}`)?.blur();
-  }
-}
-
-function cancelDateEdit(clienteId) {
-  const dateInput = document.getElementById(`dateInput_${clienteId}`);
-  const dateCell = dateInput?.previousElementSibling;
-  if (dateInput && dateCell) {
-    dateInput.style.display = "none";
-    dateCell.style.display = "flex";
-  }
-}
-
-function saveAndHideDateInput(clienteId) {
-  const dateInput = document.getElementById(`dateInput_${clienteId}`);
-  const originalValue = dateInput?.getAttribute("data-original-value") || "";
-  const newValue = dateInput?.value || "";
-
-  if (newValue !== originalValue) {
-    updateDataPassaggio(clienteId, newValue);
-  } else {
-    cancelDateEdit(clienteId);
-  }
-}
+// ---- Aggiornamento inline data passaggio (stile preventivi) ----
 
 async function updateDataPassaggio(clienteId, newDate) {
   try {
@@ -388,28 +320,17 @@ async function updateDataPassaggio(clienteId, newDate) {
         const c = arr.find((x) => x.id === clienteId);
         if (c) c.data_passaggio = newDate || null;
       });
-
-      const dateInput = document.getElementById(`dateInput_${clienteId}`);
-      const dateCell = dateInput?.previousElementSibling;
-      if (dateCell) {
-        const span = dateCell.querySelector(".date-display");
-        if (span) span.textContent = newDate ? formatDate(newDate) : "-";
-      }
-
-      cancelDateEdit(clienteId);
       showNotification(
         newDate ? "Data passaggio aggiornata" : "Data passaggio rimossa",
         "success",
       );
     } else {
       showNotification(data.error || "Errore durante l'aggiornamento", "error");
-      cancelDateEdit(clienteId);
-      renderClienti();
+      await loadClienti();
     }
   } catch {
     showNotification("Errore di connessione", "error");
-    cancelDateEdit(clienteId);
-    renderClienti();
+    await loadClienti();
   }
 }
 
