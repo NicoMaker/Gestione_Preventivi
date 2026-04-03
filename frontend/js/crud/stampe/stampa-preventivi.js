@@ -65,15 +65,13 @@ function generateClienteSection(cliente, ordiniCliente) {
         <p style="margin:4px 0;font-size:12px;color:#555;"><strong>📱 Cell:</strong> ${cliente.num_tel ? formatPhoneNumber(cliente.num_tel) : "No"}</p>
         <p style="margin:4px 0;font-size:12px;color:#555;"><strong>✉️ Email:</strong> ${cliente.email || "No"}</p>
         <p style="margin:4px 0;font-size:12px;color:#555;"><strong>📅 Data Passaggio/Ricontatto:</strong> ${cliente.data_passaggio ? formatDate(cliente.data_passaggio) : "No"}</p>
-        <p style="margin:4px 0;">
-          <span style="display:inline-block;padding:3px 12px;border-radius:99px;font-size:11px;font-weight:700;${cliente.flag_ricontatto == 1 ? "background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;" : "background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;"}">
-            ${cliente.flag_ricontatto == 1 ? "📱 Ricontattato" : "⏳ Da ricontattare"}
+        <p style="margin:4px 0;font-size:12px;color:#555;"><strong>🔖 Stato cliente:</strong>
+          <span style="display:inline-block;padding:3px 12px;border-radius:99px;font-size:11px;font-weight:700;margin-left:4px;${cliente.flag_ricontatto == 1 ? "background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;" : "background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;"}">
+            ${cliente.flag_ricontatto == 1 ? "✅ Ricontattato" : "⏳ Da ricontattare"}
           </span>
         </p>
-        <p style="margin:6px 0 0 0;font-size:12px;color:#555;">
-          <strong>📝 Note cliente:</strong> ${noteCliente ? noteCliente : "No"}
-        </p>
-        <p style="margin:8px 0 0 0;font-size:11px;color:#777;font-style:italic;">Totale preventivi: <strong>${sorted.length}</strong></p>
+        <p style="margin:4px 0;font-size:12px;color:#555;"><strong>📝 Note cliente:</strong> ${noteCliente ? noteCliente : "No"}</p>
+        <p style="margin:4px 0;font-size:12px;color:#555;"><strong>📋 Totale preventivi:</strong> ${sorted.length}</p>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>

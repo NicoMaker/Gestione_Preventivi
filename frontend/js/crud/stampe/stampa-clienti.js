@@ -88,18 +88,19 @@ function generateClientiPrintDocument(clientiList, companyWrapper) {
                 <span style="margin-right: 8px;">📅</span><strong>Data Passaggio/Ricontatto:</strong> ${c.data_passaggio ? formatDate(c.data_passaggio) : "No"}
             </p>
             
-            <div style="margin: 12px 0;">
-                <span style="display: inline-block; padding: 5px 15px; border-radius: 15px; font-size: 13px; font-weight: bold; border: 1px solid #c4b5fd; background: #ede9fe; color: #4c1d95;">
-                    <span style="margin-right: 5px;">📱</span>${c.flag_ricontatto == 1 ? "Ricontattato" : "Da ricontattare"}
+            <p style="margin: 6px 0; font-size: 14px; color: #333;">
+                <span style="margin-right: 8px;">🔖</span><strong>Stato cliente:</strong>
+                <span style="display: inline-block; padding: 3px 12px; border-radius: 15px; font-size: 13px; font-weight: bold; border: 1px solid #c4b5fd; background: #ede9fe; color: #4c1d95; margin-left: 6px;">
+                    ${c.flag_ricontatto == 1 ? "✅ Ricontattato" : "⏳ Da ricontattare"}
                 </span>
-            </div>
+            </p>
             
-            <p style="margin: 12px 0 6px 0; font-size: 14px; color: #333;">
+            <p style="margin: 6px 0; font-size: 14px; color: #333;">
                 <span style="margin-right: 8px;">📝</span><strong>Note cliente:</strong> ${c.note || "Nessuna nota"}
             </p>
             
-            <p style="margin: 10px 0 0 0; font-size: 13px; color: #666; font-style: italic;">
-                Totale preventivi: <strong>${c.ordini_count || 0}</strong>
+            <p style="margin: 6px 0; font-size: 14px; color: #333;">
+                <span style="margin-right: 8px;">📋</span><strong>Totale preventivi:</strong> ${c.ordini_count || 0}
             </p>
         </div>
     `).join("");
