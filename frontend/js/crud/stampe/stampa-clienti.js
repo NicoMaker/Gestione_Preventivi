@@ -4,56 +4,58 @@
 let companyInfoPrintCacheClienti = null;
 
 async function loadCompanyInfoForPrintClienti() {
-    try {
-        if (companyInfoPrintCacheClienti) return companyInfoPrintCacheClienti;
-        if (typeof companyInfo !== "undefined" && companyInfo) {
-            companyInfoPrintCacheClienti = companyInfo;
-            return companyInfoPrintCacheClienti;
-        }
-        const response = await fetch("company-info.json");
-        if (!response.ok) throw new Error(`Errore caricamento: ${response.status}`);
-        companyInfoPrintCacheClienti = await response.json();
-        return companyInfoPrintCacheClienti;
-    } catch (error) {
-        console.error("Errore caricamento company-info.json:", error);
-        return { name: "Anagrafica Clienti", country: "Italia" };
+  try {
+    if (companyInfoPrintCacheClienti) return companyInfoPrintCacheClienti;
+    if (typeof companyInfo !== "undefined" && companyInfo) {
+      companyInfoPrintCacheClienti = companyInfo;
+      return companyInfoPrintCacheClienti;
     }
+    const response = await fetch("company-info.json");
+    if (!response.ok) throw new Error(`Errore caricamento: ${response.status}`);
+    companyInfoPrintCacheClienti = await response.json();
+    return companyInfoPrintCacheClienti;
+  } catch (error) {
+    console.error("Errore caricamento company-info.json:", error);
+    return { name: "Anagrafica Clienti", country: "Italia" };
+  }
 }
 
 function getCurrentClientiFilters() {
-    return {
-        searchTerm: document.getElementById("filterClienti")?.value?.toLowerCase() || "",
-        dataPassaggio: document.getElementById("filterDataPassaggio")?.value || "",
-        ricontattato: document.getElementById("filterClientiRicontattato")?.value || "tutti"
-    };
+  return {
+    searchTerm:
+      document.getElementById("filterClienti")?.value?.toLowerCase() || "",
+    dataPassaggio: document.getElementById("filterDataPassaggio")?.value || "",
+    ricontattato:
+      document.getElementById("filterClientiRicontattato")?.value || "tutti",
+  };
 }
 
 function getFilteredClientiForPrint(allClientiData) {
-    const filters = getCurrentClientiFilters();
-    return allClientiData.filter((c) => {
-        const matchText =
-            !filters.searchTerm ||
-            c.nome.toLowerCase().includes(filters.searchTerm) ||
-            (c.num_tel && c.num_tel.toLowerCase().includes(filters.searchTerm)) ||
-            (c.email && c.email.toLowerCase().includes(filters.searchTerm)) ||
-            (c.note && c.note.toLowerCase().includes(filters.searchTerm));
+  const filters = getCurrentClientiFilters();
+  return allClientiData.filter((c) => {
+    const matchText =
+      !filters.searchTerm ||
+      c.nome.toLowerCase().includes(filters.searchTerm) ||
+      (c.num_tel && c.num_tel.toLowerCase().includes(filters.searchTerm)) ||
+      (c.email && c.email.toLowerCase().includes(filters.searchTerm)) ||
+      (c.note && c.note.toLowerCase().includes(filters.searchTerm));
 
-        const matchDataPassaggio =
-            !filters.dataPassaggio ||
-            (c.data_passaggio && c.data_passaggio.startsWith(filters.dataPassaggio));
+    const matchDataPassaggio =
+      !filters.dataPassaggio ||
+      (c.data_passaggio && c.data_passaggio.startsWith(filters.dataPassaggio));
 
-        const matchRicontattato =
-            filters.ricontattato === "tutti" ||
-            (filters.ricontattato === "si" && c.flag_ricontatto == 1) ||
-            (filters.ricontattato === "no" && !c.flag_ricontatto);
+    const matchRicontattato =
+      filters.ricontattato === "tutti" ||
+      (filters.ricontattato === "si" && c.flag_ricontatto == 1) ||
+      (filters.ricontattato === "no" && !c.flag_ricontatto);
 
-        return matchText && matchDataPassaggio && matchRicontattato;
-    });
+    return matchText && matchDataPassaggio && matchRicontattato;
+  });
 }
 
 function generatePrintHeaderClienti(company) {
-    const logoPath = company.logo || "img/Logo.png";
-    return `
+  const logoPath = company.logo || "img/Logo.png";
+  return `
     <div class="print-header" style="text-align:center;margin-bottom:40px;border-bottom:3px solid #333;padding-bottom:25px;">
       <img src="${logoPath}" alt="Logo Azienda" style="max-width:200px;height:auto;margin-bottom:15px;display:block;margin-left:auto;margin-right:auto;" />
       <h1 style="margin:10px 0 5px 0;font-size:26px;font-weight:bold;color:#2c3e50;">${company.name || "Elenco Clienti"}</h1>
@@ -68,11 +70,15 @@ function generatePrintHeaderClienti(company) {
 }
 
 function generateClientiPrintDocument(clientiList, companyWrapper) {
-    const company = companyWrapper.company || companyWrapper;
-    const sortedClienti = [...clientiList].sort((a, b) => a.nome.localeCompare(b.nome, "it"));
-    const header = generatePrintHeaderClienti(company);
+  const company = companyWrapper.company || companyWrapper;
+  const sortedClienti = [...clientiList].sort((a, b) =>
+    a.nome.localeCompare(b.nome, "it"),
+  );
+  const header = generatePrintHeaderClienti(company);
 
-    const bodyClienti = sortedClienti.map(c => `
+  const bodyClienti = sortedClienti
+    .map(
+      (c) => `
         <div class="cliente-row" style="margin-bottom:30px; padding: 10px 20px; border-left: 5px solid #2980b9; page-break-inside: avoid;">
             <h2 style="margin: 0 0 12px 0; font-size: 22px; color: #2980b9; font-weight: bold;">${c.nome}</h2>
             
@@ -103,9 +109,11 @@ function generateClientiPrintDocument(clientiList, companyWrapper) {
                 <span style="margin-right: 8px;">📋</span><strong>Totale preventivi:</strong> ${c.ordini_count || 0}
             </p>
         </div>
-    `).join("");
+    `,
+    )
+    .join("");
 
-    return `
+  return `
     <!DOCTYPE html>
     <html lang="it">
       <head>
@@ -134,35 +142,40 @@ function generateClientiPrintDocument(clientiList, companyWrapper) {
 }
 
 async function printClientiDiretta() {
-    try {
-        if (typeof allClienti === "undefined" || !allClienti || allClienti.length === 0) {
-            showNotification("Nessun cliente da stampare.", "warning");
-            return;
-        }
-
-        const dataToPrint = getFilteredClientiForPrint(allClienti);
-        const companyData = await loadCompanyInfoForPrintClienti();
-        const htmlPrint = generateClientiPrintDocument(dataToPrint, companyData);
-
-        const printFrame = document.createElement("iframe");
-        printFrame.style.cssText = "position:absolute;left:-9999px;width:0;height:0;border:0;";
-        document.body.appendChild(printFrame);
-
-        printFrame.contentDocument.open();
-        printFrame.contentDocument.write(htmlPrint);
-        printFrame.contentDocument.close();
-
-        printFrame.onload = () => {
-            setTimeout(() => {
-                printFrame.contentWindow.print();
-                setTimeout(() => document.body.removeChild(printFrame), 1000);
-            }, 250);
-        };
-        showNotification("Dialog stampa aperto!", "success");
-    } catch (err) {
-        console.error("Errore stampa:", err);
-        showNotification("Errore nella stampa", "error");
+  try {
+    if (
+      typeof allClienti === "undefined" ||
+      !allClienti ||
+      allClienti.length === 0
+    ) {
+      showNotification("Nessun cliente da stampare.", "warning");
+      return;
     }
+
+    const dataToPrint = getFilteredClientiForPrint(allClienti);
+    const companyData = await loadCompanyInfoForPrintClienti();
+    const htmlPrint = generateClientiPrintDocument(dataToPrint, companyData);
+
+    const printFrame = document.createElement("iframe");
+    printFrame.style.cssText =
+      "position:absolute;left:-9999px;width:0;height:0;border:0;";
+    document.body.appendChild(printFrame);
+
+    printFrame.contentDocument.open();
+    printFrame.contentDocument.write(htmlPrint);
+    printFrame.contentDocument.close();
+
+    printFrame.onload = () => {
+      setTimeout(() => {
+        printFrame.contentWindow.print();
+        setTimeout(() => document.body.removeChild(printFrame), 1000);
+      }, 250);
+    };
+    showNotification("Dialog stampa aperto!", "success");
+  } catch (err) {
+    console.error("Errore stampa:", err);
+    showNotification("Errore nella stampa", "error");
+  }
 }
 
 window.printClientiDiretta = printClientiDiretta;

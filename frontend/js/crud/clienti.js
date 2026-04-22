@@ -101,9 +101,11 @@ function renderClienti() {
         </button>
        </td>
       <td style="min-width:220px;max-width:320px;">
-        ${c.note
-          ? `<span title="${c.note.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${c.note}</span>`
-          : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`}
+        ${
+          c.note
+            ? `<span title="${c.note.replace(/"/g, "&quot;")}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${c.note}</span>`
+            : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`
+        }
        </td>
       <td style="text-align:center;">
         <span class="prodotti-badge ${c.ordini_count > 0 ? "has-products" : "empty"}">
@@ -149,7 +151,8 @@ function saveClientiFilters() {
 function restoreClientiFilters() {
   const savedSearch = localStorage.getItem("filter_clienti_search") || "";
   const savedData = localStorage.getItem("filter_clienti_data") || "";
-  const savedRicontattato = localStorage.getItem("filter_clienti_ricontattato") || "tutti";
+  const savedRicontattato =
+    localStorage.getItem("filter_clienti_ricontattato") || "tutti";
 
   const searchInput = document.getElementById("filterClienti");
   const dataInput = document.getElementById("filterDataPassaggio");
@@ -198,14 +201,18 @@ document.getElementById("filterClienti")?.addEventListener("input", () => {
   saveClientiFilters();
   applyClientiFilters();
 });
-document.getElementById("filterDataPassaggio")?.addEventListener("change", () => {
-  saveClientiFilters();
-  applyClientiFilters();
-});
-document.getElementById("filterClientiRicontattato")?.addEventListener("change", () => {
-  saveClientiFilters();
-  applyClientiFilters();
-});
+document
+  .getElementById("filterDataPassaggio")
+  ?.addEventListener("change", () => {
+    saveClientiFilters();
+    applyClientiFilters();
+  });
+document
+  .getElementById("filterClientiRicontattato")
+  ?.addEventListener("change", () => {
+    saveClientiFilters();
+    applyClientiFilters();
+  });
 
 // ---- Reset Filtri ----
 
@@ -224,12 +231,14 @@ function openClienteModal(cliente = null) {
   document.getElementById("formCliente").reset();
 
   if (cliente) {
-    document.getElementById("modalClienteTitle").textContent = "Modifica Cliente";
+    document.getElementById("modalClienteTitle").textContent =
+      "Modifica Cliente";
     document.getElementById("clienteId").value = cliente.id;
     document.getElementById("clienteNome").value = cliente.nome;
     document.getElementById("clienteTel").value = cliente.num_tel || "";
     document.getElementById("clienteEmail").value = cliente.email || "";
-    document.getElementById("clienteDataPassaggio").value = cliente.data_passaggio || "";
+    document.getElementById("clienteDataPassaggio").value =
+      cliente.data_passaggio || "";
     document.getElementById("clienteNote").value = cliente.note || "";
     setRicontattoModalState(cliente.flag_ricontatto == 1);
   } else {
@@ -290,7 +299,9 @@ async function toggleRicontatto(clienteId, isChecked) {
         if (c) c.flag_ricontatto = isChecked ? 1 : 0;
       });
       showNotification(
-        isChecked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
+        isChecked
+          ? "📱 Cliente segnato come ricontattato"
+          : "⏳ Flag ricontatto rimosso",
         "success",
       );
       renderClienti();
@@ -381,12 +392,22 @@ document.getElementById("formCliente").addEventListener("submit", async (e) => {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, num_tel, email, data_passaggio, flag_ricontatto, note }),
+      body: JSON.stringify({
+        nome,
+        num_tel,
+        email,
+        data_passaggio,
+        flag_ricontatto,
+        note,
+      }),
     });
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(id ? "Cliente aggiornato!" : "Cliente creato!", "success");
+      showNotification(
+        id ? "Cliente aggiornato!" : "Cliente creato!",
+        "success",
+      );
       closeClienteModal();
       loadClienti();
     } else {

@@ -56,7 +56,8 @@ function generateClienteSection(cliente, ordiniCliente) {
   const sorted = sortOrdiniByDateDesc(ordiniCliente);
 
   // Prendi le note cliente dal primo ordine (sono le stesse per tutti)
-  const noteCliente = sorted.length > 0 ? (sorted[0].cliente_note || "") : (cliente.note || "");
+  const noteCliente =
+    sorted.length > 0 ? sorted[0].cliente_note || "" : cliente.note || "";
 
   return `
     <div class="cliente-section" style="margin-bottom:30px;page-break-inside:avoid;">

@@ -120,14 +120,18 @@ function renderOrdini() {
         <td>${o.marca_nome || "-"}</td>
         <td>${o.modello_nome || "-"}</td>
         <td style="min-width:200px;max-width:300px;">
-          ${o.note 
-            ? `<span style="font-size:13px;color:#334155;display:block;white-space:pre-wrap;line-height:1.5;cursor:help;" title="${(o.note||'').replace(/"/g,'&quot;')}">${o.note}</span>` 
-            : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`}
+          ${
+            o.note
+              ? `<span style="font-size:13px;color:#334155;display:block;white-space:pre-wrap;line-height:1.5;cursor:help;" title="${(o.note || "").replace(/"/g, "&quot;")}">${o.note}</span>`
+              : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`
+          }
          </td>
         <td style="min-width:220px;max-width:320px;">
-          ${noteCliente
-            ? `<span title="${noteCliente.replace(/"/g, '&quot;')}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${noteCliente}</span>`
-            : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`}
+          ${
+            noteCliente
+              ? `<span title="${noteCliente.replace(/"/g, "&quot;")}" style="font-size:13px;color:#334155;font-weight:500;display:block;white-space:pre-wrap;line-height:1.5;">${noteCliente}</span>`
+              : `<span style="font-size:13px;color:#94a3b8;font-style:italic;">Nessuna nota</span>`
+          }
          </td>
         <td class="text-right">
           <button class="btn-icon" onclick="editOrdine(${o.id})" title="Modifica preventivo">
@@ -178,11 +182,15 @@ async function updateClienteFlagRicontatto(clienteId, checked) {
     [allOrdini, ordini].forEach((arr) =>
       arr
         .filter((x) => x.cliente_id === clienteId)
-        .forEach((x) => { x.cliente_flag_ricontatto = checked ? 1 : 0; }),
+        .forEach((x) => {
+          x.cliente_flag_ricontatto = checked ? 1 : 0;
+        }),
     );
 
     showNotification(
-      checked ? "📱 Cliente segnato come ricontattato" : "⏳ Flag ricontatto rimosso",
+      checked
+        ? "📱 Cliente segnato come ricontattato"
+        : "⏳ Flag ricontatto rimosso",
       "success",
     );
     renderOrdini();
@@ -284,10 +292,14 @@ function saveOrdiniFilter() {
 
 function restoreOrdiniFilter() {
   const savedSearch = localStorage.getItem("filter_ordini_search") || "";
-  const savedDataPassaggio = localStorage.getItem("filter_ordini_data_passaggio") || "";
-  const savedDataPreventivo = localStorage.getItem("filter_ordini_data_preventivo") || "";
-  const savedRicontattato = localStorage.getItem("filter_ordini_ricontattato") || "tutti";
-  const savedContratto = localStorage.getItem("filter_ordini_contratto") || "tutti";
+  const savedDataPassaggio =
+    localStorage.getItem("filter_ordini_data_passaggio") || "";
+  const savedDataPreventivo =
+    localStorage.getItem("filter_ordini_data_preventivo") || "";
+  const savedRicontattato =
+    localStorage.getItem("filter_ordini_ricontattato") || "tutti";
+  const savedContratto =
+    localStorage.getItem("filter_ordini_contratto") || "tutti";
 
   const si = document.getElementById("filterOrdini");
   const sp = document.getElementById("filterOrdiniDataPassaggio");
@@ -301,7 +313,13 @@ function restoreOrdiniFilter() {
   if (sr) sr.value = savedRicontattato;
   if (sc) sc.value = savedContratto;
 
-  applyOrdiniFilter(savedSearch.toLowerCase(), savedDataPassaggio, savedDataPreventivo, savedRicontattato, savedContratto);
+  applyOrdiniFilter(
+    savedSearch.toLowerCase(),
+    savedDataPassaggio,
+    savedDataPreventivo,
+    savedRicontattato,
+    savedContratto,
+  );
 }
 
 function applyOrdiniFilter(
@@ -340,46 +358,95 @@ function applyOrdiniFilter(
       (contrattoVal === "si" && o.contratto_finito == 1) ||
       (contrattoVal === "no" && !o.contratto_finito);
 
-    return matchText && matchDataPassaggio && matchDataPreventivo && matchRicontattato && matchContratto;
+    return (
+      matchText &&
+      matchDataPassaggio &&
+      matchDataPreventivo &&
+      matchRicontattato &&
+      matchContratto
+    );
   });
   renderOrdini();
 }
 
 function getOrdiniFilterValues() {
   return {
-    searchTerm: document.getElementById("filterOrdini")?.value.toLowerCase() || "",
-    dataPassaggio: document.getElementById("filterOrdiniDataPassaggio")?.value || "",
-    dataPreventivo: document.getElementById("filterOrdiniDataPreventivo")?.value || "",
-    ricontattoVal: document.getElementById("filterOrdiniRicontattato")?.value || "tutti",
-    contrattoVal: document.getElementById("filterOrdiniContratto")?.value || "tutti",
+    searchTerm:
+      document.getElementById("filterOrdini")?.value.toLowerCase() || "",
+    dataPassaggio:
+      document.getElementById("filterOrdiniDataPassaggio")?.value || "",
+    dataPreventivo:
+      document.getElementById("filterOrdiniDataPreventivo")?.value || "",
+    ricontattoVal:
+      document.getElementById("filterOrdiniRicontattato")?.value || "tutti",
+    contrattoVal:
+      document.getElementById("filterOrdiniContratto")?.value || "tutti",
   };
 }
 
 document.getElementById("filterOrdini")?.addEventListener("input", () => {
   const v = getOrdiniFilterValues();
   saveOrdiniFilter();
-  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
+  applyOrdiniFilter(
+    v.searchTerm,
+    v.dataPassaggio,
+    v.dataPreventivo,
+    v.ricontattoVal,
+    v.contrattoVal,
+  );
 });
-document.getElementById("filterOrdiniDataPassaggio")?.addEventListener("change", () => {
-  const v = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
-});
-document.getElementById("filterOrdiniDataPreventivo")?.addEventListener("change", () => {
-  const v = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
-});
-document.getElementById("filterOrdiniRicontattato")?.addEventListener("change", () => {
-  const v = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
-});
-document.getElementById("filterOrdiniContratto")?.addEventListener("change", () => {
-  const v = getOrdiniFilterValues();
-  saveOrdiniFilter();
-  applyOrdiniFilter(v.searchTerm, v.dataPassaggio, v.dataPreventivo, v.ricontattoVal, v.contrattoVal);
-});
+document
+  .getElementById("filterOrdiniDataPassaggio")
+  ?.addEventListener("change", () => {
+    const v = getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(
+      v.searchTerm,
+      v.dataPassaggio,
+      v.dataPreventivo,
+      v.ricontattoVal,
+      v.contrattoVal,
+    );
+  });
+document
+  .getElementById("filterOrdiniDataPreventivo")
+  ?.addEventListener("change", () => {
+    const v = getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(
+      v.searchTerm,
+      v.dataPassaggio,
+      v.dataPreventivo,
+      v.ricontattoVal,
+      v.contrattoVal,
+    );
+  });
+document
+  .getElementById("filterOrdiniRicontattato")
+  ?.addEventListener("change", () => {
+    const v = getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(
+      v.searchTerm,
+      v.dataPassaggio,
+      v.dataPreventivo,
+      v.ricontattoVal,
+      v.contrattoVal,
+    );
+  });
+document
+  .getElementById("filterOrdiniContratto")
+  ?.addEventListener("change", () => {
+    const v = getOrdiniFilterValues();
+    saveOrdiniFilter();
+    applyOrdiniFilter(
+      v.searchTerm,
+      v.dataPassaggio,
+      v.dataPreventivo,
+      v.ricontattoVal,
+      v.contrattoVal,
+    );
+  });
 
 // ---- Modal ----
 
@@ -400,9 +467,12 @@ window.openOrdineModal = async function (ordine = null) {
   }
 
   if (ordine) {
-    document.getElementById("modalOrdineTitle").textContent = "Modifica Preventivo";
+    document.getElementById("modalOrdineTitle").textContent =
+      "Modifica Preventivo";
     document.getElementById("ordineId").value = ordine.id;
-    document.getElementById("ordineData").value = formatDateForInput(ordine.data_movimento);
+    document.getElementById("ordineData").value = formatDateForInput(
+      ordine.data_movimento,
+    );
     document.getElementById("ordineNote").value = ordine.note || "";
     setContrattoModalState(ordine.contratto_finito == 1);
 
@@ -419,9 +489,12 @@ window.openOrdineModal = async function (ordine = null) {
       }
     }
   } else {
-    document.getElementById("modalOrdineTitle").textContent = "Nuovo Preventivo";
+    document.getElementById("modalOrdineTitle").textContent =
+      "Nuovo Preventivo";
     document.getElementById("ordineId").value = "";
-    document.getElementById("ordineData").value = new Date().toISOString().split("T")[0];
+    document.getElementById("ordineData").value = new Date()
+      .toISOString()
+      .split("T")[0];
   }
 
   modal.classList.add("active");
@@ -488,10 +561,15 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
   if (modello_id && Array.isArray(allModelli) && allModelli.length > 0) {
     const modello = allModelli.find((m) => String(m.id) === String(modello_id));
     if (
-      modello && marca_id && modello.marche_id &&
+      modello &&
+      marca_id &&
+      modello.marche_id &&
       String(modello.marche_id) !== String(marca_id)
     ) {
-      showNotification("Il modello selezionato non appartiene alla marca indicata.", "error");
+      showNotification(
+        "Il modello selezionato non appartiene alla marca indicata.",
+        "error",
+      );
       return;
     }
   }
@@ -517,7 +595,10 @@ document.getElementById("formOrdine").addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      showNotification(id ? "Preventivo aggiornato!" : "Preventivo creato!", "success");
+      showNotification(
+        id ? "Preventivo aggiornato!" : "Preventivo creato!",
+        "success",
+      );
       closeOrdineModal();
       loadOrdini();
     } else {
