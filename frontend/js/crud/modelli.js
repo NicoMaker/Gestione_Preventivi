@@ -39,8 +39,8 @@ function renderModelli() {
       <td><strong>${m.nome}</strong></td>
       <td>${m.marca_nome || "-"}</td>
       <td class="text-center-badge">
-        <span class="prodotti-badge ${m.ordini_count > 0 ? "has-products" : "empty"}">
-          ${m.ordini_count || 0}
+        <span class="prodotti-badge ${m.preventivi_count > 0 ? "has-products" : "empty"}">
+          ${m.preventivi_count || 0}
         </span>
       </td>
       <td class="text-right">
