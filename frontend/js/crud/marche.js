@@ -35,6 +35,7 @@ function renderMarche() {
     .map(
       (m) => `
     <tr>
+      ${bulkCheckboxCell("marche", m.id)}
       <td><strong>${m.nome}</strong></td>
       <td class="text-center-badge">
         <span class="prodotti-badge ${m.prodotti_count > 0 ? "has-products" : "empty"}">
@@ -63,6 +64,7 @@ function renderMarche() {
   `,
     )
     .join("");
+  bulkAfterRender("marche");
 }
 
 // ---- Filtri ----

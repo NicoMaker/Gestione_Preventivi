@@ -2,6 +2,7 @@
 const repo = require("../repositories/marcheRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 module.exports = {
   lista() { return repo.listaConConteggio(); },
@@ -57,5 +58,11 @@ module.exports = {
     realtime.emit("marca_eliminata", { id });
     realtime.emit("marche_aggiornate");
     return { success: true, message: "Marca eliminata con successo" };
+  },
+
+  async eliminaMultiple(ids) {
+    const lista = await repo.listaConConteggio();
+    const nomi = Object.fromEntries(lista.map((x) => [x.id, x.nome]));
+    return eliminaMultipli(ids, (id) => this.elimina(id), nomi);
   },
 };

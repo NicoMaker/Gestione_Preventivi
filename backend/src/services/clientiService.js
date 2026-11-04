@@ -2,6 +2,7 @@
 const repo = require("../repositories/clientiRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 module.exports = {
   lista() { return repo.listaConConteggio(); },
@@ -74,5 +75,11 @@ module.exports = {
     realtime.emit("cliente_eliminato", { id });
     realtime.emit("clienti_aggiornati");
     return { success: true, message: "Cliente eliminato con successo" };
+  },
+
+  async eliminaMultiple(ids) {
+    const lista = await repo.listaConConteggio();
+    const nomi = Object.fromEntries(lista.map((x) => [x.id, x.nome]));
+    return eliminaMultipli(ids, (id) => this.elimina(id), nomi);
   },
 };

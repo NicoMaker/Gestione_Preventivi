@@ -17,7 +17,7 @@ function renderModelli() {
   const tbody = document.getElementById("modelliTableBody");
 
   if (modelli.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -36,6 +36,7 @@ function renderModelli() {
     .map(
       (m) => `
     <tr>
+      ${bulkCheckboxCell("modelli", m.id)}
       <td><strong>${m.nome}</strong></td>
       <td>${m.marca_nome || "-"}</td>
       <td class="text-center-badge">
@@ -60,6 +61,7 @@ function renderModelli() {
   `,
     )
     .join("");
+  bulkAfterRender("modelli");
 }
 
 // ---- Filtri ----

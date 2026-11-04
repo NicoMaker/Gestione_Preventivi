@@ -2,6 +2,7 @@
 const repo = require("../repositories/modelliRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 module.exports = {
   lista() { return repo.lista(); },
@@ -49,5 +50,11 @@ module.exports = {
     realtime.emit("modello_eliminato", { id });
     realtime.emit("modelli_aggiornati");
     return { success: true, message: "Modello eliminato con successo" };
+  },
+
+  async eliminaMultiple(ids) {
+    const lista = await repo.lista();
+    const nomi = Object.fromEntries(lista.map((x) => [x.id, x.nome]));
+    return eliminaMultipli(ids, (id) => this.elimina(id), nomi);
   },
 };

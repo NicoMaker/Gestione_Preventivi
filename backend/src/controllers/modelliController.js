@@ -4,5 +4,6 @@ module.exports = {
   async dettaglio(req, res) { res.json(await s.dettaglio(req.params.id)); },
   async crea(req, res) { res.json(await s.crea(req.body)); },
   async aggiorna(req, res) { res.json(await s.aggiorna(req.params.id, req.body)); },
+  async eliminaMultiple(req, res) { res.json(await s.eliminaMultiple(req.body.ids)); },
   async elimina(req, res) { res.json(await s.elimina(req.params.id)); },
 };

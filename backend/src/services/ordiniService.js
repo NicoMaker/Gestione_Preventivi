@@ -2,6 +2,7 @@
 const repo = require("../repositories/ordiniRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulk");
 
 function normalizza(body) {
   return {
@@ -44,5 +45,11 @@ module.exports = {
     realtime.emit("ordine_eliminato", { id });
     realtime.emit("ordini_aggiornati");
     return { success: true, message: "Ordine eliminato con successo" };
+  },
+
+  async eliminaMultiple(ids) {
+    const lista = await repo.lista();
+    const nomi = Object.fromEntries(lista.map((x) => [x.id, `${x.cliente_nome}${x.modello_nome ? " – " + x.modello_nome : ""}`]));
+    return eliminaMultipli(ids, (id) => this.elimina(id), nomi);
   },
 };
