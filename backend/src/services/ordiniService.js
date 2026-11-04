@@ -16,8 +16,12 @@ function normalizza(body) {
 }
 
 module.exports = {
-  lista() { return repo.lista(); },
-  perCliente(clienteId) { return repo.perCliente(clienteId); },
+  lista() {
+    return repo.lista();
+  },
+  perCliente(clienteId) {
+    return repo.perCliente(clienteId);
+  },
 
   async crea(body) {
     if (!body.cliente_id) throw new HttpError(400, "Cliente obbligatorio");
@@ -49,7 +53,12 @@ module.exports = {
 
   async eliminaMultiple(ids) {
     const lista = await repo.lista();
-    const nomi = Object.fromEntries(lista.map((x) => [x.id, `${x.cliente_nome}${x.modello_nome ? " – " + x.modello_nome : ""}`]));
+    const nomi = Object.fromEntries(
+      lista.map((x) => [
+        x.id,
+        `${x.cliente_nome}${x.modello_nome ? " – " + x.modello_nome : ""}`,
+      ]),
+    );
     return eliminaMultipli(ids, (id) => this.elimina(id), nomi);
   },
 };
