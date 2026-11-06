@@ -8,11 +8,7 @@ class HttpError extends Error {
 }
 function catchErrors(handler) {
   return async (req, res, next) => {
-    try {
-      await handler(req, res, next);
-    } catch (err) {
-      next(err);
-    }
+    try { await handler(req, res, next); } catch (err) { next(err); }
   };
 }
 function errorHandler(err, req, res, next) {

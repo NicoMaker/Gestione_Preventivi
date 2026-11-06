@@ -357,17 +357,11 @@
               </div>
             </div>
           </div>
-          <div id="bulkToolbar-clienti" class="bulk-toolbar" style="display:none">
-            <span id="bulkCount-clienti" class="bulk-count"></span>
-            <button class="btn btn-danger" onclick="bulkDelete('clienti')">🗑️ Elimina selezionati</button>
-            <button class="btn btn-secondary" onclick="bulkClear('clienti')">✕ Deseleziona</button>
-          </div>
           <div class="card">
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th class="bulk-col"><input type="checkbox" id="bulkAll-clienti" onchange="bulkToggleAll('clienti', this)" title="Seleziona tutti"></th>
                     <th>Nome</th>
                     <th>Telefono</th>
                     <th>Email</th>
@@ -380,7 +374,7 @@
                 </thead>
                 <tbody id="clientiTableBody">
                   <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="7" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -604,17 +598,11 @@
               </div>
             </div>
           </div>
-          <div id="bulkToolbar-ordini" class="bulk-toolbar" style="display:none">
-            <span id="bulkCount-ordini" class="bulk-count"></span>
-            <button class="btn btn-danger" onclick="bulkDelete('ordini')">🗑️ Elimina selezionati</button>
-            <button class="btn btn-secondary" onclick="bulkClear('ordini')">✕ Deseleziona</button>
-          </div>
           <div class="card">
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th class="bulk-col"><input type="checkbox" id="bulkAll-ordini" onchange="bulkToggleAll('ordini', this)" title="Seleziona tutti"></th>
                     <th>Data Preventivo</th>
                     <th>Cliente</th>
                     <th>Telefono</th>
@@ -632,7 +620,7 @@
                 </thead>
                 <tbody id="ordiniTableBody">
                   <tr>
-                    <td colspan="12" class="text-center">
+                    <td colspan="11" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -676,17 +664,11 @@
               </button>
             </div>
           </div>
-          <div id="bulkToolbar-marche" class="bulk-toolbar" style="display:none">
-            <span id="bulkCount-marche" class="bulk-count"></span>
-            <button class="btn btn-danger" onclick="bulkDelete('marche')">🗑️ Elimina selezionati</button>
-            <button class="btn btn-secondary" onclick="bulkClear('marche')">✕ Deseleziona</button>
-          </div>
           <div class="card">
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th class="bulk-col"><input type="checkbox" id="bulkAll-marche" onchange="bulkToggleAll('marche', this)" title="Seleziona tutti"></th>
                     <th>Nome</th>
                     <th class="text-center">N° Prodotti</th>
                     <th class="text-center">N° Preventivi</th>
@@ -695,7 +677,7 @@
                 </thead>
                 <tbody id="marcheTableBody">
                   <tr>
-                    <td colspan="4" class="text-center">
+                    <td colspan="3" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -739,17 +721,11 @@
               </button>
             </div>
           </div>
-          <div id="bulkToolbar-modelli" class="bulk-toolbar" style="display:none">
-            <span id="bulkCount-modelli" class="bulk-count"></span>
-            <button class="btn btn-danger" onclick="bulkDelete('modelli')">🗑️ Elimina selezionati</button>
-            <button class="btn btn-secondary" onclick="bulkClear('modelli')">✕ Deseleziona</button>
-          </div>
           <div class="card">
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th class="bulk-col"><input type="checkbox" id="bulkAll-modelli" onchange="bulkToggleAll('modelli', this)" title="Seleziona tutti"></th>
                     <th>Nome</th>
                     <th>Marca</th>
                     <th class="text-center">N° Preventivi</th>
@@ -758,7 +734,7 @@
                 </thead>
                 <tbody id="modelliTableBody">
                   <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="4" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -802,24 +778,18 @@
               </button>
             </div>
           </div>
-          <div id="bulkToolbar-utenti" class="bulk-toolbar" style="display:none">
-            <span id="bulkCount-utenti" class="bulk-count"></span>
-            <button class="btn btn-danger" onclick="bulkDelete('utenti')">🗑️ Elimina selezionati</button>
-            <button class="btn btn-secondary" onclick="bulkClear('utenti')">✕ Deseleziona</button>
-          </div>
           <div class="card">
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th class="bulk-col"><input type="checkbox" id="bulkAll-utenti" onchange="bulkToggleAll('utenti', this)" title="Seleziona tutti"></th>
                     <th>Nome</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
                 <tbody id="utentiTableBody">
                   <tr>
-                    <td colspan="3" class="text-center">
+                    <td colspan="2" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -1292,7 +1262,6 @@
     <script src="js/ui/notifications.js"></script>
     <script src="js/ui/dialogs.js"></script>
     <script src="js/searchable-select.js"></script>
-    <script src="js/crud/bulk.js"></script>
     <script src="js/crud/clienti/render.js"></script>
     <script src="js/crud/clienti/filters.js"></script>
     <script src="js/crud/clienti/modal.js"></script>

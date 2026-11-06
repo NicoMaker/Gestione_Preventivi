@@ -46,7 +46,7 @@ function renderUtenti() {
   const searchTerm = document.getElementById("filterUtenti")?.value || "";
 
   if (utenti.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="2" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -66,7 +66,6 @@ function renderUtenti() {
     .map(
       (u) => `
     <tr>
-      ${bulkCheckboxCell("utenti", u.id)}
       <td><strong>${u.nome}</strong></td>
       <td class="text-right">
         <button class="btn-icon" onclick="editUtente(${u.id})" title="Modifica utente">
@@ -85,7 +84,6 @@ function renderUtenti() {
   `,
     )
     .join("");
-  bulkAfterRender("utenti");
 }
 
 function openUtenteModal(utente = null) {

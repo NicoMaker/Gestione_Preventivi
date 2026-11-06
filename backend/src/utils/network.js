@@ -11,19 +11,11 @@ function getLocalIP() {
 }
 function getPublicIP() {
   return new Promise((resolve) => {
-    https
-      .get("https://api.ipify.org?format=json", (res) => {
-        let data = "";
-        res.on("data", (c) => (data += c));
-        res.on("end", () => {
-          try {
-            resolve(JSON.parse(data).ip);
-          } catch {
-            resolve(null);
-          }
-        });
-      })
-      .on("error", () => resolve(null));
+    https.get("https://api.ipify.org?format=json", (res) => {
+      let data = "";
+      res.on("data", (c) => (data += c));
+      res.on("end", () => { try { resolve(JSON.parse(data).ip); } catch { resolve(null); } });
+    }).on("error", () => resolve(null));
   });
 }
 module.exports = { getLocalIP, getPublicIP };

@@ -8,7 +8,7 @@ function renderOrdini() {
   const tbody = document.getElementById("ordiniTableBody");
 
   if (ordini.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="12" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -26,7 +26,6 @@ function renderOrdini() {
   }
 
   tbody.innerHTML = ordini.map(rigaOrdine).join("");
-  bulkAfterRender("ordini");
 }
 
 // Genera l'HTML di una riga preventivo
@@ -39,7 +38,6 @@ function rigaOrdine(o) {
 
   return `
        <tr>
-        ${bulkCheckboxCell("ordini", o.id)}
         <td>${formatDate(o.data_movimento)}</td>
         <td style="min-width:180px;max-width:280px;">
           <strong>${o.cliente_nome}</strong>

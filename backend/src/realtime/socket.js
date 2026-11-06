@@ -12,9 +12,7 @@ function init(httpServer) {
   });
   io.on("connection", (socket) => {
     console.log(`Client connesso: ${socket.id}`);
-    socket.on("disconnect", () =>
-      console.log(`Client disconnesso: ${socket.id}`),
-    );
+    socket.on("disconnect", () => console.log(`Client disconnesso: ${socket.id}`));
     // Registrazione stanza utente per force-logout mirato
     socket.on("register_user", (userId) => {
       if (userId != null) socket.join(`user:${userId}`);
@@ -22,15 +20,11 @@ function init(httpServer) {
   });
   return io;
 }
-function emit(event, data) {
-  if (io) io.emit(event, data);
-}
+function emit(event, data) { if (io) io.emit(event, data); }
 function forceLogoutUser(userId, reason = "account_changed") {
   if (!io) return;
   io.to(`user:${userId}`).emit("forceLogout", { reason });
   setTimeout(() => io.in(`user:${userId}`).disconnectSockets(true), 2000);
 }
-function clientsCount() {
-  return io ? io.engine.clientsCount : 0;
-}
+function clientsCount() { return io ? io.engine.clientsCount : 0; }
 module.exports = { init, emit, forceLogoutUser, clientsCount };

@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
 
-const DB_PATH = path.join(__dirname, ".../..", "db", "Preventivi.db");
+const DB_PATH = path.join(__dirname, "../../", "db", "Preventivi.db");
 const DB_DIR = path.dirname(DB_PATH);
 
 console.log("=".repeat(60));

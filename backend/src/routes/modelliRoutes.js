@@ -6,6 +6,5 @@ router.get("/", catchErrors(c.lista));
 router.get("/:id", catchErrors(c.dettaglio));
 router.post("/", catchErrors(c.crea));
 router.put("/:id", catchErrors(c.aggiorna));
-router.post("/elimina-multiple", catchErrors(c.eliminaMultiple));
 router.delete("/:id", catchErrors(c.elimina));
 module.exports = router;

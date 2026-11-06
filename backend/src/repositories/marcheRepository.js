@@ -12,31 +12,16 @@ module.exports = {
       ORDER BY ma.nome COLLATE NOCASE, ma.nome
     `);
   },
-  trovaPerId(id) {
-    return dbGet("SELECT * FROM marche WHERE id = ?", [id]);
-  },
-  async crea(nome) {
-    const r = await dbRun("INSERT INTO marche (nome) VALUES (?)", [nome]);
-    return r.lastID;
-  },
-  aggiorna(id, nome) {
-    return dbRun("UPDATE marche SET nome = ? WHERE id = ?", [nome, id]);
-  },
-  elimina(id) {
-    return dbRun("DELETE FROM marche WHERE id = ?", [id]);
-  },
+  trovaPerId(id) { return dbGet("SELECT * FROM marche WHERE id = ?", [id]); },
+  async crea(nome) { const r = await dbRun("INSERT INTO marche (nome) VALUES (?)", [nome]); return r.lastID; },
+  aggiorna(id, nome) { return dbRun("UPDATE marche SET nome = ? WHERE id = ?", [nome, id]); },
+  elimina(id) { return dbRun("DELETE FROM marche WHERE id = ?", [id]); },
   async contaModelli(id) {
-    const row = await dbGet(
-      "SELECT COUNT(*) as count FROM modelli WHERE marche_id = ?",
-      [id],
-    );
+    const row = await dbGet("SELECT COUNT(*) as count FROM modelli WHERE marche_id = ?", [id]);
     return row.count || 0;
   },
   async contaOrdini(id) {
-    const row = await dbGet(
-      "SELECT COUNT(*) as count FROM ordini WHERE marca_id = ?",
-      [id],
-    );
+    const row = await dbGet("SELECT COUNT(*) as count FROM ordini WHERE marca_id = ?", [id]);
     return row.count || 0;
   },
 };
