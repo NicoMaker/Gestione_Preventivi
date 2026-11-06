@@ -15,8 +15,12 @@ function normalizza(body) {
 }
 
 module.exports = {
-  lista() { return repo.lista(); },
-  perCliente(clienteId) { return repo.perCliente(clienteId); },
+  lista() {
+    return repo.lista();
+  },
+  perCliente(clienteId) {
+    return repo.perCliente(clienteId);
+  },
 
   async crea(body) {
     if (!body.cliente_id) throw new HttpError(400, "Cliente obbligatorio");

@@ -104,7 +104,7 @@ function initSocket() {
   // Force-logout mirato dal server (stanza user:<id>)
   socket.on("forceLogout", (data) => {
     forceLogout(
-      (data && data.reason === "account_deleted")
+      data && data.reason === "account_deleted"
         ? "Il tuo account è stato eliminato."
         : "Il tuo account è stato modificato. Effettua di nuovo il login.",
     );

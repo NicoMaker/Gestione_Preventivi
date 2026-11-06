@@ -71,10 +71,12 @@ document.getElementById("filterClienti")?.addEventListener("input", () => {
   saveClientiFilters();
   applyClientiFilters();
 });
-document.getElementById("filterDataPassaggio")?.addEventListener("change", () => {
-  saveClientiFilters();
-  applyClientiFilters();
-});
+document
+  .getElementById("filterDataPassaggio")
+  ?.addEventListener("change", () => {
+    saveClientiFilters();
+    applyClientiFilters();
+  });
 document
   .getElementById("filterClientiRicontattato")
   ?.addEventListener("change", () => {

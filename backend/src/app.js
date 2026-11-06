@@ -26,7 +26,9 @@ function creaApp({ port } = {}) {
 
   app.use((req, res, next) => {
     if (req.path.startsWith("/api")) {
-      console.log(`${new Date().toISOString()} - ${req.method} ${req.path} da ${req.ip}`);
+      console.log(
+        `${new Date().toISOString()} - ${req.method} ${req.path} da ${req.ip}`,
+      );
     }
     next();
   });

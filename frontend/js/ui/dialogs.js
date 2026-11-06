@@ -103,7 +103,11 @@ function showAlertModal(message, title = "Informazione", type = "info") {
       const t = line.trim();
       if (t.startsWith("━━")) {
         formatted += `<hr style="margin: 8px 0; border: none; border-top: 1px solid var(--border);">`;
-      } else if (t.startsWith("✅") || t.startsWith("⚠️") || t.startsWith("❌")) {
+      } else if (
+        t.startsWith("✅") ||
+        t.startsWith("⚠️") ||
+        t.startsWith("❌")
+      ) {
         formatted += `<div style="margin: 8px 0; font-weight: 600;">${escapeHtml(line)}</div>`;
       } else if (t.startsWith("•") || t.startsWith("-")) {
         formatted += `<div style="margin: 4px 0; padding-left: 16px;">${escapeHtml(line)}</div>`;
