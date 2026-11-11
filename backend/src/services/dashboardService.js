@@ -5,8 +5,18 @@ const GIORNI_PREVENTIVO_APERTO = 30;
 const ESEMPI_MAX = 5;
 
 const NOMI_MESI = [
-  "Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
-  "Lug", "Ago", "Set", "Ott", "Nov", "Dic",
+  "Gen",
+  "Feb",
+  "Mar",
+  "Apr",
+  "Mag",
+  "Giu",
+  "Lug",
+  "Ago",
+  "Set",
+  "Ott",
+  "Nov",
+  "Dic",
 ];
 
 // Ultimi n mesi (compreso quello corrente) come [{ chiave: "2026-03", etichetta: "Mar" }]
@@ -14,7 +24,9 @@ function ultimiMesi(n) {
   const oggi = new Date();
   const mesi = [];
   for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(Date.UTC(oggi.getUTCFullYear(), oggi.getUTCMonth() - i, 1));
+    const d = new Date(
+      Date.UTC(oggi.getUTCFullYear(), oggi.getUTCMonth() - i, 1),
+    );
     const chiave = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
     mesi.push({ chiave, etichetta: NOMI_MESI[d.getUTCMonth()] });
   }
@@ -27,8 +39,17 @@ module.exports = {
   async panoramica() {
     const mesi = ultimiMesi(6);
     const [
-      kpi, scaduti, prossimi, aperti, senzaRecapiti, senzaPreventivi,
-      marcheVuote, modelliVuoti, andamento, top, ultimi,
+      kpi,
+      scaduti,
+      prossimi,
+      aperti,
+      senzaRecapiti,
+      senzaPreventivi,
+      marcheVuote,
+      modelliVuoti,
+      andamento,
+      top,
+      ultimi,
     ] = await Promise.all([
       repo.conteggi(),
       repo.ricontattiScaduti(),
@@ -53,7 +74,8 @@ module.exports = {
       codice: "ricontatti_scaduti",
       gravita: "alta",
       titolo: "Clienti da ricontattare subito",
-      descrizione: "La data di ricontatto è oggi o già passata e non sono stati ricontattati.",
+      descrizione:
+        "La data di ricontatto è oggi o già passata e non sono stati ricontattati.",
       sezione: "clienti",
       azione: "Apri i clienti",
     });
@@ -69,7 +91,8 @@ module.exports = {
       codice: "preventivi_aperti",
       gravita: "media",
       titolo: `Preventivi non conclusi da oltre ${GIORNI_PREVENTIVO_APERTO} giorni`,
-      descrizione: "Contratto ancora aperto: sollecita il cliente o chiudi la pratica.",
+      descrizione:
+        "Contratto ancora aperto: sollecita il cliente o chiudi la pratica.",
       sezione: "ordini",
       azione: "Apri i preventivi",
     });

@@ -9,7 +9,9 @@ module.exports = {
       cont("SELECT COUNT(*) AS n FROM clienti"),
       cont("SELECT COUNT(*) AS n FROM ordini"),
       cont("SELECT COUNT(*) AS n FROM ordini WHERE contratto_finito = 1"),
-      cont("SELECT COUNT(*) AS n FROM clienti WHERE COALESCE(flag_ricontatto, 0) = 0"),
+      cont(
+        "SELECT COUNT(*) AS n FROM clienti WHERE COALESCE(flag_ricontatto, 0) = 0",
+      ),
       cont("SELECT COUNT(*) AS n FROM marche"),
       cont("SELECT COUNT(*) AS n FROM modelli"),
       cont("SELECT COUNT(*) AS n FROM utenti"),
@@ -17,7 +19,16 @@ module.exports = {
         "SELECT COUNT(*) AS n FROM ordini WHERE date(data_movimento) >= date('now', 'localtime', '-30 day')",
       ),
     ]).then(
-      ([clienti, preventivi, conclusi, daRicontattare, marche, modelli, utenti, ultimi30]) => ({
+      ([
+        clienti,
+        preventivi,
+        conclusi,
+        daRicontattare,
+        marche,
+        modelli,
+        utenti,
+        ultimi30,
+      ]) => ({
         clienti,
         preventivi,
         preventivi_conclusi: conclusi,

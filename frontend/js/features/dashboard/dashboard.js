@@ -10,7 +10,10 @@ const _num = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 2 });
 const _e = (t) =>
   String(t ?? "").replace(
     /[&<>"']/g,
-    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
   );
 
 async function loadDashboard() {
@@ -56,9 +59,11 @@ function renderDashboard(d) {
     ${_dashUltimi(d.ultimi_preventivi)}
     <p class="dash-updated">Aggiornato alle ${new Date(d.generato_il).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}</p>`;
 
-  box.querySelectorAll("[data-go]").forEach((el) =>
-    el.addEventListener("click", () => dashGoTo(el.dataset.go)),
-  );
+  box
+    .querySelectorAll("[data-go]")
+    .forEach((el) =>
+      el.addEventListener("click", () => dashGoTo(el.dataset.go)),
+    );
 }
 
 // ── Da fare adesso ───────────────────────────────────────────
@@ -122,7 +127,12 @@ function _dashGrafico(serie = []) {
       <div class="dash-empty">Ancora nessun preventivo negli ultimi 6 mesi.</div></section>`;
   }
   const tetto = Math.max(4, Math.ceil(max / 4) * 4);
-  const W = 560, H = 230, L = 36, B = 28, T = 10, R = 8;
+  const W = 560,
+    H = 230,
+    L = 36,
+    B = 28,
+    T = 10,
+    R = 8;
   const area = { w: W - L - R, h: H - T - B };
   const gruppo = area.w / serie.length;
   const barra = Math.min(26, gruppo / 3);
