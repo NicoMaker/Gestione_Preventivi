@@ -11,7 +11,7 @@ async function loadCompanyInfoForPrint() {
       companyInfoPrintCache = companyInfo;
       return companyInfoPrintCache;
     }
-    const response = await fetch("company-info.json");
+    const response = await fetch("assets/company-info.json");
     if (!response.ok) throw new Error(`Errore caricamento: ${response.status}`);
     companyInfoPrintCache = await response.json();
     return companyInfoPrintCache;
@@ -37,7 +37,7 @@ function sortOrdiniByDateDesc(list) {
 }
 
 function generatePrintHeader(company) {
-  const logoPath = company.logo || "img/Logo.png";
+  const logoPath = company.logo || "assets/img/Logo.png";
   return `
     <div class="print-header" style="text-align:center;margin-bottom:30px;border-bottom:3px solid #333;padding-bottom:25px;">
       <img src="${logoPath}" alt="Logo Azienda" style="max-width:200px;height:auto;margin-bottom:15px;display:block;margin-left:auto;margin-right:auto;" />

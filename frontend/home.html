@@ -4,8 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestione Preventivi</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/png" href="img/Logo.png" />
+    <link rel="stylesheet" href="css/base/app.css" />
+    <link rel="stylesheet" href="css/shared/bulk-selection.css" />
+    <link rel="stylesheet" href="css/features/dashboard.css" />
+    <link rel="icon" type="image/png" href="assets/img/Logo.png" />
   </head>
 
   <body>
@@ -25,12 +27,26 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <img src="img/Logo2.png" alt="Logo Magazzino Moto" class="logo" />
+          <img src="assets/img/Logo2.png" alt="Logo Magazzino Moto" class="logo" />
           <h2>Gestione Preventivi</h2>
         </div>
 
         <nav class="sidebar-nav">
-          <a href="#" class="nav-item active" data-section="clienti">
+          <a href="#" class="nav-item active" data-section="dashboard">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="7" height="9" rx="1" />
+              <rect x="14" y="3" width="7" height="5" rx="1" />
+              <rect x="14" y="12" width="7" height="9" rx="1" />
+              <rect x="3" y="16" width="7" height="5" rx="1" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="nav-item" data-section="clienti">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -215,7 +231,28 @@
 
         <!-- ==================== Sezione CLIENTI ==================== -->
         <!-- ==================== Sezione CLIENTI ==================== -->
-        <section id="section-clienti" class="content-section active">
+        <!-- ==================== Sezione DASHBOARD ==================== -->
+        <section id="section-dashboard" class="content-section active">
+          <div class="section-header">
+            <div>
+              <h1>Dashboard</h1>
+              <p>Cosa richiede la tua attenzione e come stanno andando i preventivi</p>
+            </div>
+            <div class="filter-controls">
+              <button type="button" class="dash-refresh" onclick="loadDashboard()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+                <span>Aggiorna</span>
+              </button>
+            </div>
+          </div>
+          <div id="dashboardContent" class="dash"><p>Caricamento…</p></div>
+        </section>
+
+        <!-- ==================== Sezione CLIENTI ==================== -->
+        <section id="section-clienti" class="content-section">
           <div class="section-header">
             <div>
               <h1>Gestione Clienti</h1>
@@ -362,6 +399,7 @@
               <table>
                 <thead>
                   <tr>
+                    <th class="col-select"><input type="checkbox" class="bulk-check-all" aria-label="Seleziona tutti" /></th>
                     <th>Nome</th>
                     <th>Telefono</th>
                     <th>Email</th>
@@ -374,7 +412,7 @@
                 </thead>
                 <tbody id="clientiTableBody">
                   <tr>
-                    <td colspan="7" class="text-center">
+                    <td colspan="8" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -603,6 +641,7 @@
               <table>
                 <thead>
                   <tr>
+                    <th class="col-select"><input type="checkbox" class="bulk-check-all" aria-label="Seleziona tutti" /></th>
                     <th>Data Preventivo</th>
                     <th>Cliente</th>
                     <th>Telefono</th>
@@ -620,7 +659,7 @@
                 </thead>
                 <tbody id="ordiniTableBody">
                   <tr>
-                    <td colspan="11" class="text-center">
+                    <td colspan="12" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -669,6 +708,7 @@
               <table>
                 <thead>
                   <tr>
+                    <th class="col-select"><input type="checkbox" class="bulk-check-all" aria-label="Seleziona tutti" /></th>
                     <th>Nome</th>
                     <th class="text-center">N° Prodotti</th>
                     <th class="text-center">N° Preventivi</th>
@@ -677,7 +717,7 @@
                 </thead>
                 <tbody id="marcheTableBody">
                   <tr>
-                    <td colspan="3" class="text-center">
+                    <td colspan="4" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -726,6 +766,7 @@
               <table>
                 <thead>
                   <tr>
+                    <th class="col-select"><input type="checkbox" class="bulk-check-all" aria-label="Seleziona tutti" /></th>
                     <th>Nome</th>
                     <th>Marca</th>
                     <th class="text-center">N° Preventivi</th>
@@ -734,7 +775,7 @@
                 </thead>
                 <tbody id="modelliTableBody">
                   <tr>
-                    <td colspan="4" class="text-center">
+                    <td colspan="5" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -783,13 +824,14 @@
               <table>
                 <thead>
                   <tr>
+                    <th class="col-select"><input type="checkbox" class="bulk-check-all" aria-label="Seleziona tutti" /></th>
                     <th>Nome</th>
                     <th class="text-right">Azioni</th>
                   </tr>
                 </thead>
                 <tbody id="utentiTableBody">
                   <tr>
-                    <td colspan="2" class="text-center">
+                    <td colspan="3" class="text-center">
                       <span>Caricamento...</span>
                     </td>
                   </tr>
@@ -1256,25 +1298,35 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/company-loader.js"></script>
-    <script src="js/realtime.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/ui/notifications.js"></script>
-    <script src="js/ui/dialogs.js"></script>
-    <script src="js/searchable-select.js"></script>
-    <script src="js/crud/clienti/render.js"></script>
-    <script src="js/crud/clienti/filters.js"></script>
-    <script src="js/crud/clienti/modal.js"></script>
-    <script src="js/crud/clienti/data.js"></script>
-    <script src="js/crud/preventivi/render.js"></script>
-    <script src="js/crud/preventivi/filters.js"></script>
-    <script src="js/crud/preventivi/modal.js"></script>
-    <script src="js/crud/preventivi/data.js"></script>
-    <script src="js/crud/marche.js"></script>
-    <script src="js/crud/modelli.js"></script>
-    <script src="js/crud/utenti.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/crud/stampe/stampa-clienti.js"></script>
-    <script src="js/crud/stampe/stampa-preventivi.js"></script>
+
+    <!-- core: configurazione, realtime, dati azienda -->
+    <script src="js/core/company-loader.js"></script>
+    <script src="js/core/realtime.js"></script>
+    <script src="js/core/config.js"></script>
+
+    <!-- shared: componenti condivisi tra le funzionalità -->
+    <script src="js/shared/ui/notifications.js"></script>
+    <script src="js/shared/ui/dialogs.js"></script>
+    <script src="js/shared/searchable-select.js"></script>
+    <script src="js/shared/bulk-selection.js"></script>
+
+    <!-- features: una cartella per funzionalità -->
+    <script src="js/features/dashboard/dashboard.js"></script>
+    <script src="js/features/clienti/render.js"></script>
+    <script src="js/features/clienti/filters.js"></script>
+    <script src="js/features/clienti/modal.js"></script>
+    <script src="js/features/clienti/data.js"></script>
+    <script src="js/features/preventivi/render.js"></script>
+    <script src="js/features/preventivi/filters.js"></script>
+    <script src="js/features/preventivi/modal.js"></script>
+    <script src="js/features/preventivi/data.js"></script>
+    <script src="js/features/marche/marche.js"></script>
+    <script src="js/features/modelli/modelli.js"></script>
+    <script src="js/features/utenti/utenti.js"></script>
+
+    <!-- bootstrap dell'applicazione (sempre per ultimi) -->
+    <script src="js/core/app.js"></script>
+    <script src="js/features/stampe/stampa-clienti.js"></script>
+    <script src="js/features/stampe/stampa-preventivi.js"></script>
   </body>
 </html>

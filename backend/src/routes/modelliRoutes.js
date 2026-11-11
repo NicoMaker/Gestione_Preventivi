@@ -5,6 +5,7 @@ const router = express.Router();
 router.get("/", catchErrors(c.lista));
 router.get("/:id", catchErrors(c.dettaglio));
 router.post("/", catchErrors(c.crea));
+router.post("/bulk-delete", catchErrors(c.eliminaMultipli));
 router.put("/:id", catchErrors(c.aggiorna));
 router.delete("/:id", catchErrors(c.elimina));
 module.exports = router;

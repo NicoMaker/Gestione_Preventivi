@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const repo = require("../repositories/utentiRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulkDelete");
 
 function isPasswordStrong(password) {
   return (
@@ -11,7 +12,7 @@ function isPasswordStrong(password) {
   );
 }
 
-module.exports = {
+const utentiService = {
   lista() {
     return repo.lista();
   },
@@ -99,3 +100,21 @@ module.exports = {
     return { success: true, id, utente_eliminato: isCurrentUser };
   },
 };
+
+// Elimina più utenti: non tocca l'utente connesso e lascia sempre almeno un utente
+utentiService.eliminaMultipli = (ids, currentUser) =>
+  realtime.batch(() =>
+    eliminaMultipli({
+      ids,
+      singolare: "utente",
+      plurale: "utenti",
+      trovaEtichetta: async (id) => (await repo.trovaPerId(id))?.nome,
+      motivoBlocco: async (id, etichetta) =>
+        currentUser && etichetta === currentUser
+          ? "È l'utente con cui sei connesso"
+          : null,
+      eliminaSingolo: (id) => utentiService.elimina(id, currentUser),
+    }),
+  );
+
+module.exports = utentiService;

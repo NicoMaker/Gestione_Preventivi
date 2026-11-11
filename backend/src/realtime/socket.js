@@ -2,6 +2,24 @@
 const { Server } = require("socket.io");
 let io = null;
 
+// ── Buffer eventi per operazioni multiple ─────────────────────
+// Durante un'eliminazione multipla i service emettono molti eventi identici:
+// con batch() vengono raccolti, deduplicati e inviati una sola volta alla fine.
+// Gli eventi "utente_*" restano distinti per payload (servono per il force-logout).
+let buffer = null;
+
+async function batch(work) {
+  if (buffer) return work(); // già dentro un batch
+  buffer = new Map();
+  try {
+    return await work();
+  } finally {
+    const raccolti = buffer;
+    buffer = null;
+    if (io) raccolti.forEach(([event, data]) => io.emit(event, data));
+  }
+}
+
 function init(httpServer) {
   io = new Server(httpServer, {
     cors: { origin: "*", methods: ["GET", "POST"], credentials: true },
@@ -23,7 +41,15 @@ function init(httpServer) {
   return io;
 }
 function emit(event, data) {
-  if (io) io.emit(event, data);
+  if (!io) return;
+  if (buffer) {
+    const chiave = event.startsWith("utente_")
+      ? `${event}:${JSON.stringify(data ?? null)}`
+      : event;
+    buffer.set(chiave, [event, data]);
+    return;
+  }
+  io.emit(event, data);
 }
 function forceLogoutUser(userId, reason = "account_changed") {
   if (!io) return;
@@ -33,4 +59,4 @@ function forceLogoutUser(userId, reason = "account_changed") {
 function clientsCount() {
   return io ? io.engine.clientsCount : 0;
 }
-module.exports = { init, emit, forceLogoutUser, clientsCount };
+module.exports = { init, emit, batch, forceLogoutUser, clientsCount };

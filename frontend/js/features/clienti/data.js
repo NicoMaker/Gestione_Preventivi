@@ -155,3 +155,13 @@ window.loadClienti = loadClienti;
 window.toggleRicontatto = toggleRicontatto;
 window.updateDataPassaggio = updateDataPassaggio;
 window.deleteCliente = deleteCliente;
+
+// ── Selezione multipla + eliminazione in blocco ──────────────
+BulkSelection.register({
+  key: "clienti",
+  tbody: "clientiTableBody",
+  endpoint: "clienti/bulk-delete",
+  singolare: "cliente",
+  plurale: "clienti",
+  onDone: () => loadClienti(),
+});

@@ -2,8 +2,9 @@
 const repo = require("../repositories/clientiRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulkDelete");
 
-module.exports = {
+const clientiService = {
   lista() {
     return repo.listaConConteggio();
   },
@@ -94,3 +95,17 @@ module.exports = {
     return { success: true, message: "Cliente eliminato con successo" };
   },
 };
+
+// Elimina più clienti: salta quelli con preventivi collegati e riporta il motivo
+clientiService.eliminaMultipli = (ids) =>
+  realtime.batch(() =>
+    eliminaMultipli({
+      ids,
+      singolare: "cliente",
+      plurale: "clienti",
+      trovaEtichetta: async (id) => (await repo.trovaPerId(id))?.nome,
+      eliminaSingolo: (id) => clientiService.elimina(id),
+    }),
+  );
+
+module.exports = clientiService;

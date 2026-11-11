@@ -2,6 +2,7 @@
 const repo = require("../repositories/ordiniRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulkDelete");
 
 function normalizza(body) {
   return {
@@ -14,7 +15,7 @@ function normalizza(body) {
   };
 }
 
-module.exports = {
+const ordiniService = {
   lista() {
     return repo.lista();
   },
@@ -50,3 +51,24 @@ module.exports = {
     return { success: true, message: "Ordine eliminato con successo" };
   },
 };
+
+// Elimina più preventivi (non hanno dati collegati: falliscono solo se non esistono più)
+ordiniService.eliminaMultipli = (ids) =>
+  realtime.batch(() =>
+    eliminaMultipli({
+      ids,
+      singolare: "preventivo",
+      plurale: "preventivi",
+      trovaEtichetta: async (id) => {
+        const o = await repo.trovaPerId(id);
+        if (!o) return null;
+        const data = o.data_movimento
+          ? new Date(o.data_movimento).toLocaleDateString("it-IT")
+          : "";
+        return `${o.cliente_nome} · ${o.modello_nome || "senza modello"}${data ? " · " + data : ""}`;
+      },
+      eliminaSingolo: (id) => ordiniService.elimina(id),
+    }),
+  );
+
+module.exports = ordiniService;

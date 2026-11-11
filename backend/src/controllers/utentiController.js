@@ -9,6 +9,9 @@ module.exports = {
   async aggiorna(req, res) {
     res.json(await s.aggiorna(req.params.id, req.body));
   },
+  async eliminaMultipli(req, res) {
+    res.json(await s.eliminaMultipli(req.body.ids, req.body.current_user));
+  },
   async elimina(req, res) {
     res.json(
       await s.elimina(

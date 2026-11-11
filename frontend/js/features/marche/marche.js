@@ -17,7 +17,7 @@ function renderMarche() {
   const tbody = document.getElementById("marcheTableBody");
 
   if (marche.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -35,6 +35,7 @@ function renderMarche() {
     .map(
       (m) => `
     <tr>
+      <td class="col-select"><input type="checkbox" class="bulk-check" data-id="${m.id}" data-label="${BulkSelection.esc(m.nome)}" aria-label="Seleziona marca" /></td>
       <td><strong>${m.nome}</strong></td>
       <td class="text-center-badge">
         <span class="prodotti-badge ${m.prodotti_count > 0 ? "has-products" : "empty"}">
@@ -168,4 +169,15 @@ document.getElementById("formMarca").addEventListener("submit", async (e) => {
   } catch {
     showNotification("Errore di connessione", "error");
   }
+});
+
+// ── Selezione multipla + eliminazione in blocco ──────────────
+BulkSelection.register({
+  key: "marche",
+  tbody: "marcheTableBody",
+  endpoint: "marche/bulk-delete",
+  singolare: "marca",
+  plurale: "marche",
+  femminile: true,
+  onDone: () => Promise.all([loadMarche(), loadModelli()]),
 });

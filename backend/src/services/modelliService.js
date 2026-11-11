@@ -2,8 +2,9 @@
 const repo = require("../repositories/modelliRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulkDelete");
 
-module.exports = {
+const modelliService = {
   lista() {
     return repo.lista();
   },
@@ -59,3 +60,17 @@ module.exports = {
     return { success: true, message: "Modello eliminato con successo" };
   },
 };
+
+// Elimina più modelli: salta quelli usati in preventivi
+modelliService.eliminaMultipli = (ids) =>
+  realtime.batch(() =>
+    eliminaMultipli({
+      ids,
+      singolare: "modello",
+      plurale: "modelli",
+      trovaEtichetta: async (id) => (await repo.trovaPerId(id))?.nome,
+      eliminaSingolo: (id) => modelliService.elimina(id),
+    }),
+  );
+
+module.exports = modelliService;

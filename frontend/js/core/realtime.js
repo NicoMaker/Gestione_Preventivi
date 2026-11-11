@@ -46,6 +46,11 @@ function initSocket() {
     console.error("Errore connessione Socket.IO:", error),
   );
 
+  // Qualsiasi evento: aggiorna la dashboard se è la sezione visibile
+  socket.onAny(() => {
+    if (typeof refreshDashboardIfActive === "function") refreshDashboardIfActive();
+  });
+
   // ── Marche ──
   socket.on("marca_aggiunta", () => refreshIf("loadMarche"));
   socket.on("marca_modificata", () => {

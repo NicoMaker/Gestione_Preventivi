@@ -8,7 +8,7 @@ function renderClienti() {
   const tbody = document.getElementById("clientiTableBody");
 
   if (clienti.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -31,6 +31,7 @@ function renderClienti() {
 function rigaCliente(c) {
   return `
      <tr>
+       <td class="col-select"><input type="checkbox" class="bulk-check" data-id="${c.id}" data-label="${BulkSelection.esc(c.nome)}" aria-label="Seleziona cliente" /></td>
        <td style="min-width:180px;max-width:280px;white-space:nowrap;"><strong>${c.nome}</strong></td>
        <td>
         ${

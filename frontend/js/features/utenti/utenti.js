@@ -46,7 +46,7 @@ function renderUtenti() {
   const searchTerm = document.getElementById("filterUtenti")?.value || "";
 
   if (utenti.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="2" class="text-center">
+    tbody.innerHTML = `<tr><td colspan="3" class="text-center">
           <div style="padding:40px 20px;color:var(--text-secondary);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.5;">
@@ -66,6 +66,7 @@ function renderUtenti() {
     .map(
       (u) => `
     <tr>
+      <td class="col-select"><input type="checkbox" class="bulk-check" data-id="${u.id}" data-label="${BulkSelection.esc(u.nome)}" aria-label="Seleziona utente" /></td>
       <td><strong>${u.nome}</strong></td>
       <td class="text-right">
         <button class="btn-icon" onclick="editUtente(${u.id})" title="Modifica utente">
@@ -181,4 +182,16 @@ document.getElementById("formUtente").addEventListener("submit", async (e) => {
   } catch {
     showNotification("Errore di connessione", "error");
   }
+});
+
+// ── Selezione multipla + eliminazione in blocco ──────────────
+BulkSelection.register({
+  key: "utenti",
+  tbody: "utentiTableBody",
+  endpoint: "utenti/bulk-delete",
+  singolare: "utente",
+  plurale: "utenti",
+  // Il server salta l'utente connesso (non puoi eliminare te stesso in blocco)
+  extraBody: () => ({ current_user: localStorage.getItem("nomeUtente") || "" }),
+  onDone: () => loadUtenti(),
 });

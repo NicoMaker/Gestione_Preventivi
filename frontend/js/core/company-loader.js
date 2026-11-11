@@ -43,7 +43,7 @@ function formatPhoneNumber(phone) {
  */
 async function loadCompanyInfo() {
   try {
-    const response = await fetch("company-info.json");
+    const response = await fetch("assets/company-info.json");
 
     if (!response.ok) {
       throw new Error(`Errore caricamento: ${response.status}`);
@@ -189,7 +189,7 @@ function getCompanyName() {
  * @returns {string} - Path del logo
  */
 function getLogoPath() {
-  if (!companyInfo) return "img/Logo.png";
+  if (!companyInfo) return "assets/img/Logo.png";
 
   return companyInfo.company.logo;
 }

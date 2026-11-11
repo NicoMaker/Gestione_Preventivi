@@ -12,6 +12,9 @@ module.exports = {
   async aggiorna(req, res) {
     res.json(await s.aggiorna(req.params.id, req.body.nome));
   },
+  async eliminaMultipli(req, res) {
+    res.json(await s.eliminaMultipli(req.body.ids));
+  },
   async elimina(req, res) {
     res.json(await s.elimina(req.params.id));
   },

@@ -2,8 +2,9 @@
 const repo = require("../repositories/marcheRepository");
 const realtime = require("../realtime/socket");
 const { HttpError } = require("../middleware/errorHandler");
+const { eliminaMultipli } = require("../utils/bulkDelete");
 
-module.exports = {
+const marcheService = {
   lista() {
     return repo.listaConConteggio();
   },
@@ -69,3 +70,18 @@ module.exports = {
     return { success: true, message: "Marca eliminata con successo" };
   },
 };
+
+// Elimina più marche: salta quelle con modelli o preventivi collegati
+marcheService.eliminaMultipli = (ids) =>
+  realtime.batch(() =>
+    eliminaMultipli({
+      ids,
+      singolare: "marca",
+      plurale: "marche",
+      femminile: true,
+      trovaEtichetta: async (id) => (await repo.trovaPerId(id))?.nome,
+      eliminaSingolo: (id) => marcheService.elimina(id),
+    }),
+  );
+
+module.exports = marcheService;

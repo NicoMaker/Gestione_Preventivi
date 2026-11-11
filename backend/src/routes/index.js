@@ -5,6 +5,7 @@ router.use("/auth", require("./authRoutes"));
 router.use("/clienti", require("./clientiRoutes"));
 router.use("/ordini", require("./ordiniRoutes"));
 router.use("/utenti", require("./utentiRoutes"));
+router.use("/dashboard", require("./dashboardRoutes"));
 router.use("/marche", require("./marcheRoutes"));
 router.use("/modelli", require("./modelliRoutes"));
 router.use("/admin", require("./downloadRoutes"));

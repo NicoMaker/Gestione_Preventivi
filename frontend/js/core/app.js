@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Carica dati della sezione attivata
       const loaders = {
+        dashboard: loadDashboard,
         clienti: loadClienti,
         ordini: loadOrdini,
         marche: loadMarche,
@@ -68,14 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Ripristina la sezione salvata
-  const savedSection = localStorage.getItem("activeSection") || "clienti";
+  const savedSection = localStorage.getItem("activeSection") || "dashboard";
   const targetNav = document.querySelector(
     `.nav-item[data-section="${savedSection}"]`,
   );
   if (targetNav) {
     targetNav.click();
   } else {
-    document.querySelector('.nav-item[data-section="clienti"]')?.click();
+    document.querySelector('.nav-item[data-section="dashboard"]')?.click();
   }
 
   // ---- Logout ----

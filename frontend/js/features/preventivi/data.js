@@ -205,3 +205,13 @@ window.updateClienteFlagRicontatto = updateClienteFlagRicontatto;
 window.updateContrattoFinito = updateContrattoFinito;
 window.editOrdine = editOrdine;
 window.deleteOrdine = deleteOrdine;
+
+// ── Selezione multipla + eliminazione in blocco ──────────────
+BulkSelection.register({
+  key: "ordini",
+  tbody: "ordiniTableBody",
+  endpoint: "ordini/bulk-delete",
+  singolare: "preventivo",
+  plurale: "preventivi",
+  onDone: () => Promise.all([loadOrdini(), loadClienti()]),
+});
